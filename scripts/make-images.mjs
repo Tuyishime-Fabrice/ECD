@@ -198,8 +198,8 @@ for (const [id, label, fruit, n] of THUMBS) {
     <rect width="320" height="180" fill="${P.sky100}"/>
     ${cloud(18, 14, 0.9)}
     ${hills(320, 180, 0.78)}
-    ${numeral(label, { cx: label.length > 3 ? 82 : 86, baseline: 128, height, fill: P.white, sw: 6 })}
-    ${group(fruit, n, { x: 166, y: 16, w: 146, h: 140, maxCell: 80 })}`,
+    ${numeral(label, { cx: label.length > 3 ? 92 : 100, baseline: 132, height, fill: P.white, sw: 6 })}
+    ${group(fruit, n, { x: 178, y: 16, w: 136, h: 140, maxCell: 78 })}`,
   );
 }
 
