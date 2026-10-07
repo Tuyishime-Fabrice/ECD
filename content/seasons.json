@@ -1,0 +1,331 @@
+{
+  "_note": "// NEEDS NATIVE REVIEW — the Kinyarwanda (rw) text in this file is a first draft and must be checked by a native speaker. How to edit this file: see README, section 'For the content team'.",
+  "skills": {
+    "count-1-5": { "rw": "Kubara kuva kuri 1 kugeza kuri 5", "en": "Counting 1–5" },
+    "numerals-1-5": { "rw": "Kumenya imibare 1–5", "en": "Recognizing the numbers 1–5" },
+    "match-1-5": { "rw": "Guhuza umubare n'ibintu (1–5)", "en": "Matching a number to a group (1–5)" },
+    "count-6-10": { "rw": "Kubara kuva kuri 6 kugeza kuri 10", "en": "Counting 6–10" },
+    "numerals-6-10": { "rw": "Kumenya imibare 6–10", "en": "Recognizing the numbers 6–10" },
+    "match-6-10": { "rw": "Guhuza umubare n'ibintu (6–10)", "en": "Matching a number to a group (6–10)" }
+  },
+  "seasons": [
+    {
+      "id": "s1",
+      "slug": "numbers",
+      "order": 1,
+      "title": { "rw": "Imibare 1–10", "en": "Numbers 1–10" },
+      "color": "sky",
+      "posterImage": "/images/seasons/numbers.svg",
+      "status": "published",
+      "items": [
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e1",
+            "number": 1,
+            "title": { "rw": "Umubare 1: Rimwe", "en": "Number 1: One" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e1.svg",
+            "skills": ["count-1-5", "numerals-1-5"],
+            "homeActivity": {
+              "rw": "Mushakire hamwe ikiyiko KIMWE mu gikoni. Mukizamure muvuge ngo “rimwe!”. Hanyuma mushake igikombe kimwe n'urukweto rumwe.",
+              "en": "Find ONE spoon in the kitchen together. Hold it up and say “one!”. Then find one cup and one shoe."
+            },
+            "pausePoints": [
+              {
+                "atSec": 20,
+                "question": {
+                  "id": "s1e1-p1",
+                  "promptText": { "rw": "Kanda ku ishusho iriho umwembe umwe", "en": "Tap the picture with 1 mango" },
+                  "promptAudio": { "rw": "/audio/s1e1-p1.rw.mp3" },
+                  "options": [
+                    { "id": "a", "image": "/images/counting/mango-1.svg", "label": "1 mango" },
+                    { "id": "b", "image": "/images/counting/mango-3.svg", "label": "3 mangoes" }
+                  ],
+                  "correctOptionId": "a",
+                  "skill": "count-1-5"
+                }
+              }
+            ]
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e2",
+            "number": 2,
+            "title": { "rw": "Umubare 2: Kabiri", "en": "Number 2: Two" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e2.svg",
+            "skills": ["count-1-5", "numerals-1-5"],
+            "homeActivity": {
+              "rw": "Mukome amashyi KABIRI. Hanyuma mubare amaso abiri, amatwi abiri n'amaboko abiri by'umwana.",
+              "en": "Clap your hands TWO times together. Then count your child's two eyes, two ears and two hands."
+            }
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e3",
+            "number": 3,
+            "title": { "rw": "Umubare 3: Gatatu", "en": "Number 3: Three" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e3.svg",
+            "skills": ["count-1-5", "numerals-1-5"],
+            "homeActivity": {
+              "rw": "Shyira amabuye ATATU (cyangwa ibishyimbo) ku murongo. Muyabare mukoraho buri rimwe: rimwe, kabiri, gatatu.",
+              "en": "Put THREE stones (or beans) in a row. Count them together, touching each one: one, two, three."
+            }
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e4",
+            "number": 4,
+            "title": { "rw": "Imibare 4 na 5: Kane na Gatanu", "en": "Numbers 4 and 5: Four and Five" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e4.svg",
+            "skills": ["count-1-5", "numerals-1-5", "match-1-5"],
+            "homeActivity": {
+              "rw": "Mubare intoki z'umwana ku kiganza kimwe: kuva kuri rimwe kugeza kuri GATANU. Hanyuma muhishe urutoki rumwe — ni zingahe ubu? (Enye!)",
+              "en": "Count your child's fingers on one hand: one to FIVE. Then hide one finger — how many now? (Four!)"
+            }
+          }
+        },
+        {
+          "type": "challenge",
+          "challenge": {
+            "id": "s1c1",
+            "title": { "rw": "Umukino wa 1: Imibare 1–5", "en": "Challenge 1: Numbers 1–5" },
+            "sticker": "/images/stickers/s1c1.svg",
+            "questions": [
+              {
+                "id": "s1c1-q1",
+                "promptText": { "rw": "Kanda ku ishusho iriho imyembe itatu", "en": "Tap the picture with 3 mangoes" },
+                "promptAudio": { "rw": "/audio/s1c1-q1.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/counting/mango-2.svg", "label": "2 mangoes" },
+                  { "id": "b", "image": "/images/counting/mango-3.svg", "label": "3 mangoes" },
+                  { "id": "c", "image": "/images/counting/mango-5.svg", "label": "5 mangoes" }
+                ],
+                "correctOptionId": "b",
+                "skill": "count-1-5"
+              },
+              {
+                "id": "s1c1-q2",
+                "promptText": { "rw": "Hari imineke ingahe? Kanda ku mubare.", "en": "How many bananas? Tap the number." },
+                "promptAudio": { "rw": "/audio/s1c1-q2.rw.mp3" },
+                "promptImage": "/images/counting/banana-4.svg",
+                "options": [
+                  { "id": "a", "image": "/images/numbers/4.svg", "label": "4" },
+                  { "id": "b", "image": "/images/numbers/2.svg", "label": "2" },
+                  { "id": "c", "image": "/images/numbers/5.svg", "label": "5" }
+                ],
+                "correctOptionId": "a",
+                "skill": "match-1-5"
+              },
+              {
+                "id": "s1c1-q3",
+                "promptText": { "rw": "Kanda ku mubare gatanu", "en": "Tap the number 5" },
+                "promptAudio": { "rw": "/audio/s1c1-q3.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/numbers/2.svg", "label": "2" },
+                  { "id": "b", "image": "/images/numbers/3.svg", "label": "3" },
+                  { "id": "c", "image": "/images/numbers/1.svg", "label": "1" },
+                  { "id": "d", "image": "/images/numbers/5.svg", "label": "5" }
+                ],
+                "correctOptionId": "d",
+                "skill": "numerals-1-5"
+              },
+              {
+                "id": "s1c1-q4",
+                "promptText": { "rw": "Kanda ku ishusho iriho avoka imwe", "en": "Tap the picture with 1 avocado" },
+                "promptAudio": { "rw": "/audio/s1c1-q4.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/counting/avocado-4.svg", "label": "4 avocados" },
+                  { "id": "b", "image": "/images/counting/avocado-1.svg", "label": "1 avocado" }
+                ],
+                "correctOptionId": "b",
+                "skill": "count-1-5"
+              },
+              {
+                "id": "s1c1-q5",
+                "promptText": { "rw": "Hari amacunga angahe? Kanda ku mubare.", "en": "How many oranges? Tap the number." },
+                "promptAudio": { "rw": "/audio/s1c1-q5.rw.mp3" },
+                "promptImage": "/images/counting/orange-2.svg",
+                "options": [
+                  { "id": "a", "image": "/images/numbers/2.svg", "label": "2" },
+                  { "id": "b", "image": "/images/numbers/3.svg", "label": "3" },
+                  { "id": "c", "image": "/images/numbers/1.svg", "label": "1" }
+                ],
+                "correctOptionId": "a",
+                "skill": "match-1-5"
+              }
+            ]
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e5",
+            "number": 5,
+            "title": { "rw": "Umubare 6: Gatandatu", "en": "Number 6: Six" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e5.svg",
+            "skills": ["count-6-10", "numerals-6-10"],
+            "homeActivity": {
+              "rw": "Mutoragure amababi ATANDATU hanze. Muyatondeke maze muyabare hamwe.",
+              "en": "Collect SIX leaves outside. Line them up and count them together."
+            }
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e6",
+            "number": 6,
+            "title": { "rw": "Umubare 7: Karindwi", "en": "Number 7: Seven" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e6.svg",
+            "skills": ["count-6-10", "numerals-6-10"],
+            "homeActivity": {
+              "rw": "Musimbuke inshuro ZIRINDWI hamwe, mubara buri gusimbuka mu ijwi riranguruye.",
+              "en": "Jump SEVEN times together and count each jump out loud."
+            }
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e7",
+            "number": 7,
+            "title": { "rw": "Umubare 8: Umunani", "en": "Number 8: Eight" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e7.svg",
+            "skills": ["count-6-10", "numerals-6-10"],
+            "homeActivity": {
+              "rw": "Shyira ibishyimbo UMUNANI mu gikombe, kimwe kimwe, mubara.",
+              "en": "Drop EIGHT beans into a cup, one at a time, counting as you go."
+            }
+          }
+        },
+        {
+          "type": "episode",
+          "episode": {
+            "id": "s1e8",
+            "number": 8,
+            "title": { "rw": "Imibare 9 na 10: Icyenda na Icumi", "en": "Numbers 9 and 10: Nine and Ten" },
+            "youtubeId": "DEMO",
+            "durationSec": 240,
+            "thumbnail": "/images/thumbs/s1e8.svg",
+            "skills": ["count-6-10", "numerals-6-10", "match-6-10"],
+            "homeActivity": {
+              "rw": "Mubare intoki ICUMI zose hamwe. Hanyuma muhine rumwe — ni zingahe ubu? (Icyenda!)",
+              "en": "Count all TEN fingers together. Then fold one down — how many now? (Nine!)"
+            }
+          }
+        },
+        {
+          "type": "challenge",
+          "challenge": {
+            "id": "s1c2",
+            "title": { "rw": "Umukino wa 2: Imibare 6–10", "en": "Challenge 2: Numbers 6–10" },
+            "sticker": "/images/stickers/s1c2.svg",
+            "questions": [
+              {
+                "id": "s1c2-q1",
+                "promptText": { "rw": "Kanda ku ishusho iriho imyembe irindwi", "en": "Tap the picture with 7 mangoes" },
+                "promptAudio": { "rw": "/audio/s1c2-q1.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/counting/mango-6.svg", "label": "6 mangoes" },
+                  { "id": "b", "image": "/images/counting/mango-9.svg", "label": "9 mangoes" },
+                  { "id": "c", "image": "/images/counting/mango-7.svg", "label": "7 mangoes" }
+                ],
+                "correctOptionId": "c",
+                "skill": "count-6-10"
+              },
+              {
+                "id": "s1c2-q2",
+                "promptText": { "rw": "Hari imineke ingahe? Kanda ku mubare.", "en": "How many bananas? Tap the number." },
+                "promptAudio": { "rw": "/audio/s1c2-q2.rw.mp3" },
+                "promptImage": "/images/counting/banana-8.svg",
+                "options": [
+                  { "id": "a", "image": "/images/numbers/6.svg", "label": "6" },
+                  { "id": "b", "image": "/images/numbers/8.svg", "label": "8" },
+                  { "id": "c", "image": "/images/numbers/10.svg", "label": "10" }
+                ],
+                "correctOptionId": "b",
+                "skill": "match-6-10"
+              },
+              {
+                "id": "s1c2-q3",
+                "promptText": { "rw": "Kanda ku mubare icyenda", "en": "Tap the number 9" },
+                "promptAudio": { "rw": "/audio/s1c2-q3.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/numbers/6.svg", "label": "6" },
+                  { "id": "b", "image": "/images/numbers/9.svg", "label": "9" },
+                  { "id": "c", "image": "/images/numbers/7.svg", "label": "7" },
+                  { "id": "d", "image": "/images/numbers/10.svg", "label": "10" }
+                ],
+                "correctOptionId": "b",
+                "skill": "numerals-6-10"
+              },
+              {
+                "id": "s1c2-q4",
+                "promptText": { "rw": "Kanda ku ishusho iriho amacunga icumi", "en": "Tap the picture with 10 oranges" },
+                "promptAudio": { "rw": "/audio/s1c2-q4.rw.mp3" },
+                "options": [
+                  { "id": "a", "image": "/images/counting/orange-10.svg", "label": "10 oranges" },
+                  { "id": "b", "image": "/images/counting/orange-6.svg", "label": "6 oranges" }
+                ],
+                "correctOptionId": "a",
+                "skill": "count-6-10"
+              },
+              {
+                "id": "s1c2-q5",
+                "promptText": { "rw": "Hari avoka zingahe? Kanda ku mubare.", "en": "How many avocados? Tap the number." },
+                "promptAudio": { "rw": "/audio/s1c2-q5.rw.mp3" },
+                "promptImage": "/images/counting/avocado-6.svg",
+                "options": [
+                  { "id": "a", "image": "/images/numbers/9.svg", "label": "9" },
+                  { "id": "b", "image": "/images/numbers/6.svg", "label": "6" }
+                ],
+                "correctOptionId": "b",
+                "skill": "match-6-10"
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "id": "s2",
+      "slug": "colors-shapes",
+      "order": 2,
+      "title": { "rw": "Amabara n'Imiterere", "en": "Colors & Shapes" },
+      "color": "coral",
+      "posterImage": "/images/seasons/colors-shapes.svg",
+      "status": "coming_soon",
+      "items": []
+    },
+    {
+      "id": "s3",
+      "slug": "body-hygiene",
+      "order": 3,
+      "title": { "rw": "Umubiri wanjye n'Isuku", "en": "My Body & Hygiene" },
+      "color": "leaf",
+      "posterImage": "/images/seasons/body-hygiene.svg",
+      "status": "coming_soon",
+      "items": []
+    }
+  ]
+}

@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<defs>
+<linearGradient id="mangoSkin" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0.12" stop-color="#8DC63F"/><stop offset="0.5" stop-color="#FFC93C"/><stop offset="1" stop-color="#FF9F43"/>
+</linearGradient>
+<g id="mango" stroke="#263238" stroke-linejoin="round" stroke-linecap="round">
+<g transform="rotate(-28 50 52)">
+<path d="M10 54C9 36 28 25 50 25C74 25 92 37 91 55C90 69 79 77 66 79C56 81 48 84 38 82C22 79 11 69 10 54Z" fill="url(#mangoSkin)" stroke-width="4"/>
+<path d="M24 44C31 36 41 33 52 33" fill="none" stroke="#FFFFFF" stroke-opacity=".6" stroke-width="5"/>
+<path d="M11 50C7 48 4 45 3 41" fill="none" stroke-width="4"/>
+</g>
+</g></defs><use href="#mango" transform="translate(3.2 43.2) scale(0.74) rotate(-8 50 50)"/><use href="#mango" transform="translate(83.2 43.2) scale(0.74) rotate(6 50 50)"/><use href="#mango" transform="translate(163.2 43.2) scale(0.74) rotate(-4 50 50)"/><use href="#mango" transform="translate(3.2 123.2) scale(0.74) rotate(8 50 50)"/><use href="#mango" transform="translate(83.2 123.2) scale(0.74) rotate(-6 50 50)"/><use href="#mango" transform="translate(163.2 123.2) scale(0.74) rotate(4 50 50)"/>
+</svg>

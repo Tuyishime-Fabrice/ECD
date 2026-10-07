@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<defs>
+<g id="banana" stroke="#263238" stroke-linejoin="round" stroke-linecap="round">
+<path d="M18 30C22 64 50 86 85 77C91 75 90 66 84 67C56 71 37 53 33 28C32 21 18 22 18 30Z" fill="#FFD23F" stroke-width="4"/>
+<path d="M29 37C35 57 52 69 74 71" fill="none" stroke="#E9B800" stroke-width="3"/>
+<path d="M19 27L16 15L27 13L32 25" fill="#8D5A34" stroke-width="3.5"/>
+<circle cx="87" cy="72" r="3.5" fill="#8D5A34" stroke-width="2.5"/>
+</g></defs><use href="#banana" transform="translate(3.2 43.2) scale(0.74) rotate(-8 50 50)"/><use href="#banana" transform="translate(83.2 43.2) scale(0.74) rotate(6 50 50)"/><use href="#banana" transform="translate(163.2 43.2) scale(0.74) rotate(-4 50 50)"/><use href="#banana" transform="translate(43.2 123.2) scale(0.74) rotate(8 50 50)"/><use href="#banana" transform="translate(123.2 123.2) scale(0.74) rotate(-6 50 50)"/>
+</svg>
