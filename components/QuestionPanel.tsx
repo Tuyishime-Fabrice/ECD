@@ -60,16 +60,15 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
   }
 
   const scaffold = wrong.length >= 2 && !correct;
-  const many = question.options.length > 2;
 
   return (
     <div
       className={clsx(
-        "mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 short:max-w-4xl short:flex-row short:items-center short:gap-5",
+        "mx-auto flex w-full max-w-xl flex-col items-center gap-3 px-4 short:max-w-4xl short:flex-row short:items-center short:justify-center short:gap-6",
         className,
       )}
     >
-      <div className="flex w-full flex-col items-center gap-3 short:w-auto short:max-w-[38%] short:shrink-0">
+      <div className="flex w-full flex-col items-center gap-3 short:w-52 short:shrink-0">
         <div className="flex w-full items-center gap-3">
           <button
             type="button"
@@ -87,15 +86,18 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             alt=""
             width={240}
             height={240}
-            className="h-36 w-auto rounded-card bg-white p-2 shadow-soft short:h-32"
+            className="h-36 w-auto rounded-card bg-white p-2 shadow-soft short:h-28"
           />
         )}
       </div>
 
       <div
         className={clsx(
-          "grid w-full grid-cols-2 gap-3 sm:gap-4",
-          many && "short:grid-cols-4",
+          "grid w-full grid-cols-2 gap-3 sm:gap-4 short:w-auto short:justify-center",
+          // Sideways phones: size cards by the short screen height (2×2 for four options).
+          question.options.length === 2 && "short:grid-cols-[repeat(2,min(150px,62dvh))]",
+          question.options.length === 3 && "short:grid-cols-[repeat(3,min(140px,62dvh))]",
+          question.options.length === 4 && "short:grid-cols-[repeat(2,min(130px,38dvh))]",
           // A lone third option sits centered under the first two.
           question.options.length === 3 &&
             "[&>*:nth-child(3)]:col-span-2 [&>*:nth-child(3)]:w-[calc(50%-0.375rem)] [&>*:nth-child(3)]:justify-self-center short:[&>*:nth-child(3)]:col-span-1 short:[&>*:nth-child(3)]:w-full",
@@ -114,7 +116,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
               aria-label={option.label ?? `${i + 1}`}
               onAnimationEnd={() => setWobbling((w) => (w === option.id ? null : w))}
               className={clsx(
-                "tactile relative aspect-square min-h-[120px] w-full rounded-card border-4 bg-white p-2 transition-[opacity,filter,border-color] duration-300 short:min-h-0 short:max-h-[42dvh]",
+                "tactile relative aspect-square min-h-[120px] w-full rounded-card border-4 bg-white p-2 transition-[opacity,filter,border-color] duration-300 short:min-h-0",
                 won ? "border-leaf-500 shadow-[0_0_0_8px_rgba(61,174,107,0.35)]" : "border-transparent",
                 faded && "bg-mist-100 opacity-40 grayscale",
                 wobbling === option.id && "animate-wobble",

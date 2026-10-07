@@ -4,6 +4,7 @@ import clsx from "clsx";
 import { useRouter } from "next/navigation";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { EpisodeView, SeasonCard } from "@/content/types";
+import { useImmersive } from "@/lib/immersive";
 import { duePausePoint, effectiveDuration, initialTriggered } from "@/lib/playback";
 import { resumePosition } from "@/lib/progress";
 import { nextAfter } from "@/lib/recommend";
@@ -34,6 +35,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   const [questionIndex, setQuestionIndex] = useState<number | null>(null);
   const [error, setError] = useState<PlayerError | null>(null);
   const [attempt, setAttempt] = useState(0);
+
+  useImmersive(phase === "video" || phase === "question");
 
   const player = useRef<YTPlayer | null>(null);
   const triggered = useRef<Set<number>>(new Set());

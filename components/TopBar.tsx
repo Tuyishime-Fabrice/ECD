@@ -3,22 +3,21 @@
 import clsx from "clsx";
 import { Lock, Star } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { brand } from "@/lib/brand";
+import { useIsImmersive } from "@/lib/immersive";
 import { playPop } from "@/lib/sounds";
 import { useT } from "@/lib/store";
 
 export function TopBar() {
   const t = useT();
-  const pathname = usePathname();
-  const onWatch = pathname.startsWith("/watch/");
+  const immersive = useIsImmersive();
 
   return (
     <header
       className={clsx(
         "flex items-center gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))]",
-        // While watching on a phone held sideways, give the video every pixel.
-        onWatch && "short:hidden",
+        // While watching or answering on a phone held sideways, give the screen every pixel.
+        immersive && "short:hidden",
       )}
     >
       <Link
