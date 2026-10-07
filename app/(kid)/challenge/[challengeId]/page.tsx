@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ChallengeFlow } from "@/components/ChallengeFlow";
+import { TimeGate } from "@/components/TimesUp";
 import { getChallenge, getChallengeIds, getSeasons } from "@/content";
 
 type Props = { params: Promise<{ challengeId: string }> };
@@ -19,5 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ChallengePage({ params }: Props) {
   const data = getChallenge((await params).challengeId);
   if (!data) notFound();
-  return <ChallengeFlow challenge={data.challenge} seasons={getSeasons()} />;
+  return (
+    <TimeGate mode="start">
+      <ChallengeFlow challenge={data.challenge} seasons={getSeasons()} />
+    </TimeGate>
+  );
 }

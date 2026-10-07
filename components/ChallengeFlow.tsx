@@ -7,6 +7,7 @@ import { useEffect, useState } from "react";
 import type { ChallengeView, SeasonCard } from "@/content/types";
 import { useImmersive } from "@/lib/immersive";
 import { starsFor, type QuestionResult, type Stars } from "@/lib/progress";
+import { useUsageTicker } from "@/lib/screen-time";
 import { itemStatus, nextAfter } from "@/lib/recommend";
 import { playPop, playSparkle, unlockAudio } from "@/lib/sounds";
 import { getStore, useHydrated, useLearningState, usePick, useT } from "@/lib/store";
@@ -28,6 +29,8 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
   const [phase, setPhase] = useState<Phase>({ kind: "intro" });
   const [results, setResults] = useState<QuestionResult[]>([]);
   useImmersive(phase.kind === "question");
+  // Screen time counts while a challenge is open.
+  useUsageTicker(hydrated);
 
   // Until saved progress is read, show nothing that could flash "locked".
   if (!hydrated) {

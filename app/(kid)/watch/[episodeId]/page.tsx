@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { TimeGate } from "@/components/TimesUp";
 import { WatchView } from "@/components/WatchView";
 import { getEpisode, getEpisodeIds, getSeasons } from "@/content";
 
@@ -19,5 +20,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function WatchPage({ params }: Props) {
   const data = getEpisode((await params).episodeId);
   if (!data) notFound();
-  return <WatchView episode={data.episode} seasons={getSeasons()} />;
+  return (
+    <TimeGate mode="start">
+      <WatchView episode={data.episode} seasons={getSeasons()} />
+    </TimeGate>
+  );
 }

@@ -308,8 +308,8 @@ write(
   400,
   260,
   `<rect width="400" height="260" rx="28" fill="${P.sky100}"/>
-  ${sun(58, 58, 26)}
-  ${cloud(250, 26, 1.3)}
+  ${cloud(36, 30, 1.1)}
+  ${cloud(170, 18, 0.8)}
   ${hills(400, 260, 0.64)}
   <!-- jumping child -->
   ${limb("M140 196L128 232", P.skinA)}${limb("M164 196L176 232", P.skinA)}

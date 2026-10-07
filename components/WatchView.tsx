@@ -7,6 +7,7 @@ import type { EpisodeView, SeasonCard } from "@/content/types";
 import { useImmersive } from "@/lib/immersive";
 import { duePausePoint, effectiveDuration, initialTriggered } from "@/lib/playback";
 import { resumePosition } from "@/lib/progress";
+import { timeUpNow, useUsageTicker } from "@/lib/screen-time";
 import { nextAfter } from "@/lib/recommend";
 import { getStore, useLang, useLearningState, usePick } from "@/lib/store";
 import { PlayerState, type YTPlayer } from "@/lib/youtube";
@@ -14,9 +15,10 @@ import { BigControls } from "./BigControls";
 import { EndScreen } from "./EndScreen";
 import { FriendlyError } from "./FriendlyError";
 import { QuestionPanel } from "./QuestionPanel";
+import { TimesUp } from "./TimesUp";
 import { YouTubePlayer, type PlayerError } from "./YouTubePlayer";
 
-type Phase = "video" | "question" | "ended" | "error";
+type Phase = "video" | "question" | "ended" | "timesup" | "error";
 
 const POLL_MS = 500;
 const AUTOPLAY_GRACE_MS = 1800;
@@ -37,6 +39,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   const [attempt, setAttempt] = useState(0);
 
   useImmersive(phase === "video" || phase === "question");
+  // Screen time counts only while the video actually plays (and the tab is visible).
+  useUsageTicker(playing && phase === "video");
 
   const player = useRef<YTPlayer | null>(null);
   const triggered = useRef<Set<number>>(new Set());
@@ -63,7 +67,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     }
     if (state === PlayerState.ENDED) {
       getStore().markEpisodeEnded(episode.id);
-      setPhase("ended");
+      // The episode always finishes; only then does the daily limit apply.
+      setPhase(timeUpNow() ? "timesup" : "ended");
     }
   }
 
@@ -194,6 +199,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
           onWatchAgain={replay}
         />
       )}
+
+      {phase === "timesup" && <TimesUp homeActivity={episode.homeActivity} onExtended={() => setPhase("ended")} />}
 
       {phase === "error" && <FriendlyError offline={error === "offline"} onRetry={retry} />}
     </div>
