@@ -3,9 +3,8 @@
 import { Plus } from "lucide-react";
 import { useState, type ReactNode } from "react";
 import type { LocalizedText } from "@/content/types";
-import { getStore, useHydrated, useT } from "@/lib/store";
-import { useTimeUp } from "@/lib/screen-time";
-import { EXTENSION_SEC, kigaliDate } from "@/lib/timer";
+import { useHydrated, useT } from "@/lib/store";
+import { grantExtension, useTimeUp } from "@/lib/screen-time";
 import { HomeActivityCard } from "./EndScreen";
 import { Mascot } from "./Mascot";
 import { ParentGateDialog } from "./ParentGate";
@@ -49,7 +48,7 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
         <ParentGateDialog
           onClose={() => setGateOpen(false)}
           onPass={() => {
-            getStore().addExtraTime(kigaliDate(), EXTENSION_SEC);
+            grantExtension();
             setGateOpen(false);
             onExtended?.();
           }}
@@ -73,6 +72,7 @@ export function TimeGate({ mode, children }: { mode: "live" | "start"; children:
   if (mode === "start" && hydrated && upWhenOpened === null) setUpWhenOpened(up);
 
   const blocked = mode === "live" ? up : upWhenOpened === true && up;
-  return blocked ? <TimesUp /> : <>{children}</>;
+  // Once a parent adds time, this page counts as opened in time: its video or challenge may finish.
+  return blocked ? <TimesUp onExtended={() => setUpWhenOpened(false)} /> : <>{children}</>;
 }
 

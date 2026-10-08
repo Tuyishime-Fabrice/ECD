@@ -9,7 +9,7 @@ import { duePausePoint, effectiveDuration, initialTriggered } from "@/lib/playba
 import { resumePosition } from "@/lib/progress";
 import { timeUpNow, useUsageTicker } from "@/lib/screen-time";
 import { nextAfter } from "@/lib/recommend";
-import { getStore, useHydrated, useLang, useLearningState, usePick } from "@/lib/store";
+import { getStore, useDocumentTitle, useHydrated, useLang, useLearningState, usePick } from "@/lib/store";
 import { PlayerState, type YTPlayer } from "@/lib/youtube";
 import { BigControls } from "./BigControls";
 import { EndScreen } from "./EndScreen";
@@ -23,6 +23,13 @@ type Phase = "video" | "question" | "ended" | "timesup" | "error";
 const POLL_MS = 500;
 const AUTOPLAY_GRACE_MS = 1800;
 
+/** Leave YouTube's fullscreen so our question / end screen (in the page) can be seen and tapped. */
+function leaveFullscreen() {
+  const d = document as Document & { webkitFullscreenElement?: Element | null; webkitExitFullscreen?: () => void };
+  if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+  else if (d.webkitFullscreenElement) d.webkitExitFullscreen?.();
+}
+
 export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons: SeasonCard[] }) {
   const router = useRouter();
   const lang = useLang();
@@ -33,20 +40,29 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
 
   const [phase, setPhase] = useState<Phase>("video");
   const [ready, setReady] = useState(false);
-  const [playing, setPlaying] = useState(false);
+  const [playerState, setPlayerState] = useState<number>(PlayerState.UNSTARTED);
   const [hasPlayed, setHasPlayed] = useState(false);
   const [needsTap, setNeedsTap] = useState(false);
   const [questionIndex, setQuestionIndex] = useState<number | null>(null);
   const [error, setError] = useState<PlayerError | null>(null);
   const [attempt, setAttempt] = useState(0);
 
+  // Buffering shows the Pause icon (the video is on its way), but only real playback counts as screen time.
+  const playing = playerState === PlayerState.PLAYING || playerState === PlayerState.BUFFERING;
+
+  useDocumentTitle(pick(episode.title));
   useImmersive(phase === "video" || phase === "question");
-  // Screen time counts only while the video actually plays (and the tab is visible).
-  useUsageTicker(playing && phase === "video");
+  useUsageTicker(playerState === PlayerState.PLAYING && phase === "video");
 
   const player = useRef<YTPlayer | null>(null);
   const triggered = useRef<Set<number>>(new Set());
   const lastSaved = useRef(-1);
+  /** Where a seek is heading; until the player reports that time, ignore what it says. */
+  const seekTarget = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (phase !== "video") leaveFullscreen();
+  }, [phase]);
 
   const duration = (p: YTPlayer) => effectiveDuration(p.getDuration(), episode.durationSec);
 
@@ -54,15 +70,17 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     player.current = p;
     const start = resumePosition(getStore().getEpisodeProgress(episode.id), duration(p));
     triggered.current = initialTriggered(episode.pausePoints, start);
-    if (start > 0) p.seekTo(start, true);
+    if (start > 0) {
+      seekTarget.current = start;
+      p.seekTo(start, true);
+    }
     // The child's tap on the card was the gesture; phones may still block this.
     p.playVideo();
     setReady(true);
   }
 
   function handleStateChange(state: number) {
-    const isPlaying = state === PlayerState.PLAYING || state === PlayerState.BUFFERING;
-    setPlaying(isPlaying);
+    setPlayerState(state);
     if (state === PlayerState.PLAYING) {
       setHasPlayed(true);
       setNeedsTap(false);
@@ -80,9 +98,13 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   }
 
   // Autoplay blocked? Make our Play button giant (never an overlay on the video).
+  // A slow first buffer is not "blocked": the video is about to start.
   useEffect(() => {
     if (!ready || hasPlayed || phase !== "video") return;
-    const timer = setTimeout(() => setNeedsTap(true), AUTOPLAY_GRACE_MS);
+    const timer = setTimeout(() => {
+      const state = player.current?.getPlayerState();
+      if (state !== PlayerState.PLAYING && state !== PlayerState.BUFFERING) setNeedsTap(true);
+    }, AUTOPLAY_GRACE_MS);
     return () => clearTimeout(timer);
   }, [ready, hasPlayed, phase]);
 
@@ -90,6 +112,11 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     const p = player.current;
     if (!p) return;
     const t = p.getCurrentTime();
+    if (seekTarget.current !== null) {
+      // Right after a seek the player may still report the old time; don't save it or fire a question.
+      if (Math.abs(t - seekTarget.current) > 2) return;
+      seekTarget.current = null;
+    }
     if (Math.abs(t - lastSaved.current) >= 0.4) {
       getStore().saveEpisodePosition(episode.id, t, duration(p));
       lastSaved.current = t;
@@ -118,15 +145,22 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   function togglePlay() {
     const p = player.current;
     if (!p) return;
-    if (playing) p.pauseVideo();
+    if (playing && !needsTap) p.pauseVideo();
     else p.playVideo();
   }
 
   function replay() {
     const p = player.current;
     if (!p) return;
+    // Starting over is a new viewing: once today's time is used up, it's time to play outside.
+    if (timeUpNow()) {
+      p.pauseVideo();
+      setPhase("timesup");
+      return;
+    }
     triggered.current = new Set();
     lastSaved.current = -1;
+    seekTarget.current = 0;
     setPhase("video");
     p.seekTo(0, true);
     p.playVideo();
@@ -138,6 +172,7 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     setReady(false);
     setHasPlayed(false);
     setNeedsTap(false);
+    setPlayerState(PlayerState.UNSTARTED);
     setPhase("video");
     setAttempt((a) => a + 1);
   }

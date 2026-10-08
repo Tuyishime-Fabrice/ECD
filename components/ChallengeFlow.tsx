@@ -10,7 +10,8 @@ import { starsFor, type QuestionResult, type Stars } from "@/lib/progress";
 import { useUsageTicker } from "@/lib/screen-time";
 import { itemStatus, nextAfter } from "@/lib/recommend";
 import { playPop, playSparkle, unlockAudio } from "@/lib/sounds";
-import { getStore, useHydrated, useLearningState, usePick, useT } from "@/lib/store";
+import { primeVoice } from "@/lib/speech";
+import { getStore, useDocumentTitle, useHydrated, useLearningState, usePick, useT } from "@/lib/store";
 import { isChallengeUnlocked, missingForChallenge } from "@/lib/unlock";
 import { itemHref, ItemThumb } from "./ItemCard";
 import { Mascot } from "./Mascot";
@@ -28,6 +29,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
   const learning = useLearningState();
   const [phase, setPhase] = useState<Phase>({ kind: "intro" });
   const [results, setResults] = useState<QuestionResult[]>([]);
+  useDocumentTitle(t("challengeN", { n: challenge.number }));
   useImmersive(phase.kind === "question");
   // Screen time counts while a challenge is open.
   useUsageTicker(hydrated);
@@ -39,6 +41,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
 
   function start() {
     unlockAudio();
+    primeVoice();
     playPop();
     setResults([]);
     setPhase({ kind: "question", index: 0 });
@@ -67,7 +70,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
         <div className="relative grid size-48 place-items-center short:size-40">
           <svg className="absolute inset-0 size-full motion-safe:animate-spin-slow" viewBox="0 0 100 100" aria-hidden>
             {Array.from({ length: 12 }, (_, i) => (
-              <path key={i} d="M50 50 L46 0 L54 0 Z" fill="#FFD23F" opacity="0.45" transform={`rotate(${i * 30} 50 50)`} />
+              <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun-400" opacity="0.45" transform={`rotate(${i * 30} 50 50)`} />
             ))}
           </svg>
           <img
@@ -188,7 +191,7 @@ function ChallengeDone({
       <div className="relative mt-4 grid size-56 place-items-center short:size-40">
         <svg className="absolute inset-0 size-full motion-safe:animate-spin-slow" viewBox="0 0 100 100" aria-hidden>
           {Array.from({ length: 12 }, (_, i) => (
-            <path key={i} d="M50 50 L46 0 L54 0 Z" fill="#FFD23F" opacity="0.55" transform={`rotate(${i * 30} 50 50)`} />
+            <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun-400" opacity="0.55" transform={`rotate(${i * 30} 50 50)`} />
           ))}
         </svg>
         <StarBurst />

@@ -25,7 +25,7 @@ export function SeasonRow({ season, eager = false }: { season: SeasonCard; eager
           href={`/season/${season.slug}`}
           onClick={playPop}
           className={clsx(
-            "tactile inline-flex min-h-14 items-center gap-1 rounded-full py-2 pl-5 pr-3 font-display text-2xl font-extrabold text-ink-900",
+            "tactile inline-flex min-h-16 items-center gap-1 rounded-full py-2 pl-5 pr-3 font-display text-2xl font-extrabold text-ink-900",
             theme.bg,
           )}
         >
@@ -33,7 +33,7 @@ export function SeasonRow({ season, eager = false }: { season: SeasonCard; eager
           <ChevronRight className="size-7" strokeWidth={3} aria-hidden />
         </Link>
       </h2>
-      <ul className="scrollbar-none relative mt-3 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-5 pt-1">
+      <ul className="scrollbar-touch-hidden relative mt-3 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-5 pt-1">
         {season.items.map((item, i) => (
           <li key={item.id} className="shrink-0 snap-start">
             <ItemCardView
@@ -77,7 +77,7 @@ function ComingSoonRow({ season }: { season: SeasonCard }) {
           {t("soon")}
         </span>
       </h2>
-      <div className="scrollbar-none mt-3 flex gap-4 overflow-x-auto px-4 pb-5 pt-1">
+      <div className="scrollbar-touch-hidden mt-3 flex gap-4 overflow-x-auto px-4 pb-5 pt-1">
         <button
           type="button"
           aria-label={t("comingSoon", { title })}

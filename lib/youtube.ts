@@ -50,14 +50,21 @@ export function loadYouTubeApi(timeoutMs = 15000): Promise<YTNamespace> {
 
   loading = new Promise<YTNamespace>((resolve, reject) => {
     const script = document.createElement("script");
+    const previous = window.onYouTubeIframeAPIReady;
     const fail = (reason: string) => {
       clearTimeout(timer);
       loading = null;
       script.remove();
+      // iframe_api leaves a `YT` stub (with YT.loading set) even when its second script fails;
+      // left in place, it would make every retry a no-op until the page reloads.
+      if (window.YT && !window.YT.Player) {
+        delete window.YT;
+        document.getElementById("www-widgetapi-script")?.remove();
+      }
+      window.onYouTubeIframeAPIReady = previous;
       reject(new Error(reason));
     };
     const timer = setTimeout(() => fail("YouTube API timed out"), timeoutMs);
-    const previous = window.onYouTubeIframeAPIReady;
     window.onYouTubeIframeAPIReady = () => {
       previous?.();
       clearTimeout(timer);

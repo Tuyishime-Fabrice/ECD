@@ -15,17 +15,44 @@ export type VoiceOptions = { lang: Lang; placeholderVoice: boolean };
 export const VOICE_LINES = {
   tryAgain: { audio: {} as Partial<Record<Lang, string>>, text: "Try again!" },
   great: { audio: {} as Partial<Record<Lang, string>>, text: "Great job!" },
-  letsPlay: { audio: {} as Partial<Record<Lang, string>>, text: "Let's play!" },
 };
 export type VoiceLine = keyof typeof VOICE_LINES;
 
-let current: HTMLAudioElement | null = null;
+/** 10 ms of silence, used once to unlock audio on the first tap. */
+const SILENCE =
+  "data:audio/wav;base64,UklGRnQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YVAAAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgA==";
+
+/**
+ * One audio element for every prompt. Safari only lets an element play
+ * sound once a tap has started it, so it is unlocked once (primeVoice) and
+ * then reused — new elements created later, e.g. after a timer, stay silent.
+ */
+let voiceEl: HTMLAudioElement | null = null;
+/** The source currently meant to be heard; anything else finishing or failing is ignored. */
+let currentSrc: string | null = null;
+let primed = false;
+
+function element(): HTMLAudioElement | null {
+  if (typeof window === "undefined") return null;
+  voiceEl ??= new Audio();
+  return voiceEl;
+}
+
+/** Call from a tap: unlocks the shared audio element and the speech engine. */
+export function primeVoice() {
+  if (primed || typeof window === "undefined") return;
+  primed = true;
+  const el = element();
+  if (el && !currentSrc) {
+    el.src = SILENCE;
+    el.play().catch(() => {});
+  }
+  if ("speechSynthesis" in window) window.speechSynthesis.speak(new SpeechSynthesisUtterance(""));
+}
 
 export function stopVoice() {
-  if (current) {
-    current.pause();
-    current = null;
-  }
+  currentSrc = null;
+  voiceEl?.pause();
   if (typeof window !== "undefined" && "speechSynthesis" in window) window.speechSynthesis.cancel();
 }
 
@@ -44,19 +71,23 @@ function speakEnglish(text: string) {
 
 function play(src: string | undefined, fallbackText: string, opts: VoiceOptions) {
   stopVoice();
-  const fallback = () => {
+  const el = element();
+  if (!src || !el) {
     if (opts.placeholderVoice) speakEnglish(fallbackText);
-  };
-  if (!src) {
-    fallback();
     return;
   }
-  const audio = new Audio(src);
-  current = audio;
-  audio.addEventListener("error", fallback, { once: true });
-  audio.play().catch((err: unknown) => {
-    // NotAllowedError = no tap yet; anything else = file problem.
-    if (!(err instanceof DOMException && err.name === "NotAllowedError")) fallback();
+  currentSrc = src;
+  // Only a recording that is still wanted may fall back to the placeholder voice:
+  // a prompt cut short by an answer, or by the next question, stays quiet.
+  const fallback = () => {
+    if (currentSrc === src && opts.placeholderVoice) speakEnglish(fallbackText);
+  };
+  el.onerror = fallback;
+  el.src = src;
+  el.play().catch((err: unknown) => {
+    // AbortError: interrupted on purpose. NotAllowedError: no tap yet. Anything else: file problem.
+    if (err instanceof DOMException && (err.name === "AbortError" || err.name === "NotAllowedError")) return;
+    fallback();
   });
 }
 

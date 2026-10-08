@@ -3,13 +3,14 @@
  * device so the app opens without internet. Videos are never cached
  * (they stream from YouTube).
  *
- * __VERSION__ and __PRECACHE__ are filled in after each build by
- * scripts/finalize-sw.mjs.
+ * VERSION and PRECACHE are filled in after each build by
+ * scripts/finalize-sw.mjs (this template stays valid JavaScript).
  */
-const VERSION = "__VERSION__";
-const PRECACHE = __PRECACHE__;
+const VERSION = "dev";
+const PRECACHE = [];
 const SHELL = `shell-${VERSION}`;
-const RUNTIME = "runtime-v1";
+// Versioned too, so pages saved from an older deploy are dropped with it.
+const RUNTIME = `runtime-${VERSION}`;
 const OFFLINE_URL = "/offline";
 const NETWORK_TIMEOUT_MS = 4000;
 
@@ -17,10 +18,9 @@ self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(SHELL);
-      // One by one, so a single missing file can't break the install.
-      await Promise.all(
-        PRECACHE.map((url) => cache.add(new Request(url, { cache: "reload" })).catch(() => undefined)),
-      );
+      // All or nothing: if the connection drops halfway, this update fails and the
+      // previous, complete version stays in charge until the browser tries again.
+      await cache.addAll(PRECACHE.map((url) => new Request(url, { cache: "reload" })));
       await self.skipWaiting();
     })(),
   );
@@ -38,8 +38,13 @@ self.addEventListener("activate", (event) => {
 
 const timeout = (ms) => new Promise((_, reject) => setTimeout(() => reject(new Error("timeout")), ms));
 
+/** This deploy's precache first, then pages and files saved while browsing. */
 async function fromCache(request) {
-  return (await caches.match(request, { ignoreSearch: true })) || undefined;
+  return (
+    (await caches.match(request, { cacheName: SHELL, ignoreSearch: true })) ||
+    (await caches.match(request, { cacheName: RUNTIME, ignoreSearch: true })) ||
+    undefined
+  );
 }
 
 /** Pages and page data: fresh when online, cached copy when slow or offline. */
@@ -82,7 +87,11 @@ self.addEventListener("fetch", (event) => {
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(request, OFFLINE_URL));
-  } else if (url.pathname.startsWith("/_next/static/") || /^\/(images|icons|audio)\//.test(url.pathname)) {
+  } else if (url.pathname.startsWith("/audio/")) {
+    // <audio> asks for byte ranges, and partial (206) responses can't be cached:
+    // always fetch and keep the whole file, and answer every range request with it.
+    event.respondWith(cacheFirst(new Request(url.href)));
+  } else if (url.pathname.startsWith("/_next/static/") || /^\/(images|icons)\//.test(url.pathname)) {
     event.respondWith(cacheFirst(request));
   } else {
     event.respondWith(networkFirst(request));

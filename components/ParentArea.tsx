@@ -9,13 +9,15 @@ import { brand } from "@/lib/brand";
 import { LANGUAGE_NAMES } from "@/lib/i18n";
 import { DAILY_LIMITS, type Lang, type Settings } from "@/lib/progress";
 import { skillStatuses, type SkillStatus } from "@/lib/skills";
-import { getStore, useLearningState, usePick, useProgress, useSettings, useT } from "@/lib/store";
-import { dailyLimitSec, EXTENSION_SEC, kigaliDate, usageToday } from "@/lib/timer";
+import { getStore, useDocumentTitle, useLearningState, usePick, useProgress, useSettings, useT } from "@/lib/store";
+import { grantExtension } from "@/lib/screen-time";
+import { dailyLimitSec, kigaliDate, usageToday } from "@/lib/timer";
 import { ParentGate } from "./ParentGate";
 
 export function ParentPage({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillInfo[] }) {
   const t = useT();
   const [unlocked, setUnlocked] = useState(false);
+  useDocumentTitle(t("parentArea"));
 
   if (!unlocked) {
     return (
@@ -178,7 +180,7 @@ function ParentArea({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillI
         {today.extraSec > 0 && <p className="mt-2 text-sm text-ink-600">{t("extraToday", { n: today.extraSec / 60 })}</p>}
         <button
           type="button"
-          onClick={() => getStore().addExtraTime(kigaliDate(), EXTENSION_SEC)}
+          onClick={grantExtension}
           className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-grape-700 px-4 font-semibold text-grape-700"
         >
           <Plus className="size-5" strokeWidth={2.5} aria-hidden />

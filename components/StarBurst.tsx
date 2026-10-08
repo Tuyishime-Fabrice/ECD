@@ -1,6 +1,12 @@
 import clsx from "clsx";
 
-const COLORS = ["#FFD23F", "#29A9E0", "#FF8A65", "#3DAE6B", "#8E7CC3"];
+const COLORS = [
+  "var(--color-sun-400)",
+  "var(--color-sky-500)",
+  "var(--color-coral-400)",
+  "var(--color-leaf-500)",
+  "var(--color-grape-500)",
+];
 
 // Fixed layout (no randomness) so server and client render the same thing.
 const PIECES = Array.from({ length: 14 }, (_, i) => {
@@ -37,8 +43,8 @@ export function StarBurst({ className }: { className?: string }) {
             <svg viewBox="0 0 24 24" className="size-6">
               <path
                 d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9z"
-                fill={p.color}
-                stroke="#263238"
+                style={{ fill: p.color }}
+                className="stroke-ink-900"
                 strokeWidth="1.5"
                 strokeLinejoin="round"
               />

@@ -26,7 +26,7 @@ const urls = [];
 const hash = createHash("sha256");
 for (const file of walk(out).sort()) {
   const rel = relative(out, file).split(sep).join("/");
-  if (rel === "sw.js" || rel === "404.html" || rel.endsWith(".map") || rel.startsWith("audio/")) continue;
+  if (rel === "sw.js" || rel === "404.html" || rel.endsWith(".map")) continue;
   // Navigation data (.txt) is cached as pages are visited; offline, Next falls back to the cached HTML.
   if (rel.endsWith(".txt")) continue;
   if (legacyOnly.has(`/${rel}`)) continue;
@@ -46,8 +46,10 @@ for (const file of walk(out).sort()) {
 const version = hash.digest("hex").slice(0, 12);
 const template = readFileSync(swPath, "utf8");
 const sw = template
-  .replace('const VERSION = "__VERSION__";', `const VERSION = "${version}";`)
-  .replace("const PRECACHE = __PRECACHE__;", `const PRECACHE = ${JSON.stringify(urls)};`);
-if (sw.includes('"__VERSION__";') || sw.includes("= __PRECACHE__;")) throw new Error("out/sw.js placeholders not found");
+  .replace('const VERSION = "dev";', `const VERSION = "${version}";`)
+  .replace("const PRECACHE = [];", `const PRECACHE = ${JSON.stringify(urls)};`);
+if (!sw.includes(`const VERSION = "${version}";`) || sw.includes("const PRECACHE = [];")) {
+  throw new Error("out/sw.js: could not fill in VERSION / PRECACHE");
+}
 writeFileSync(swPath, sw);
 console.log(`✔ Service worker: ${urls.length} files kept for offline use (version ${version}).`);

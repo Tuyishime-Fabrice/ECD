@@ -62,10 +62,10 @@ export function ItemThumb({
   return (
     <div className={clsx("relative grid aspect-video place-items-center overflow-hidden bg-sun-400", className)}>
       <svg className="absolute inset-0 size-full" viewBox="0 0 160 90" aria-hidden>
-        <circle cx="22" cy="20" r="5" fill="#fff" opacity=".7" />
-        <circle cx="140" cy="68" r="7" fill="#fff" opacity=".6" />
-        <circle cx="132" cy="18" r="3.5" fill="#fff" opacity=".8" />
-        <circle cx="30" cy="72" r="3" fill="#fff" opacity=".8" />
+        <circle cx="22" cy="20" r="5" className="fill-white" opacity=".7" />
+        <circle cx="140" cy="68" r="7" className="fill-white" opacity=".6" />
+        <circle cx="132" cy="18" r="3.5" className="fill-white" opacity=".8" />
+        <circle cx="30" cy="72" r="3" className="fill-white" opacity=".8" />
       </svg>
       <Star
         className={clsx("relative size-[46%] fill-white text-ink-900", s?.locked && "opacity-45")}

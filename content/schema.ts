@@ -24,10 +24,12 @@ export const imagePathSchema = z
   .string()
   .regex(/^\/images\/[^\s]+\.(svg|png|jpe?g|webp)$/, 'must look like "/images/folder/picture.svg"');
 
-const thumbnailSchema = z.union([
-  imagePathSchema,
-  z.string().regex(/^https:\/\/\S+$/, 'must be "/images/…" or a full https:// link'),
-]);
+const thumbnailSchema = z
+  .string()
+  .regex(
+    /^(\/images\/[^\s]+\.(svg|png|jpe?g|webp)|https:\/\/\S+)$/,
+    'must look like "/images/thumbs/picture.svg" or be a full https:// link',
+  );
 
 export const audioPathSchema = z
   .string()
@@ -161,13 +163,18 @@ export const contentSchema = z
   .superRefine((c, ctx) => {
     // Every id must be unique across the whole file.
     const seen = new Map<string, string>();
+    // "Season 1 › item 3" — the same wording the error list uses for locations.
+    const where = (path: (string | number)[]) => {
+      const season = Number(path[1]) + 1;
+      return typeof path[3] === "number" ? `Season ${season} › item ${path[3] + 1}` : `Season ${season}`;
+    };
     const claim = (kind: string, value: string, path: (string | number)[]) => {
       const key = `${kind === "slug" ? "slug" : "id"}:${value}`;
       const first = seen.get(key);
       if (first) {
-        ctx.addIssue({ code: "custom", path, message: `${kind} "${value}" is already used by ${first}` });
+        ctx.addIssue({ code: "custom", path, message: `${kind} "${value}" is already used in ${first}` });
       } else {
-        seen.set(key, `${kind} at ${path.join(".")}`);
+        seen.set(key, where(path));
       }
     };
     const knownSkill = (skill: string, path: (string | number)[]) => {

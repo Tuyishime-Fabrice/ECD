@@ -2,13 +2,15 @@
 
 import clsx from "clsx";
 import { Star, Volume2 } from "lucide-react";
-import { useEffect, useEffectEvent, useState } from "react";
+import { useEffect, useEffectEvent, useRef, useState } from "react";
 import type { Question } from "@/content/types";
 import { playCheer, playTryAgain } from "@/lib/sounds";
 import { playPrompt, sayLine, stopVoice } from "@/lib/speech";
 import { usePick, useSettings, useT } from "@/lib/store";
 
 const ADVANCE_MS = 1200;
+/** Taps this soon after a question appears are the tail of a double-tap on the button it replaced. */
+const SETTLE_MS = 450;
 
 type Props = {
   question: Question;
@@ -31,9 +33,11 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
   const [wrong, setWrong] = useState<string[]>([]);
   const [correct, setCorrect] = useState(false);
   const [wobbling, setWobbling] = useState<string | null>(null);
+  const shownAt = useRef(Number.POSITIVE_INFINITY);
 
   const announce = useEffectEvent(() => playPrompt(question, voice));
   useEffect(() => {
+    shownAt.current = performance.now();
     announce();
     return stopVoice;
   }, [question.id]);
@@ -45,12 +49,14 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
     return () => clearTimeout(timer);
   }, [correct]);
 
-  function choose(optionId: string) {
+  /** `at` is the tap's event.timeStamp (same clock as performance.now()). */
+  function choose(optionId: string, at: number) {
     if (correct || wrong.includes(optionId)) return;
+    if (at - shownAt.current < SETTLE_MS) return;
     if (optionId === question.correctOptionId) {
       setCorrect(true);
-      stopVoice();
       playCheer();
+      sayLine("great", voice);
     } else {
       setWrong([...wrong, optionId]);
       setWobbling(optionId);
@@ -68,7 +74,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
         className,
       )}
     >
-      <div className="flex w-full flex-col items-center gap-3 short:w-52 short:shrink-0">
+      <div className="flex w-full flex-col items-center gap-3 short:w-48 short:shrink-0">
         <div className="flex w-full items-center gap-3">
           <button
             type="button"
@@ -86,17 +92,20 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             alt=""
             width={240}
             height={240}
-            className="h-36 w-auto rounded-card bg-white p-2 shadow-soft short:h-28"
+            className="h-[min(9rem,15dvh)] w-auto rounded-card bg-white p-2 shadow-soft short:h-28"
           />
         )}
       </div>
 
       <div
         className={clsx(
-          "grid w-full grid-cols-2 gap-3 sm:gap-4 short:w-auto short:justify-center",
-          // Sideways phones: size cards by the short screen height (2×2 for four options).
-          question.options.length === 2 && "short:grid-cols-[repeat(2,min(150px,62dvh))]",
-          question.options.length === 3 && "short:grid-cols-[repeat(3,min(140px,62dvh))]",
+          // Two columns, shrinking on short screens so both rows fit (never below 120px).
+          "grid w-full grid-cols-[repeat(2,max(120px,min(calc(50%-0.375rem),26dvh)))] justify-center gap-3",
+          "short:w-auto",
+          // Sideways phones: size cards by the short screen height and the width left
+          // next to the prompt (19rem), so nothing scrolls sideways (2×2 for four options).
+          question.options.length === 2 && "short:grid-cols-[repeat(2,min(150px,62dvh,calc((100vw-19rem)/2)))]",
+          question.options.length === 3 && "short:grid-cols-[repeat(3,min(140px,62dvh,calc((100vw-20rem)/3)))]",
           question.options.length === 4 && "short:grid-cols-[repeat(2,min(130px,38dvh))]",
           // A lone third option sits centered under the first two.
           question.options.length === 3 &&
@@ -111,7 +120,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             <button
               key={option.id}
               type="button"
-              onClick={() => choose(option.id)}
+              onClick={(e) => choose(option.id, e.timeStamp)}
               disabled={faded || correct}
               aria-label={option.label ?? `${i + 1}`}
               onAnimationEnd={() => setWobbling((w) => (w === option.id ? null : w))}
@@ -120,7 +129,8 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
                 won ? "border-leaf-500 shadow-[0_0_0_8px_rgba(61,174,107,0.35)]" : "border-transparent",
                 faded && "bg-mist-100 opacity-40 grayscale",
                 wobbling === option.id && "animate-wobble",
-                scaffold && isRight && "motion-safe:animate-glow",
+                // The hint after two misses; a steady gold outline when motion is reduced.
+                scaffold && isRight && "motion-safe:animate-glow motion-reduce:outline-4 motion-reduce:outline-offset-2 motion-reduce:outline-sun-400",
                 correct && !isRight && "opacity-60",
               )}
             >

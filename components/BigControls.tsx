@@ -27,13 +27,13 @@ export function BigControls({ ready, playing, needsTap, onHome, onTogglePlay, on
         type="button"
         onClick={onTogglePlay}
         disabled={!ready}
-        aria-label={playing ? t("pause") : t("play")}
+        aria-label={playing && !needsTap ? t("pause") : t("play")}
         className={clsx(
           "tactile grid shrink-0 place-items-center rounded-full bg-sky-700 text-white transition-[width,height] disabled:opacity-60",
           needsTap ? "size-28 motion-safe:animate-pulse-next short:size-20" : "size-20",
         )}
       >
-        {playing ? (
+        {playing && !needsTap ? (
           <Pause className="size-10 fill-white" strokeWidth={2.5} aria-hidden />
         ) : (
           <Play className={clsx("ml-1.5 fill-white", needsTap ? "size-14" : "size-10")} strokeWidth={2.5} aria-hidden />

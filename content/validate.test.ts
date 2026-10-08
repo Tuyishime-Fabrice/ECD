@@ -35,7 +35,7 @@ describe("validateContent", () => {
     const errors = errorsFor(c);
     expect(errors).toHaveLength(1);
     expect(errors[0]).toContain('item 2 (episode "s1e1")');
-    expect(errors[0]).toContain('episode id "s1e1" is already used');
+    expect(errors[0]).toContain('episode id "s1e1" is already used in Season 1 › item 1');
   });
 
   it("reports a correctOptionId that matches no option", () => {
@@ -88,6 +88,14 @@ describe("validateContent", () => {
     const d = copy();
     d.seasons[0].items[0].episode.youtubeID = "DEMO";
     expect(errorsFor(d)[0]).toContain('Unrecognized key: "youtubeID"');
+  });
+
+  it("explains a malformed thumbnail", () => {
+    const c = copy();
+    c.seasons[0].items[0].episode.thumbnail = "images/thumbs/s1e1.svg";
+    expect(errorsFor(c)).toEqual([
+      'Season 1 "numbers" › item 1 (episode "s1e1") › thumbnail: must look like "/images/thumbs/picture.svg" or be a full https:// link',
+    ]);
   });
 
   it("says when a required field is missing", () => {

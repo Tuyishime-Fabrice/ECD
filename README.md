@@ -65,8 +65,9 @@ required (it's the fallback). Kinyarwanda can be left `""` until it's ready.
 
 - `id` must be unique in the whole file (we use `s<season>e<episode>`).
 - `durationSec` is the length in seconds (4 minutes = 240).
-- `thumbnail` is optional. Without it, YouTube's own thumbnail is used. To use your
-  own picture, put it in `public/images/thumbs/` and add `"thumbnail": "/images/thumbs/s1e9.svg"`.
+- `thumbnail` is optional. Without it, YouTube's own thumbnail is used (it needs the
+  internet). To use your own picture, which also shows offline, put it in
+  `public/images/thumbs/` and add `"thumbnail": "/images/thumbs/s1e9.svg"`.
 - `skills` must be names listed in `"skills"` at the top of the file.
 - Watch the commas: every block in a list is separated by a comma, except the last.
 
@@ -144,7 +145,7 @@ Until a file exists, demo mode reads the **English** text aloud with the phone's
 built-in voice (Parent area → Demo mode → *Placeholder voice*). Keep files short
 and small (mono, 64 kbps is plenty).
 
-**App voice lines** ("Try again!", "Great job!", "Let's play!") are set in
+**App voice lines** ("Try again!", "Great job!") are set in
 `lib/speech.ts` (`VOICE_LINES`). Add a recording to `public/audio/ui/` and fill in
 its path, e.g. `tryAgain: { audio: { rw: "/audio/ui/try-again.rw.mp3" }, … }`.
 
@@ -185,7 +186,7 @@ npm install
 npm run dev        # http://localhost:3000
 npm run check      # lint + typecheck + tests + build (what CI should run)
 npm run build      # validates content, builds the static site into out/, writes the service worker
-npm start          # serves out/ locally
+npm start          # serves out/ on http://localhost:4173 (a different port from dev)
 ```
 
 Node 22.18+ (the content validator runs as TypeScript directly on Node).
@@ -234,12 +235,14 @@ scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.
   is visible, per Kigali date. When the limit is reached the current episode finishes,
   then Time's Up replaces the end screen.
 - **Offline:** `public/sw.js` precaches the app shell (pages, JS/CSS, fonts, pictures,
-  icons, ~1 MB) and caches audio on first use. Videos are never cached.
+  icons and question recordings, ~1 MB plus audio). An update installs only when every
+  file downloaded, so a dropped connection keeps the previous complete version.
+  Videos are never cached.
 
 ### Quality checks done for this MVP
 
-- Unit tests: progress store, unlock, recommendations, skill mastery, time limit,
-  content validation, color contrast.
+- Unit tests (88): progress store, unlock, recommendations, skill mastery, time limit
+  and extensions, content validation, color contrast.
 - End-to-end checks (headless Chromium, YouTube replaced by a stand-in): pause point at
   20 s, 80% rule, resume, end screen without autoplay, blocked-autoplay Play button below
   the video, offline/unavailable screens, challenge flow (scaffolding, stars, saved

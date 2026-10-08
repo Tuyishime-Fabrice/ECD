@@ -52,3 +52,24 @@ export function isTimeUp(
 ): boolean {
   return remainingSec(usage, settings, today) <= 0;
 }
+
+/**
+ * Seconds to add so the child really gets EXTENSION_SEC more: any time already
+ * used past the limit (an episode that finished late) is forgiven first.
+ */
+export function extensionSec(
+  usage: DailyUsage,
+  settings: Pick<Settings, "dailyLimitMin" | "oneMinuteLimit">,
+  today: string,
+): number {
+  const remaining = remainingSec(usage, settings, today);
+  const overrun = Number.isFinite(remaining) && remaining < 0 ? -remaining : 0;
+  return EXTENSION_SEC + overrun;
+}
+
+/** Milliseconds until the next midnight in Kigali (UTC+2, no daylight saving). */
+export function msUntilKigaliMidnight(now: Date = new Date()): number {
+  const day = 24 * 3600 * 1000;
+  const kigaliMs = now.getTime() + 2 * 3600 * 1000;
+  return day - (((kigaliMs % day) + day) % day);
+}

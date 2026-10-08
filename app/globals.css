@@ -2,6 +2,8 @@
 
 /* Phones held sideways: short screens where every pixel of height counts. */
 @custom-variant short (@media (orientation: landscape) and (max-height: 520px));
+/* Very short portrait screens (small phones with the browser bar showing). */
+@custom-variant tight (@media (orientation: portrait) and (max-height: 600px));
 
 /*
  * Design tokens. Inspired by Rwanda's sky, sun and hills.
@@ -156,10 +158,17 @@
   }
 }
 
-@utility scrollbar-none {
-  scrollbar-width: none;
-  &::-webkit-scrollbar {
-    display: none;
+/* Hide scrollbars on touch screens (swipe instead); mouse users keep a scrollbar to drag. */
+@utility scrollbar-touch-hidden {
+  @media (pointer: coarse) {
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  @media (pointer: fine) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-mist-300) transparent;
   }
 }
 

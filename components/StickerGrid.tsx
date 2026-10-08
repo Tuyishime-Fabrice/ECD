@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { Star } from "lucide-react";
 import type { StickerSlot } from "@/content/types";
 import { playLocked, playSparkle } from "@/lib/sounds";
-import { useProgress, usePick, useT } from "@/lib/store";
+import { useDocumentTitle, useProgress, usePick, useT } from "@/lib/store";
 import { useOneShot } from "./useWiggle";
 
 function Slot({ slot, earned }: { slot: StickerSlot; earned: boolean }) {
@@ -43,6 +43,7 @@ function Slot({ slot, earned }: { slot: StickerSlot; earned: boolean }) {
 export function StickerGrid({ slots }: { slots: StickerSlot[] }) {
   const t = useT();
   const earned = useProgress((s) => s.stickers);
+  useDocumentTitle(t("myStickers"));
   const count = slots.filter((s) => earned.includes(s.challengeId)).length;
 
   return (

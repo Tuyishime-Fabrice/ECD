@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEFAULT_SETTINGS, type DailyUsage } from "./progress";
-import { dailyLimitSec, isTimeUp, kigaliDate, remainingSec } from "./timer";
+import { dailyLimitSec, extensionSec, isTimeUp, kigaliDate, msUntilKigaliMidnight, remainingSec } from "./timer";
 import { skillStatuses } from "./skills";
 
 describe("kigaliDate", () => {
@@ -36,6 +36,30 @@ describe("daily limit", () => {
   it("resets on a new Kigali day", () => {
     expect(isTimeUp(usage(5000, 0, "2026-10-06"), settings(), "2026-10-07")).toBe(false);
     expect(remainingSec(usage(5000, 600, "2026-10-06"), settings(), "2026-10-07")).toBe(1200);
+  });
+});
+
+describe("extensionSec", () => {
+  const settings = { ...DEFAULT_SETTINGS }; // 20 min
+  it("gives 10 minutes when time is up exactly", () => {
+    expect(extensionSec({ date: "d", usedSec: 1200, extraSec: 0 }, settings, "d")).toBe(600);
+  });
+  it("forgives an episode that ran past the limit, so 10 minutes remain", () => {
+    const usage = { date: "d", usedSec: 1200 + 250, extraSec: 0 };
+    const extra = extensionSec(usage, settings, "d");
+    expect(remainingSec({ ...usage, extraSec: extra }, settings, "d")).toBe(600);
+  });
+  it("just adds 10 minutes when time remains or there is no limit", () => {
+    expect(extensionSec({ date: "d", usedSec: 100, extraSec: 0 }, settings, "d")).toBe(600);
+    expect(extensionSec({ date: "d", usedSec: 99999, extraSec: 0 }, { ...settings, dailyLimitMin: 0 }, "d")).toBe(600);
+  });
+});
+
+describe("msUntilKigaliMidnight", () => {
+  it("counts down to 22:00 UTC (midnight in Kigali)", () => {
+    expect(msUntilKigaliMidnight(new Date("2026-10-07T21:59:00Z"))).toBe(60 * 1000);
+    expect(msUntilKigaliMidnight(new Date("2026-10-07T22:00:00Z"))).toBe(24 * 3600 * 1000);
+    expect(msUntilKigaliMidnight(new Date("2026-10-08T10:00:00Z"))).toBe(12 * 3600 * 1000);
   });
 });
 

@@ -13,9 +13,21 @@ const CIRCUMFERENCE = 2 * Math.PI * R;
  * Press-and-hold for 3 seconds. Text only (no voice), so a young child
  * can't follow the instruction. Letting go early starts over.
  */
-export function ParentGate({ onPass, onCancel, className }: { onPass: () => void; onCancel?: () => void; className?: string }) {
+export function ParentGate({
+  onPass,
+  onCancel,
+  titleId: titleIdProp,
+  className,
+}: {
+  onPass: () => void;
+  onCancel?: () => void;
+  /** Lets a surrounding dialog point aria-labelledby at the heading. */
+  titleId?: string;
+  className?: string;
+}) {
   const t = useT();
-  const titleId = useId();
+  const ownId = useId();
+  const titleId = titleIdProp ?? ownId;
   const [progress, setProgress] = useState(0);
   const frame = useRef<number | null>(null);
   const startedAt = useRef(0);
@@ -50,7 +62,7 @@ export function ParentGate({ onPass, onCancel, className }: { onPass: () => void
   );
 
   return (
-    <div className={clsx("flex flex-col items-center gap-5 text-center", className)} aria-labelledby={titleId}>
+    <div className={clsx("flex flex-col items-center gap-5 text-center", className)}>
       <h2 id={titleId} className="font-display text-2xl font-bold text-ink-900">
         {t("gateTitle")}
       </h2>
@@ -79,13 +91,13 @@ export function ParentGate({ onPass, onCancel, className }: { onPass: () => void
         className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-grape-100 [-webkit-touch-callout:none]"
       >
         <svg viewBox="0 0 120 120" className="absolute inset-0 size-full -rotate-90" aria-hidden>
-          <circle cx="60" cy="60" r={R} fill="none" stroke="#D9D2EE" strokeWidth="10" />
+          <circle cx="60" cy="60" r={R} fill="none" className="stroke-white" strokeWidth="10" />
           <circle
             cx="60"
             cy="60"
             r={R}
             fill="none"
-            stroke="#5B4A99"
+            className="stroke-grape-700"
             strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
@@ -109,10 +121,27 @@ export function ParentGate({ onPass, onCancel, className }: { onPass: () => void
 /** The gate as a modal dialog, e.g. to add time from the Time's Up screen. */
 export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onClose: () => void }) {
   const ref = useRef<HTMLDivElement>(null);
+  const titleId = useId();
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null;
     ref.current?.querySelector<HTMLButtonElement>("button")?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+      // Keep keyboard focus inside the dialog.
+      if (e.key === "Tab" && ref.current) {
+        const buttons = [...ref.current.querySelectorAll<HTMLButtonElement>("button")];
+        const first = buttons[0];
+        const last = buttons[buttons.length - 1];
+        const inside = ref.current.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === first || !inside)) {
+          e.preventDefault();
+          last?.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+          e.preventDefault();
+          first?.focus();
+        }
+      }
+    };
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
@@ -126,10 +155,11 @@ export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onCl
         ref={ref}
         role="dialog"
         aria-modal="true"
+        aria-labelledby={titleId}
         className="w-full max-w-sm rounded-card bg-white p-6 shadow-soft"
         onClick={(e) => e.stopPropagation()}
       >
-        <ParentGate onPass={onPass} onCancel={onClose} />
+        <ParentGate onPass={onPass} onCancel={onClose} titleId={titleId} />
       </div>
     </div>
   );

@@ -13,9 +13,9 @@ export default defineConfig([
     },
   },
   {
-    // The service worker runs in its own global scope; __PRECACHE__ is filled in after the build.
+    // The service worker runs in its own global scope.
     files: ["public/sw.js"],
-    languageOptions: { globals: { self: "readonly", caches: "readonly", __PRECACHE__: "readonly" } },
+    languageOptions: { globals: { self: "readonly", caches: "readonly" } },
   },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);

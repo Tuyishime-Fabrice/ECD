@@ -5,6 +5,9 @@ import { loadYouTubeApi, YOUTUBE_HOST, type YTPlayer } from "@/lib/youtube";
 
 export type PlayerError = "offline" | "unavailable";
 
+/** If YouTube hasn't said "ready" by then (e.g. the connection dropped), show the friendly error. */
+const READY_TIMEOUT_MS = 20000;
+
 type Props = {
   videoId: string;
   lang: string;
@@ -30,10 +33,21 @@ export function YouTubePlayer({ videoId, lang, onReady, onStateChange, onError }
     if (!container) return;
     let cancelled = false;
     let player: YTPlayer | null = null;
+    let readyTimer: ReturnType<typeof setTimeout> | undefined;
+    const fail = () => {
+      if (!cancelled) failed(navigator.onLine ? "unavailable" : "offline");
+    };
 
     loadYouTubeApi()
       .then((YT) => {
         if (cancelled) return;
+        // The API can already be in memory from an earlier episode while the device is offline.
+        if (!navigator.onLine) {
+          fail();
+          return;
+        }
+        // An iframe that can't load never reports ready or error, so don't wait forever.
+        readyTimer = setTimeout(fail, READY_TIMEOUT_MS);
         const target = document.createElement("div");
         container.appendChild(target);
         player = new YT.Player(target, {
@@ -52,19 +66,24 @@ export function YouTubePlayer({ videoId, lang, onReady, onStateChange, onError }
             hl: lang,
           },
           events: {
-            onReady: (e) => !cancelled && ready(e.target),
+            onReady: (e) => {
+              clearTimeout(readyTimer);
+              if (!cancelled) ready(e.target);
+            },
             onStateChange: (e) => !cancelled && changed(e.data, e.target),
             // 2 bad id, 5 HTML5 error, 100 removed/private, 101/150 embedding not allowed.
-            onError: () => !cancelled && failed(navigator.onLine ? "unavailable" : "offline"),
+            onError: () => {
+              clearTimeout(readyTimer);
+              fail();
+            },
           },
         });
       })
-      .catch(() => {
-        if (!cancelled) failed(navigator.onLine ? "unavailable" : "offline");
-      });
+      .catch(fail);
 
     return () => {
       cancelled = true;
+      clearTimeout(readyTimer);
       try {
         player?.destroy();
       } catch {
