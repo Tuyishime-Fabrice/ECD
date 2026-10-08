@@ -246,9 +246,9 @@ scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.
   results, sticker), parent gate, settings, reset, 1-minute limit → Time's Up → +10 min,
   installability, offline app shell, no console errors and no sideways scrolling at
   360 px (portrait and landscape) and desktop.
-- Lighthouse (mobile) on Home, Season, Challenge, Stickers, Parents: Accessibility 100,
-  Best Practices 100, Performance 86–94. Lighthouse's default *simulated* throttling gives
-  86–90; its *applied* (devtools) throttling gives 91–94. The watch page wasn't measured:
+- Lighthouse 12 (mobile) on Home, Season, Challenge, Stickers, Parents: Accessibility 100,
+  Best Practices 100, Performance 88–93 (88–91 with Lighthouse's default *simulated*
+  throttling, 91–93 with *applied* devtools throttling). The watch page wasn't measured:
   YouTube's own iframe dominates it and isn't reachable from the build machine.
 
 ### Known placeholders / next steps
