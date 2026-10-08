@@ -72,9 +72,6 @@ export function TimeGate({ mode, children }: { mode: "live" | "start"; children:
   const [upWhenOpened, setUpWhenOpened] = useState<boolean | null>(null);
   if (mode === "start" && hydrated && upWhenOpened === null) setUpWhenOpened(up);
 
-  // Don't start a video or challenge (or download YouTube's script) before we know.
-  if (mode === "start" && upWhenOpened === null) return <div className="min-h-[60dvh]" aria-busy="true" />;
-
   const blocked = mode === "live" ? up : upWhenOpened === true && up;
   return blocked ? <TimesUp /> : <>{children}</>;
 }

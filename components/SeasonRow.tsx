@@ -33,7 +33,7 @@ export function SeasonRow({ season, eager = false }: { season: SeasonCard; eager
           <ChevronRight className="size-7" strokeWidth={3} aria-hidden />
         </Link>
       </h2>
-      <ul className="scrollbar-none mt-3 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-5 pt-1">
+      <ul className="scrollbar-none relative mt-3 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4 pb-5 pt-1">
         {season.items.map((item, i) => (
           <li key={item.id} className="shrink-0 snap-start">
             <ItemCardView
@@ -66,8 +66,8 @@ function ComingSoonRow({ season }: { season: SeasonCard }) {
       <h2 id={`season-${season.id}`} className="flex items-center gap-2 px-4">
         <span
           className={clsx(
-            "inline-flex min-h-14 items-center rounded-full px-5 py-2 font-display text-2xl font-extrabold text-ink-900 opacity-75",
-            theme.bg,
+            "inline-flex min-h-14 items-center rounded-full px-5 py-2 font-display text-2xl font-extrabold text-ink-900",
+            theme.soft,
           )}
         >
           {title}
@@ -89,7 +89,7 @@ function ComingSoonRow({ season }: { season: SeasonCard }) {
             wiggle.className,
           )}
         >
-          <span className="block w-[min(64vw,260px)] overflow-hidden rounded-card bg-white">
+          <span className="block w-[min(64vw,260px)] overflow-hidden rounded-card bg-white p-2">
             <img
               src={season.posterImage}
               alt=""
@@ -97,11 +97,11 @@ function ComingSoonRow({ season }: { season: SeasonCard }) {
               height={300}
               loading="lazy"
               decoding="async"
-              className="aspect-video w-full object-cover"
+              className="aspect-video w-full rounded-2xl object-cover"
             />
           </span>
           {[0, 1].map((i) => (
-            <span key={i} aria-hidden className={clsx("block aspect-video w-[min(64vw,260px)] rounded-card", theme.soft)} />
+            <span key={i} aria-hidden className={clsx("block w-[min(64vw,260px)] rounded-card", theme.soft)} />
           ))}
         </button>
       </div>

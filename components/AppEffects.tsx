@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { setSoundEnabled, unlockAudio } from "@/lib/sounds";
 import { useSettings } from "@/lib/store";
 
-/** App-wide side effects: page language, sound setting, audio unlock on first tap. */
+/** App-wide side effects: page language, sound setting, audio unlock on first tap, offline support. */
 export function AppEffects() {
   const { language, soundOn } = useSettings();
 
@@ -15,6 +15,13 @@ export function AppEffects() {
   useEffect(() => {
     setSoundEnabled(soundOn);
   }, [soundOn]);
+
+  useEffect(() => {
+    // Offline support (production builds only; the dev server changes files constantly).
+    if (process.env.NODE_ENV === "production" && "serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/sw.js").catch(() => {});
+    }
+  }, []);
 
   useEffect(() => {
     const unlock = () => unlockAudio();

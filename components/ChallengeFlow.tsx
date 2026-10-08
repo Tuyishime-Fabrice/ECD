@@ -32,16 +32,8 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
   // Screen time counts while a challenge is open.
   useUsageTicker(hydrated);
 
-  // Until saved progress is read, show nothing that could flash "locked".
-  if (!hydrated) {
-    return (
-      <div className="grid min-h-[60dvh] place-items-center" aria-busy="true">
-        <Mascot className="w-28 opacity-60" />
-      </div>
-    );
-  }
-
-  if (phase.kind === "intro" && !isChallengeUnlocked(challenge, learning)) {
+  // Saved progress is unknown until hydration; the intro shows meanwhile (Start waits).
+  if (hydrated && phase.kind === "intro" && !isChallengeUnlocked(challenge, learning)) {
     return <LockedChallenge challenge={challenge} seasons={seasons} />;
   }
 
@@ -70,13 +62,30 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
 
   if (phase.kind === "intro") {
     return (
-      <section className="mx-auto flex max-w-md animate-fade-in flex-col items-center gap-5 px-6 py-6 text-center short:flex-row short:max-w-2xl short:py-2">
-        <Mascot pose="wave" className="w-40 motion-safe:animate-float short:w-28" />
+      <section className="mx-auto flex max-w-md flex-col items-center gap-4 px-6 py-4 text-center short:max-w-3xl short:flex-row short:justify-center short:gap-8 short:py-2">
+        {/* The sticker they'll win: a reason to play (and the page's main picture). */}
+        <div className="relative grid size-48 place-items-center short:size-40">
+          <svg className="absolute inset-0 size-full motion-safe:animate-spin-slow" viewBox="0 0 100 100" aria-hidden>
+            {Array.from({ length: 12 }, (_, i) => (
+              <path key={i} d="M50 50 L46 0 L54 0 Z" fill="#FFD23F" opacity="0.45" transform={`rotate(${i * 30} 50 50)`} />
+            ))}
+          </svg>
+          <img
+            src={challenge.sticker}
+            alt=""
+            width={200}
+            height={200}
+            fetchPriority="high"
+            className="relative size-40 short:size-32"
+          />
+          <Mascot pose="wave" className="absolute -bottom-2 -left-6 w-20 motion-safe:animate-float" />
+        </div>
         <div className="flex flex-col items-center gap-5">
           <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink-900">{t("letsPlay")}</h1>
           <button
             type="button"
             onClick={start}
+            disabled={!hydrated}
             className={clsx(bigButton, "min-h-24 bg-sky-700 px-10 text-[28px] text-white motion-safe:animate-pulse-next")}
           >
             <Play className="size-10 fill-white" strokeWidth={2.5} aria-hidden />

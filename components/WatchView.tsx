@@ -9,7 +9,7 @@ import { duePausePoint, effectiveDuration, initialTriggered } from "@/lib/playba
 import { resumePosition } from "@/lib/progress";
 import { timeUpNow, useUsageTicker } from "@/lib/screen-time";
 import { nextAfter } from "@/lib/recommend";
-import { getStore, useLang, useLearningState, usePick } from "@/lib/store";
+import { getStore, useHydrated, useLang, useLearningState, usePick } from "@/lib/store";
 import { PlayerState, type YTPlayer } from "@/lib/youtube";
 import { BigControls } from "./BigControls";
 import { EndScreen } from "./EndScreen";
@@ -28,6 +28,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   const lang = useLang();
   const pick = usePick();
   const learning = useLearningState();
+  // The player (and YouTube's script) starts only after the time-limit check has run.
+  const hydrated = useHydrated();
 
   const [phase, setPhase] = useState<Phase>("video");
   const [ready, setReady] = useState(false);
@@ -163,7 +165,7 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
           height={180}
           className="absolute inset-0 size-full object-cover opacity-60"
         />
-        {phase !== "error" && (
+        {hydrated && phase !== "error" && (
           <YouTubePlayer
             key={attempt}
             videoId={episode.videoId}

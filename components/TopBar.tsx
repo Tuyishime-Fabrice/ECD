@@ -22,7 +22,7 @@ export function TopBar() {
     >
       <Link
         href="/"
-        aria-label={t("home")}
+        aria-label={`${brand.name}, ${t("home")}`}
         onClick={playPop}
         className="flex min-h-16 items-center gap-2 rounded-full pr-3 active:scale-95"
       >

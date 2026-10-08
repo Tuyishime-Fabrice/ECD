@@ -11,6 +11,7 @@
     "validate": "node --disable-warning=ExperimentalWarning scripts/validate-content.ts",
     "prebuild": "npm run validate",
     "build": "next build",
+    "postbuild": "node scripts/finalize-sw.mjs",
     "start": "npx serve@14 out",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",

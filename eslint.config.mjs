@@ -12,5 +12,10 @@ export default defineConfig([
       "@next/next/no-img-element": "off",
     },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", "public/sw.js"]),
+  {
+    // The service worker runs in its own global scope; __PRECACHE__ is filled in after the build.
+    files: ["public/sw.js"],
+    languageOptions: { globals: { self: "readonly", caches: "readonly", __PRECACHE__: "readonly" } },
+  },
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
 ]);

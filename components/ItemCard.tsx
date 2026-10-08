@@ -41,6 +41,7 @@ export function ItemThumb({
           width={320}
           height={180}
           loading={eager ? "eager" : "lazy"}
+          fetchPriority={eager ? "high" : "auto"}
           decoding="async"
           className="size-full object-cover"
         />
@@ -112,10 +113,9 @@ export function ItemCardView({ item, status, color, layout, highlight, eager }: 
         : status.done
           ? t("starsN", { n: status.stars })
           : "";
-  const label = [heading, item.type === "episode" ? title : "", stateLabel].filter(Boolean).join(", ");
 
   const className = clsx(
-    "tactile block overflow-hidden rounded-card text-left",
+    "tactile relative block overflow-hidden rounded-card text-left",
     item.type === "challenge" ? "bg-sun-400" : "bg-white",
     layout === "row" ? "w-[min(64vw,260px)]" : "flex w-full items-center gap-3 p-2",
     highlight && "ring-4 ring-sun-400 ring-offset-2 ring-offset-cream-50 motion-safe:animate-pulse-next",
@@ -133,12 +133,15 @@ export function ItemCardView({ item, status, color, layout, highlight, eager }: 
         className={layout === "row" ? "" : "w-36 shrink-0 rounded-2xl sm:w-48"}
       />
       <span className={clsx("block", layout === "row" ? "px-3 py-2" : "min-w-0 flex-1 pr-2")}>
-        {layout === "list" && (
-          <span className="block text-base font-semibold text-ink-600">{item.type === "episode" ? heading : ""}</span>
+        {layout === "list" && item.type === "episode" ? (
+          <span className="block text-base font-semibold text-ink-600">{heading}</span>
+        ) : (
+          item.type === "episode" && <span className="sr-only">{heading}, </span>
         )}
         <span className="line-clamp-2 block font-display text-xl font-bold leading-snug text-ink-900">
           {item.type === "episode" ? title : heading}
         </span>
+        {stateLabel && <span className="sr-only">, {stateLabel}</span>}
       </span>
     </>
   );
@@ -147,7 +150,6 @@ export function ItemCardView({ item, status, color, layout, highlight, eager }: 
     return (
       <button
         type="button"
-        aria-label={label}
         aria-disabled="true"
         className={className}
         onClick={() => {
@@ -161,7 +163,7 @@ export function ItemCardView({ item, status, color, layout, highlight, eager }: 
     );
   }
   return (
-    <Link href={itemHref(item)} prefetch={false} aria-label={label} className={className} onClick={playPop}>
+    <Link href={itemHref(item)} prefetch={false} className={className} onClick={playPop}>
       {content}
     </Link>
   );
