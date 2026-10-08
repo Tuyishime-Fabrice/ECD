@@ -15,6 +15,7 @@ import { getStore, useDocumentTitle, useHydrated, useLearningState, usePick, use
 import { isChallengeUnlocked, missingForChallenge } from "@/lib/unlock";
 import { itemHref, ItemThumb } from "./ItemCard";
 import { Mascot } from "./Mascot";
+import { QuestionHomeLink } from "./QuestionHomeLink";
 import { QuestionPanel } from "./QuestionPanel";
 import { StarBurst } from "./StarBurst";
 
@@ -105,7 +106,10 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
     return (
       <section className="py-2">
         <h1 className="sr-only">{t("challengeN", { n: challenge.number })}</h1>
-        <ProgressDots current={phase.index} total={challenge.questions.length} results={results} />
+        <div className="relative flex items-center justify-center px-4">
+          <QuestionHomeLink className="absolute left-4" />
+          <ProgressDots current={phase.index} total={challenge.questions.length} results={results} />
+        </div>
         <QuestionPanel
           key={question.id}
           question={question}

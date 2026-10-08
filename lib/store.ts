@@ -1,7 +1,7 @@
 /**
  * React hooks over the device progress store. Client components only.
  */
-import { useCallback, useEffect, useMemo, useSyncExternalStore } from "react";
+import { useCallback, useLayoutEffect, useMemo, useSyncExternalStore } from "react";
 import { brand } from "./brand";
 import { t, pick, type MessageKey, type Vars } from "./i18n";
 import { createProgressStore, EMPTY_STATE, type ProgressState, type ProgressStore } from "./progress";
@@ -63,7 +63,9 @@ export const useHydrated = () =>
  * screen readers announce pages in Kinyarwanda too.
  */
 export function useDocumentTitle(title: string | null | undefined) {
-  useEffect(() => {
+  // Layout effect: its cleanup runs while the next page is being committed, so a
+  // pending re-apply can't put this title back on the next page.
+  useLayoutEffect(() => {
     if (!title) return;
     const wanted = `${title} · ${brand.name}`;
     const apply = () => {

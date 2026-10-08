@@ -177,7 +177,7 @@ function ParentArea({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillI
             : t("usedNoLimit", { used: usedMin })}
         </p>
         {Number.isFinite(limit) && <Bar value={today.usedSec} max={limit + today.extraSec} />}
-        {today.extraSec > 0 && <p className="mt-2 text-sm text-ink-600">{t("extraToday", { n: today.extraSec / 60 })}</p>}
+        {today.extraSec > 0 && <p className="mt-2 text-sm text-ink-600">{t("extraToday", { n: Math.round(today.extraSec / 60) })}</p>}
         <button
           type="button"
           onClick={grantExtension}

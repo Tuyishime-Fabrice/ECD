@@ -14,6 +14,7 @@ import { PlayerState, type YTPlayer } from "@/lib/youtube";
 import { BigControls } from "./BigControls";
 import { EndScreen } from "./EndScreen";
 import { FriendlyError } from "./FriendlyError";
+import { QuestionHomeLink } from "./QuestionHomeLink";
 import { QuestionPanel } from "./QuestionPanel";
 import { TimesUp } from "./TimesUp";
 import { YouTubePlayer, type PlayerError } from "./YouTubePlayer";
@@ -38,17 +39,27 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   // The player (and YouTube's script) starts only after the time-limit check has run.
   const hydrated = useHydrated();
 
-  const [phase, setPhase] = useState<Phase>("video");
+  const [phase, setPhaseState] = useState<Phase>("video");
+  // The same phase, readable immediately: player events can arrive before React re-renders.
+  const phaseNow = useRef<Phase>("video");
+  const setPhase = (next: Phase) => {
+    phaseNow.current = next;
+    setPhaseState(next);
+  };
   const [ready, setReady] = useState(false);
   const [playerState, setPlayerState] = useState<number>(PlayerState.UNSTARTED);
   const [hasPlayed, setHasPlayed] = useState(false);
-  const [needsTap, setNeedsTap] = useState(false);
+  /** The first seconds after "ready" are over and it still hasn't played. */
+  const [graceOver, setGraceOver] = useState(false);
   const [questionIndex, setQuestionIndex] = useState<number | null>(null);
   const [error, setError] = useState<PlayerError | null>(null);
   const [attempt, setAttempt] = useState(0);
 
   // Buffering shows the Pause icon (the video is on its way), but only real playback counts as screen time.
   const playing = playerState === PlayerState.PLAYING || playerState === PlayerState.BUFFERING;
+  // Autoplay blocked: make our Play button giant (never an overlay on the video). Derived from the
+  // live player state, so a slow first buffer that ends in a block still gets the big button.
+  const needsTap = graceOver && !hasPlayed && !playing;
 
   useDocumentTitle(pick(episode.title));
   useImmersive(phase === "video" || phase === "question");
@@ -83,7 +94,8 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     setPlayerState(state);
     if (state === PlayerState.PLAYING) {
       setHasPlayed(true);
-      setNeedsTap(false);
+      // The video must not run behind a question or the end screen (e.g. from iPhone's own player).
+      if (phaseNow.current !== "video") player.current?.pauseVideo();
     }
     if (state === PlayerState.ENDED) {
       getStore().markEpisodeEnded(episode.id);
@@ -97,16 +109,11 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     setPhase("error");
   }
 
-  // Autoplay blocked? Make our Play button giant (never an overlay on the video).
-  // A slow first buffer is not "blocked": the video is about to start.
   useEffect(() => {
-    if (!ready || hasPlayed || phase !== "video") return;
-    const timer = setTimeout(() => {
-      const state = player.current?.getPlayerState();
-      if (state !== PlayerState.PLAYING && state !== PlayerState.BUFFERING) setNeedsTap(true);
-    }, AUTOPLAY_GRACE_MS);
+    if (!ready || hasPlayed) return;
+    const timer = setTimeout(() => setGraceOver(true), AUTOPLAY_GRACE_MS);
     return () => clearTimeout(timer);
-  }, [ready, hasPlayed, phase]);
+  }, [ready, hasPlayed]);
 
   const tick = useEffectEvent(() => {
     const p = player.current;
@@ -171,7 +178,7 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
     setError(null);
     setReady(false);
     setHasPlayed(false);
-    setNeedsTap(false);
+    setGraceOver(false);
     setPlayerState(PlayerState.UNSTARTED);
     setPhase("video");
     setAttempt((a) => a + 1);
@@ -225,6 +232,7 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
 
       {phase === "question" && question && (
         <div className="py-4 short:py-2">
+          <QuestionHomeLink className="mb-2 ml-4" />
           <QuestionPanel key={question.id} question={question} onComplete={resumeAfterQuestion} />
         </div>
       )}

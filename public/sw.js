@@ -79,6 +79,41 @@ async function cacheFirst(request) {
   return response;
 }
 
+/**
+ * Recordings: keep the whole file (partial responses can't be cached) and answer
+ * <audio>'s byte-range requests with the matching slice, as Safari requires a 206.
+ */
+async function audioResponse(request) {
+  const full = await cacheFirst(new Request(request.url));
+  const range = /^bytes=(\d*)-(\d*)$/.exec((request.headers.get("range") || "").trim());
+  if (!range || full.status !== 200 || (range[1] === "" && range[2] === "")) return full;
+  const blob = await full.blob();
+  const size = blob.size;
+  let start;
+  let end;
+  if (range[1] === "") {
+    // "bytes=-N": the last N bytes.
+    start = Math.max(0, size - Number(range[2]));
+    end = size - 1;
+  } else {
+    start = Number(range[1]);
+    end = range[2] === "" ? size - 1 : Math.min(Number(range[2]), size - 1);
+  }
+  if (start >= size || start > end) {
+    return new Response(null, { status: 416, headers: { "Content-Range": `bytes */${size}` } });
+  }
+  return new Response(blob.slice(start, end + 1), {
+    status: 206,
+    statusText: "Partial Content",
+    headers: {
+      "Content-Type": full.headers.get("Content-Type") || "audio/mpeg",
+      "Content-Range": `bytes ${start}-${end}/${size}`,
+      "Content-Length": String(end - start + 1),
+      "Accept-Ranges": "bytes",
+    },
+  });
+}
+
 self.addEventListener("fetch", (event) => {
   const { request } = event;
   if (request.method !== "GET") return;
@@ -88,9 +123,7 @@ self.addEventListener("fetch", (event) => {
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(request, OFFLINE_URL));
   } else if (url.pathname.startsWith("/audio/")) {
-    // <audio> asks for byte ranges, and partial (206) responses can't be cached:
-    // always fetch and keep the whole file, and answer every range request with it.
-    event.respondWith(cacheFirst(new Request(url.href)));
+    event.respondWith(audioResponse(request));
   } else if (url.pathname.startsWith("/_next/static/") || /^\/(images|icons)\//.test(url.pathname)) {
     event.respondWith(cacheFirst(request));
   } else {

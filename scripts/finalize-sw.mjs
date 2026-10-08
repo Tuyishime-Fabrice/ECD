@@ -22,6 +22,9 @@ const legacyOnly = new Set(
   [...readFileSync(join(out, "index.html"), "utf8").matchAll(/<script src="([^"]+)" noModule/gi)].map((m) => m[1]),
 );
 
+// "#", "?" and "%" mean something in a URL: escape them so files named with them still load.
+const urlPath = (p) => p.replace(/[%#?]/g, (c) => encodeURIComponent(c));
+
 const urls = [];
 const hash = createHash("sha256");
 for (const file of walk(out).sort()) {
@@ -37,9 +40,9 @@ for (const file of walk(out).sort()) {
   if (rel.endsWith(".html")) {
     // Clean URLs, as served by Vercel/Netlify: /season/numbers.html → /season/numbers
     const path = rel === "index.html" ? "/" : `/${rel.replace(/(\/index)?\.html$/, "")}`;
-    urls.push(path);
+    urls.push(urlPath(path));
   } else {
-    urls.push(`/${rel}`);
+    urls.push(urlPath(`/${rel}`));
   }
 }
 

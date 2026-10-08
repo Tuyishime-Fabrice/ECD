@@ -92,7 +92,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             alt=""
             width={240}
             height={240}
-            className="h-[min(9rem,15dvh)] w-auto rounded-card bg-white p-2 shadow-soft short:h-28"
+            className="h-36 w-auto rounded-card bg-white p-2 shadow-soft tight:h-[min(8rem,20dvh)] short:h-28"
           />
         )}
       </div>
@@ -101,6 +101,8 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
         className={clsx(
           // Two columns, shrinking on short screens so both rows fit (never below 120px).
           "grid w-full grid-cols-[repeat(2,max(120px,min(calc(50%-0.375rem),26dvh)))] justify-center gap-3",
+          // Counting questions: on very short screens the picture keeps its size; the cards give way.
+          question.promptImage && "tight:grid-cols-[repeat(2,max(112px,min(calc(50%-0.375rem),20dvh)))]",
           "short:w-auto",
           // Sideways phones: size cards by the short screen height and the width left
           // next to the prompt (19rem), so nothing scrolls sideways (2×2 for four options).
@@ -126,11 +128,12 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
               onAnimationEnd={() => setWobbling((w) => (w === option.id ? null : w))}
               className={clsx(
                 "tactile relative aspect-square min-h-[120px] w-full rounded-card border-4 bg-white p-2 transition-[opacity,filter,border-color] duration-300 short:min-h-0",
+                question.promptImage && "tight:min-h-[112px]",
                 won ? "border-leaf-500 shadow-[0_0_0_8px_rgba(61,174,107,0.35)]" : "border-transparent",
                 faded && "bg-mist-100 opacity-40 grayscale",
                 wobbling === option.id && "animate-wobble",
                 // The hint after two misses; a steady gold outline when motion is reduced.
-                scaffold && isRight && "motion-safe:animate-glow motion-reduce:outline-4 motion-reduce:outline-offset-2 motion-reduce:outline-sun-400",
+                scaffold && isRight && "motion-safe:animate-glow motion-reduce:outline-4 motion-reduce:outline-offset-2 motion-reduce:outline-sky-700",
                 correct && !isRight && "opacity-60",
               )}
             >

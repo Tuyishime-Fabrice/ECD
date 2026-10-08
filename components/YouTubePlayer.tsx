@@ -5,8 +5,19 @@ import { loadYouTubeApi, YOUTUBE_HOST, type YTPlayer } from "@/lib/youtube";
 
 export type PlayerError = "offline" | "unavailable";
 
-/** If YouTube hasn't said "ready" by then (e.g. the connection dropped), show the friendly error. */
-const READY_TIMEOUT_MS = 20000;
+/** If YouTube hasn't said "ready" by then (e.g. the connection dropped), show the friendly error.
+ *  Generous, because a working player can take this long on 2G/3G. */
+const READY_TIMEOUT_MS = 45000;
+
+/**
+ * iPhones have no element fullscreen: YouTube's button opens the native player,
+ * which hides our questions and end screen and can't be closed from the page.
+ * Offer YouTube's fullscreen button only where we can bring the child back.
+ */
+function fullscreenSupported() {
+  const d = document as Document & { webkitFullscreenEnabled?: boolean };
+  return Boolean(document.fullscreenEnabled || d.webkitFullscreenEnabled);
+}
 
 type Props = {
   videoId: string;
@@ -60,7 +71,7 @@ export function YouTubePlayer({ videoId, lang, onReady, onStateChange, onError }
             playsinline: 1,
             controls: 1,
             iv_load_policy: 3,
-            fs: 1,
+            fs: fullscreenSupported() ? 1 : 0,
             enablejsapi: 1,
             origin: window.location.origin,
             hl: lang,
