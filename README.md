@@ -16,8 +16,10 @@ screen-time limit.
 ## For the content team (no coding needed)
 
 All learning content lives in **one file: `content/seasons.json`**. You can edit
-it directly on GitHub: open the file, click the ✏️ pencil, make your change,
-then "Commit changes". The site rebuilds by itself in a minute or two.
+it directly on GitHub: open the file, check that the branch menu above the file
+says **main**, click the ✏️ pencil, make your change, then "Commit changes". The
+site rebuilds by itself in a minute or two. (Changes on any other branch only
+make a preview, never the live app.)
 
 If something is wrong, **the build stops and lists every problem in plain words**,
 for example:
@@ -29,8 +31,9 @@ for example:
   2. Season 1 "numbers" › item 5 (challenge "s1c1") › question 2 "s1c1-q2" › correctOptionId: "x" is not one of this question's options (a, b, c)
 ```
 
-On Vercel or Netlify you'll see this list in the deploy log, and the live site
-keeps the last good version until you fix it.
+On Vercel you'll see this list in the deploy log (project → **Deployments** → the
+failed one → **Build Logs**), and the live site keeps the last good version until
+you fix it.
 
 Every piece of text has two languages: `{ "rw": "…", "en": "…" }`. English is
 required (it's the fallback). Kinyarwanda can be left `""` until it's ready.
@@ -152,6 +155,7 @@ its path, e.g. `tryAgain: { audio: { rw: "/audio/ui/try-again.rw.mp3" }, … }`.
 ### How to change the brand name and colors
 
 - **Name, tagline, logo, WhatsApp contact, demo video:** `lib/brand.ts`.
+  The Contact card in the parent area stays hidden until you fill in `contactLink`.
   The page title, header, installed-app name and parent area all follow.
   (Leave `storagePrefix` alone after launch; changing it starts every family over.)
 - **Logo:** replace `public/icons/logo.svg`, then regenerate the app icons:
@@ -162,6 +166,51 @@ its path, e.g. `tryAgain: { audio: { rw: "/audio/ui/try-again.rw.mp3" }, … }`.
 - **Never use red on children's screens.**
 
 ---
+
+## Put it online (Vercel, once, about 5 minutes)
+
+1. Go to [vercel.com/signup](https://vercel.com/signup) and choose **Continue with GitHub**.
+   Use the GitHub account that **owns** the repository (**Tuyishime-Fabrice**). Vercel only
+   lets the owner connect a personal repository.
+2. Open [vercel.com/new](https://vercel.com/new), find **ECD** and click **Import**.
+   If it isn't listed, click the GitHub link under the list (**Configure GitHub App**, or
+   **Adjust GitHub App Permissions** on some screens). Choose **Only select repositories**,
+   pick **ECD**, click **Save**, then come back to vercel.com/new.
+3. **Don't change any setting** (Vercel detects Next.js; `vercel.json` does the rest). Click **Deploy**.
+4. About two minutes later you get a link like `ecd-….vercel.app`. That's the live app.
+   To change the address, open the project's **Settings → Domains** (a free `…vercel.app`
+   name, or your own domain).
+5. Check that Vercel publishes the **`main`** branch: in the project, open **Settings →
+   Environments → Production** and look under **Branch Tracking**. It must say `main`.
+   If it doesn't, type `main` and click **Save**. Also make `main` the default branch on
+   GitHub (repository **Settings → General → Default branch**), so edits made on GitHub land there.
+6. **Leave Vercel Analytics and Speed Insights off.** The app promises families no tracking.
+
+From then on, every change on `main` goes live by itself within about two minutes. Other
+branches get their own preview link. If a change breaks the content file, the deploy
+stops and the live app keeps the last good version. Phones that installed the app get
+the new version the next time they open it with internet.
+
+> Vercel's free **Hobby** plan is for personal, non-commercial use only. Vercel counts a
+> project as commercial if anyone involved earns money from it: charging families, showing
+> ads, or paying someone (staff or a consultant) to build or run it. Asking for donations is
+> fine. Commercial use needs the **Pro** plan; if you're unsure, ask Vercel Support.
+>
+> Keep the GitHub repository **public**. If it becomes private, the free plan only publishes
+> changes made from the repository owner's own GitHub account.
+
+## Before real families use it
+
+The live app works today with placeholder content. Swap these in when they're ready.
+Each change goes live by itself.
+
+- [ ] **Real videos:** replace `"DEMO"` with each episode's YouTube ID in `content/seasons.json`.
+  Until then every episode plays YouTube's sample video. Embedding must be allowed on each video.
+- [ ] **WhatsApp:** fill in `contactLink` and `contactLabel` in `lib/brand.ts`. The Contact card then appears.
+- [ ] **Name, logo and mascot:** `lib/brand.ts`, `public/icons/logo.svg`, `components/Mascot.tsx`.
+- [ ] **Kinyarwanda review** by a native speaker (`content/seasons.json`, `lib/i18n.ts`).
+- [ ] **Question recordings:** the build log lists the missing files.
+- [ ] Run the checklist below on the live link, on one Android phone and one iPhone.
 
 ## Demo checklist (2 minutes, on a real phone)
 
@@ -203,7 +252,14 @@ Node 22.18+ (the content validator runs as TypeScript directly on Node).
 
 Both hosts build from GitHub on every push:
 
-- **Vercel:** import the repo; it detects Next.js and serves the static export. `vercel.json` keeps `sw.js` uncached.
+- **Vercel (production):** see [Put it online](#put-it-online-vercel-once-about-5-minutes).
+  Keep the auto-detected **Next.js** preset. It runs `npm run build` (so the content check
+  and the service-worker step run too) and serves the static export with clean URLs
+  (`/watch/s1e1` → `watch/s1e1.html`). `vercel.json` only adds headers: `sw.js` always
+  revalidated (`no-cache`), `nosniff`, `X-Frame-Options: DENY`, a `Permissions-Policy` that
+  turns off camera, microphone and location (remove an entry there if a feature ever needs
+  one), and a referrer policy that still sends the origin (YouTube embeds need it). Checked locally with `vercel build`. Don't switch the preset to
+  "Other" or set an output directory: the Next.js builder reads `out/` itself.
 - **Netlify:** import the repo; `netlify.toml` sets `npm run build` and publishes `out/`.
 
 ### How it fits together
@@ -256,7 +312,7 @@ scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.
 
 ### Known placeholders / next steps
 
-- Brand name "Izuba", WhatsApp number, demo video ID: `lib/brand.ts`.
+- Brand name "Izuba", WhatsApp number (Contact card hidden until set), demo video ID: `lib/brand.ts`.
 - Sun mascot, thumbnails, posters and stickers are simple placeholder SVGs.
 - Kinyarwanda strings (`content/seasons.json`, `lib/i18n.ts`) need native review.
 - Question recordings (list printed by `npm run build`) and app voice lines.
