@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+<defs>
+<g id="avocado" stroke="#263238" stroke-linejoin="round">
+<path d="M50 9C64 9 70 25 74 39C83 56 82 91 50 93C18 91 17 56 26 39C30 25 36 9 50 9Z" fill="#3E7B3A" stroke-width="4"/>
+<path d="M50 18C60 18 64 30 67 42C74 56 74 84 50 85C26 84 26 56 33 42C36 30 40 18 50 18Z" fill="#D9F0A3" stroke="none"/>
+<circle cx="50" cy="62" r="14" fill="#9C6B3F" stroke-width="3.5"/>
+<circle cx="45" cy="57" r="4" fill="#C49064" stroke="none"/>
+</g></defs><use href="#avocado" transform="translate(3.2 3.2) scale(0.74) rotate(-8 50 50)"/><use href="#avocado" transform="translate(83.2 3.2) scale(0.74) rotate(6 50 50)"/><use href="#avocado" transform="translate(163.2 3.2) scale(0.74) rotate(-4 50 50)"/><use href="#avocado" transform="translate(3.2 83.2) scale(0.74) rotate(8 50 50)"/><use href="#avocado" transform="translate(83.2 83.2) scale(0.74) rotate(-6 50 50)"/><use href="#avocado" transform="translate(163.2 83.2) scale(0.74) rotate(4 50 50)"/><use href="#avocado" transform="translate(3.2 163.2) scale(0.74) rotate(-8 50 50)"/><use href="#avocado" transform="translate(83.2 163.2) scale(0.74) rotate(6 50 50)"/><use href="#avocado" transform="translate(163.2 163.2) scale(0.74) rotate(-4 50 50)"/>
+</svg>

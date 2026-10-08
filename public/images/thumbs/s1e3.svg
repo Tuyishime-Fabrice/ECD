@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+<defs>
+<g id="orange" stroke="#263238" stroke-linejoin="round" stroke-linecap="round">
+<circle cx="50" cy="57" r="34" fill="#FF9F43" stroke-width="4"/>
+<circle cx="37" cy="45" r="7" fill="#FFC88A" stroke="none"/>
+<g fill="#E8822A" stroke="none"><circle cx="62" cy="50" r="2"/><circle cx="56" cy="70" r="2"/><circle cx="70" cy="64" r="2"/><circle cx="42" cy="68" r="2"/></g>
+<path d="M50 23C50 17 52 13 55 11" fill="none" stroke-width="4"/>
+<path d="M54 18C62 8 76 10 81 16C71 23 61 23 54 18Z" fill="#3DAE6B" stroke-width="3.5"/>
+</g></defs>
+<rect width="320" height="180" fill="#E1F3FB"/>
+<path transform="translate(18 14) scale(0.9)" d="M10 30C0 30 0 14 12 14C14 4 30 2 34 12C40 4 56 8 54 20C64 20 64 30 56 30Z" fill="#FFFFFF"/>
+<path d="M0 140.4C64 115.2 134.4 126 192 144C240 154.8 281.6 129.6 320 122.4V180H0Z" fill="#6CC18A"/>
+<path d="M0 158.4C70.4 147.6 144 154.8 198.4 163.8C256 171 288 154.8 320 151.2V180H0Z" fill="#3DAE6B"/>
+<g transform="translate(60.67 132) scale(1.55)" fill="#FFFFFF" stroke="#263238" stroke-width="7.75" stroke-linejoin="round" paint-order="stroke"><path transform="translate(0 0)" d="M23.3-62.3L23.3-62.3Q34.7-62.3 40.8-57.6Q46.8-52.8 46.8-44.8L46.8-44.8Q46.8-41.6 45.7-39.1Q44.5-36.5 42.6-34.6Q40.6-32.7 38.2-31.6L38.2-31.6Q41-30.6 43.3-28.8Q45.5-26.9 46.9-24Q48.3-21.1 48.3-16.8L48.3-16.8Q48.3-11.1 45.1-7.0Q41.9-2.8 36.4-0.6Q30.8 1.6 23.5 1.6L23.5 1.6Q16.6 1.6 12.0 0.3Q7.3-1 4.9-3.4Q2.5-5.7 2.5-8.7L2.5-8.7Q2.5-11.4 3.8-13.4Q5.1-15.4 7-16.4L7-16.4Q9-15.1 12.4-13.5Q15.7-11.9 21.1-11.9L21.1-11.9Q26.1-11.9 28.6-13.8Q31.1-15.6 31.1-18.4L31.1-18.4Q31.1-21.3 29.2-22.8Q27.2-24.3 22.4-24.3L22.4-24.3L13-24.3Q12.3-25.4 11.8-27Q11.3-28.6 11.3-30.8L11.3-30.8Q11.3-33.1 11.8-34.8Q12.3-36.5 13-37.5L13-37.5L22.4-37.5Q26.1-37.5 27.9-38.9Q29.6-40.3 29.6-43L29.6-43Q29.6-45.6 27.3-47.2Q25-48.8 20.4-48.8L20.4-48.8Q16.4-48.8 13.3-47.9Q10.1-46.9 8.1-45.5L8.1-45.5Q6.5-46.7 5.4-48.5Q4.2-50.2 4.2-52.6L4.2-52.6Q4.2-56 6.6-58.1Q8.9-60.2 13.2-61.3Q17.5-62.3 23.3-62.3Z"/></g>
+<use href="#orange" transform="translate(180.72 20.72) scale(0.63) rotate(-8 50 50)"/><use href="#orange" transform="translate(248.72 20.72) scale(0.63) rotate(6 50 50)"/><use href="#orange" transform="translate(214.72 88.72) scale(0.63) rotate(-4 50 50)"/>
+</svg>

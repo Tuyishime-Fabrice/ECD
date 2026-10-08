@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+<defs>
+<g id="banana" stroke="#263238" stroke-linejoin="round" stroke-linecap="round">
+<path d="M18 30C22 64 50 86 85 77C91 75 90 66 84 67C56 71 37 53 33 28C32 21 18 22 18 30Z" fill="#FFD23F" stroke-width="4"/>
+<path d="M29 37C35 57 52 69 74 71" fill="none" stroke="#E9B800" stroke-width="3"/>
+<path d="M19 27L16 15L27 13L32 25" fill="#8D5A34" stroke-width="3.5"/>
+<circle cx="87" cy="72" r="3.5" fill="#8D5A34" stroke-width="2.5"/>
+</g></defs>
+<rect width="320" height="180" fill="#E1F3FB"/>
+<path transform="translate(18 14) scale(0.9)" d="M10 30C0 30 0 14 12 14C14 4 30 2 34 12C40 4 56 8 54 20C64 20 64 30 56 30Z" fill="#FFFFFF"/>
+<path d="M0 140.4C64 115.2 134.4 126 192 144C240 154.8 281.6 129.6 320 122.4V180H0Z" fill="#6CC18A"/>
+<path d="M0 158.4C70.4 147.6 144 154.8 198.4 163.8C256 171 288 154.8 320 151.2V180H0Z" fill="#3DAE6B"/>
+<g transform="translate(61.91 132) scale(1.55)" fill="#FFFFFF" stroke="#263238" stroke-width="7.75" stroke-linejoin="round" paint-order="stroke"><path transform="translate(0 0)" d="M8-60.8L8-60.8L42.8-60.8Q44.5-59.7 45.9-57.8Q47.2-55.8 47.2-52.9L47.2-52.9Q47.2-51.3 46.9-49.7Q46.6-48 45.9-46.4L45.9-46.4L25.1 0.7Q23.7 0.8 22.5 0.8Q21.2 0.8 20.1 0.8L20.1 0.8Q15.6 0.8 12.8-1.0Q10-2.7 10-6.8L10-6.8Q10-8.9 11.1-11.4Q12.1-13.8 13.7-17.2L13.7-17.2L28.3-47.1L3.8-47.1Q3.2-48.2 2.6-50Q2-51.8 2-53.8L2-53.8Q2-57.6 3.7-59.2Q5.4-60.8 8-60.8Z"/></g>
+<use href="#banana" transform="translate(179.36 53.36) scale(0.31) rotate(-8 50 50)"/><use href="#banana" transform="translate(213.36 53.36) scale(0.31) rotate(6 50 50)"/><use href="#banana" transform="translate(247.36 53.36) scale(0.31) rotate(-4 50 50)"/><use href="#banana" transform="translate(281.36 53.36) scale(0.31) rotate(8 50 50)"/><use href="#banana" transform="translate(196.36 87.36) scale(0.31) rotate(-6 50 50)"/><use href="#banana" transform="translate(230.36 87.36) scale(0.31) rotate(4 50 50)"/><use href="#banana" transform="translate(264.36 87.36) scale(0.31) rotate(-8 50 50)"/>
+</svg>

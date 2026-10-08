@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 180" width="320" height="180">
+<defs>
+<g id="banana" stroke="#263238" stroke-linejoin="round" stroke-linecap="round">
+<path d="M18 30C22 64 50 86 85 77C91 75 90 66 84 67C56 71 37 53 33 28C32 21 18 22 18 30Z" fill="#FFD23F" stroke-width="4"/>
+<path d="M29 37C35 57 52 69 74 71" fill="none" stroke="#E9B800" stroke-width="3"/>
+<path d="M19 27L16 15L27 13L32 25" fill="#8D5A34" stroke-width="3.5"/>
+<circle cx="87" cy="72" r="3.5" fill="#8D5A34" stroke-width="2.5"/>
+</g></defs>
+<rect width="320" height="180" fill="#E1F3FB"/>
+<path transform="translate(18 14) scale(0.9)" d="M10 30C0 30 0 14 12 14C14 4 30 2 34 12C40 4 56 8 54 20C64 20 64 30 56 30Z" fill="#FFFFFF"/>
+<path d="M0 140.4C64 115.2 134.4 126 192 144C240 154.8 281.6 129.6 320 122.4V180H0Z" fill="#6CC18A"/>
+<path d="M0 158.4C70.4 147.6 144 154.8 198.4 163.8C256 171 288 154.8 320 151.2V180H0Z" fill="#3DAE6B"/>
+<g transform="translate(59.59 132) scale(1.55)" fill="#FFFFFF" stroke="#263238" stroke-width="7.75" stroke-linejoin="round" paint-order="stroke"><path transform="translate(0 0)" d="M6-52L6-52Q6-55.5 8.3-57.8Q10.5-60 14.6-61.2Q18.6-62.3 24.1-62.3L24.1-62.3Q32-62.3 37.3-59.9Q42.6-57.4 45.3-53.2Q48-49 48-43.7L48-43.7Q48-38.4 45.1-33.5Q42.1-28.5 36.1-23.7L36.1-23.7L23-13.2L47-13.2Q47.6-12.2 48.2-10.5Q48.7-8.7 48.7-6.7L48.7-6.7Q48.7-3.1 47.1-1.6Q45.5 0 42.9 0L42.9 0L8.2 0Q6-1.5 4.8-3.9Q3.5-6.3 3.5-9.4L3.5-9.4Q3.5-12.8 5.0-15.2Q6.4-17.5 8-18.9L8-18.9L21.8-30.7Q27-35.1 28.9-37.8Q30.8-40.5 30.8-42.7L30.8-42.7Q30.8-45.5 28.6-47.1Q26.3-48.7 22.3-48.7L22.3-48.7Q18.3-48.7 15.2-47.5Q12-46.2 9.9-44.8L9.9-44.8Q8.3-46 7.2-47.8Q6-49.6 6-52Z"/></g>
+<use href="#banana" transform="translate(180.72 54.72) scale(0.63) rotate(-8 50 50)"/><use href="#banana" transform="translate(248.72 54.72) scale(0.63) rotate(6 50 50)"/>
+</svg>
