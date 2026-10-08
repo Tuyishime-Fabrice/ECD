@@ -303,18 +303,22 @@ function ParentArea({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillI
       <Card title={t("privacy")} icon={<ShieldCheck className="size-5" strokeWidth={2.5} aria-hidden />}>
         <p className="leading-relaxed">{t("privacyBody")}</p>
       </Card>
-      <Card title={t("contact")} icon={<MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />}>
-        <p>{t("contactBody")}</p>
-        <a
-          href={brand.contactLink}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-leaf-700 px-5 font-semibold text-white"
-        >
-          <MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />
-          {t("whatsapp")} · {brand.contactLabel}
-        </a>
-      </Card>
+      {/* Hidden until a real number is set in lib/brand.ts. */}
+      {brand.contactLink && (
+        <Card title={t("contact")} icon={<MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />}>
+          <p>{t("contactBody")}</p>
+          <a
+            href={brand.contactLink}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-leaf-700 px-5 font-semibold text-white"
+          >
+            <MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />
+            {t("whatsapp")}
+            {brand.contactLabel && ` · ${brand.contactLabel}`}
+          </a>
+        </Card>
+      )}
     </main>
   );
 }
