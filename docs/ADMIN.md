@@ -183,3 +183,42 @@ reachable by keyboard.
 
 Every save shows a clear result: "Saved. Live in about 2 minutes." Every refusal lists the
 problems in plain words next to the fields they're about.
+
+## Dashboard: how the screens work
+
+The routes are in `app/admin/` (rendered per request with `dynamic = "force-dynamic"`, so `/admin` is
+sent with `Cache-Control: private, no-cache, no-store`), the screens in `components/admin/`, and the
+pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api/admin/*` and
+`/build-info.json`.
+
+- **Changes stay in the browser until Save.** Editing a story, moving it or changing a setting
+  updates a draft; a bar at the bottom says there are unsaved changes, with **Discard** and
+  **Save**. Leaving the page with unsaved changes asks first. A new story or challenge stays on its
+  own screen until **Add story** / **Add challenge**, so a half-filled form never reaches the draft.
+- **One save** sends the draft and the new pictures it uses. If the new pictures don't fit in one
+  save (40 pictures, 3 MB), the extra ones go first in saves of their own. The summary in History
+  is written from what was changed ("Added story “…” and changed the order of stories").
+- **Before sending**, the same checks as the server run in the browser (`checkDraft` in
+  `lib/admin/ui-issues.ts`, everything but pictures), so most problems show next to their field
+  at once. A 422 from the server is shown the same way: next to the field when `issues[].path`
+  points at one, and in the "Fix these before saving" list with a **Fix** link that opens the
+  field. A 409 shows "Someone else saved changes" with **Reload**; a 401 shows the sign-in screen
+  and keeps the draft.
+- **Consistency before saving** (`prepareForSave` in `lib/admin/ui-content.ts`): story numbers
+  count 1, 2, 3… in each collection, `site.featured` keeps only stories in Live collections, once
+  each, at most 6. New ids follow the sample: `s4`, `s1e9`, `s1c3`, `s1e9-p1`, `s1c3-q2`.
+  Moving a story swaps it with the next story; challenges keep their places.
+- **Pictures** are resized with a canvas (`lib/admin/ui-images.ts`): story pictures 1280×720 and
+  posters 800×600, cut from the middle; answers and stickers fit in 512×512 and stay PNG when
+  see-through. Names come from `uploadPath()`. The dashboard keeps showing the pictures it just
+  saved; after a reload, one that isn't live yet shows a placeholder until the app is rebuilt.
+- **YouTube:** the link is looked up with `/api/admin/youtube` (title and picture). The story
+  editor alone loads the YouTube IFrame API, in a hidden player, to read the length; if that
+  fails it asks for minutes:seconds.
+- **Live status** (`lib/admin/ui-live.ts`): after a save the header chip says "Going live…" and
+  polls `/build-info.json` every 10 seconds until the build is that save or newer, then "Live ✓".
+  After 10 minutes it says "Taking longer than usual". Without build info (`next dev`) it shows
+  nothing.
+
+To try it, run the fake GitHub and `next start` as in "Trying it locally", then open `/admin` and
+sign in with `correct horse battery`.

@@ -30,7 +30,10 @@ function RecentSaves() {
       <CardHeader
         title="Recent saves"
         actions={
-          <Link href="/admin/history" className="inline-flex min-h-11 items-center text-[15px] font-semibold text-listen-ink hover:underline">
+          <Link
+            href="/admin/history"
+            className="-my-2.5 inline-flex min-h-11 items-center text-[15px] font-semibold text-listen-ink hover:underline"
+          >
             See all
           </Link>
         }
@@ -148,29 +151,41 @@ export function Overview() {
 
       <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-5">
         <div className="space-y-6 lg:col-span-3">
-        <Card>
-          <CardHeader title="Shortcuts" />
-          <CardBody>
-            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              {shortcuts.map(({ href, label, note, icon: Icon }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    className="group flex h-full min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
-                  >
-                    <Icon className="size-5 shrink-0 text-ink-3 group-hover:text-listen-ink" {...ICON} />
-                    <span className="min-w-0 flex-1">
-                      <span className="block font-semibold text-ink">{label}</span>
-                      <span className="block text-sm text-ink-2">{note}</span>
-                    </span>
-                    <ArrowRight className="size-4 shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" {...ICON} />
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </CardBody>
-        </Card>
-        <RecentSaves />
+          <Card>
+            <CardHeader title="Shortcuts" />
+            <CardBody>
+              <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                {shortcuts.map(({ href, label, note, icon: Icon }) => (
+                  <li key={href}>
+                    <Link
+                      href={href}
+                      className="group flex h-full min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
+                    >
+                      <Icon className="size-5 shrink-0 text-ink-3 group-hover:text-listen-ink" {...ICON} />
+                      <span className="min-w-0 flex-1">
+                        <span className="block font-semibold text-ink">{label}</span>
+                        <span className="block text-sm text-ink-2">{note}</span>
+                      </span>
+                      <ArrowRight className="size-4 shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" {...ICON} />
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </CardBody>
+          </Card>
+          <RecentSaves />
+          <Card>
+            <CardHeader
+              icon={<Star className="size-5" {...ICON} />}
+              title="Featured on Home"
+              description={`${draft.site.featured.length} of 6 stories in the big slider.`}
+            />
+            <CardBody className="pt-3">
+              <Link href="/admin/settings#f-featured" className="text-[15px] font-semibold text-listen-ink hover:underline">
+                Choose featured stories
+              </Link>
+            </CardBody>
+          </Card>
         </div>
 
         <div className="space-y-6 lg:col-span-2">
@@ -210,18 +225,6 @@ export function Overview() {
             </CardBody>
           </Card>
 
-          <Card>
-            <CardHeader
-              icon={<Star className="size-5" {...ICON} />}
-              title="Featured on Home"
-              description={`${draft.site.featured.length} of 6 stories in the big slider.`}
-            />
-            <CardBody className="pt-3">
-              <Link href="/admin/settings#f-featured" className="text-[15px] font-semibold text-listen-ink hover:underline">
-                Choose featured stories
-              </Link>
-            </CardBody>
-          </Card>
         </div>
       </div>
     </>

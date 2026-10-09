@@ -75,8 +75,12 @@ function LoginScreen() {
   const input = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    document.title = `Sign in · Admin · ${brand.name}`;
+    const previous = document.title;
+    document.title = `Sign in · ${brand.name} Admin`;
     input.current?.focus();
+    return () => {
+      document.title = previous;
+    };
   }, []);
 
   async function submit(e: React.FormEvent) {
@@ -154,8 +158,15 @@ function SetupScreen() {
   const { session, recheck } = useAdmin();
   const [busy, setBusy] = useState(false);
   const problems = session?.setup.problems ?? [];
+  // Only the settings that are missing or wrong; all of them if the problem is elsewhere.
+  const named = SETTINGS.filter((s) => problems.some((p) => p.includes(s.name)));
+  const settings = named.length ? named : SETTINGS;
   useEffect(() => {
-    document.title = `Finish setting up · Admin · ${brand.name}`;
+    const previous = document.title;
+    document.title = `Finish setting up · ${brand.name} Admin`;
+    return () => {
+      document.title = previous;
+    };
   }, []);
   return (
     <Frame wide>
@@ -182,7 +193,7 @@ function SetupScreen() {
         </Step>
         <Step n={2} title="Add each missing setting">
           <ul className="mt-2 space-y-2">
-            {SETTINGS.map((s) => (
+            {settings.map((s) => (
               <li key={s.name} className="rounded-xl border border-line bg-paper-2 px-3.5 py-3">
                 <code className="font-mono text-[14px] font-bold text-ink">{s.name}</code>
                 <p className="mt-0.5 text-sm text-ink-2">{s.what}</p>
