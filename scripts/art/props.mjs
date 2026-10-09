@@ -187,6 +187,19 @@ export function stall(doc, x0, x1, topY, groundY, colors = ["#2BA6A0", "#FFF3DE"
   return { svg: o, tableY, table: `<path d="M${f(x0)} ${f(tableY)}H${f(x1)}V${f(tableY + 18)}H${f(x0)}Z" fill="#C98B4E" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/><path d="M${f(x0 + 6)} ${f(tableY + 6)}H${f(x1 - 6)}" stroke="#E2AE72" stroke-width="3" stroke-linecap="round"/><path d="M${f(x0 + 14)} ${f(tableY + 18)}V${f(groundY)}M${f(x1 - 14)} ${f(tableY + 18)}V${f(groundY)}" stroke="${OUTLINE}" stroke-width="${6 + OW * 2}"/><path d="M${f(x0 + 14)} ${f(tableY + 18)}V${f(groundY)}M${f(x1 - 14)} ${f(tableY + 18)}V${f(groundY)}" stroke="#A86E3A" stroke-width="6"/>` };
 }
 
+/** A ball of dried banana leaves tied with twine, the football every Rwandan child knows. */
+export function ball(doc, cx, cy, r) {
+  doc.def("g-ball", radial("g-ball", [[0, "#F6DA9C"], [0.6, "#E2B66A"], [1, "#B9853F"]], [0.38, 0.34, 0.8]));
+  const k = r / 20;
+  const p = (x, y) => `${f(cx + x * k)} ${f(cy + y * k)}`;
+  const twine = `M${p(-19, -5)}C${p(-8, -1)} ${p(8, -1)} ${p(19, -5)}M${p(-17, 9)}C${p(-6, 13)} ${p(6, 13)} ${p(17, 9)}M${p(-6, -19)}C${p(-11, -6)} ${p(-11, 6)} ${p(-6, 19)}M${p(7, -19)}C${p(2, -6)} ${p(2, 6)} ${p(7, 19)}`;
+  return (
+    `<circle cx="${f(cx)}" cy="${f(cy)}" r="${f(r)}" fill="url(#g-ball)" stroke="${OUTLINE}" stroke-width="${OW}"/>` +
+    `<path d="${twine}" fill="none" stroke="#8A5A2B" stroke-width="${f(2.4 * k)}" stroke-linecap="round"/>` +
+    `<path d="M${p(-13, -6)}C${p(-11, -11)} ${p(-7, -14)} ${p(-2, -15)}" fill="none" stroke="#fff" stroke-width="${f(3 * k)}" stroke-linecap="round" opacity=".6"/>`
+  );
+}
+
 /** A ground shadow under a figure. */
 export const shadow = (cx, cy, rx, ry = rx * 0.18, o = 0.18) => `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="#2E4A1E" opacity="${o}"/>`;
 

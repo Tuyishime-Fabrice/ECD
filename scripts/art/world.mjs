@@ -50,9 +50,9 @@ function ridge(W, y, spec, roll = 0, phase = 0) {
   return pts;
 }
 
-const hutsAt = (doc, P, spots) =>
+export const hutsAt = (doc, P, spots) =>
   spots.map(([x, y, w, lit]) => stand(hutSymbol(doc, P, P.night && lit), x, y, w, HUT_RATIO)).join("");
-const bananasAt = (doc, P, spots) =>
+export const bananasAt = (doc, P, spots) =>
   spots.map(([x, y, w, flip]) => stand(bananaSymbol(doc, P), x, y, w, BANANA_RATIO, { flip })).join("");
 
 /* ---------- collection path map: tall, calm in the middle ---------- */

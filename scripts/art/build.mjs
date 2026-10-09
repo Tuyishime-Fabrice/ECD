@@ -9,11 +9,12 @@
  */
 import { report, write } from "./lib.mjs";
 import { buildPosters } from "./posters.mjs";
+import { buildScenes } from "./scenes.mjs";
 import { buildThumbs } from "./thumbs.mjs";
 import { buildUi } from "./ui.mjs";
 import { buildWorld } from "./world.mjs";
 
-const GROUPS = { world: buildWorld, thumbs: buildThumbs, posters: buildPosters, ui: buildUi };
+const GROUPS = { world: buildWorld, thumbs: buildThumbs, posters: buildPosters, ui: buildUi, scenes: buildScenes };
 const wanted = process.argv.slice(2);
 for (const [name, build] of Object.entries(GROUPS)) if (!wanted.length || wanted.includes(name)) build(write);
 report();
