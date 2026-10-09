@@ -6,7 +6,7 @@ import { useEffect } from "react";
 import type { ItemCard, LocalizedText } from "@/content/types";
 import { playCheer, playPop } from "@/lib/sounds";
 import { usePick, useT } from "@/lib/store";
-import { itemHref } from "./ItemCard";
+import { itemHref } from "./kid/StoryCard";
 import { Mascot } from "./Mascot";
 import { StarBurst } from "./StarBurst";
 

@@ -9,6 +9,10 @@ import { useLearningState, usePick, useT } from "@/lib/store";
 import { useOneShot } from "../useWiggle";
 import { LockMark, Pips, PlayDisc, ProgressStrip, StarMarks, WatchedMark } from "./marks";
 
+/** Where tapping an item goes. */
+export const itemHref = (item: { type: "episode" | "challenge"; id: string }) =>
+  item.type === "episode" ? `/watch/${item.id}` : `/challenge/${item.id}`;
+
 const card =
   "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 shadow-rim md:w-64";
 /** The story to watch next: a sun ring and a soft halo. */

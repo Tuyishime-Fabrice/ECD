@@ -44,7 +44,7 @@ export function StarBurst({ className }: { className?: string }) {
               <path
                 d="M12 2l3 6.5 7 .9-5.1 4.8 1.3 7L12 17.8 5.8 21.2l1.3-7L2 9.4l7-.9z"
                 style={{ fill: p.color }}
-                className="stroke-ink-900"
+                className="stroke-ink"
                 strokeWidth="1.5"
                 strokeLinejoin="round"
               />

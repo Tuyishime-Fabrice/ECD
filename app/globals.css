@@ -102,37 +102,14 @@
   }
 }
 
-/* LEGACY tokens: used by screens not yet redesigned. Remove when the redesign is complete. */
+/*
+ * Fonts, radii and motion. Tailwind's default palette is dropped so only the
+ * day/night colors below can be used (plus plain white/black for photo scrims).
+ */
 @theme {
   --color-*: initial;
   --color-white: #ffffff;
   --color-black: #000000;
-
-  --color-cream-50: #fff9ee;
-  --color-ink-900: #263238;
-  --color-ink-600: #546e7a;
-
-  --color-sky-100: #e1f3fb;
-  --color-sky-500: #29a9e0;
-  --color-sky-700: #1572a8;
-
-  --color-sun-100: #fff3c7;
-  --color-sun-400: #ffd23f;
-
-  --color-leaf-100: #e2f4e8;
-  --color-leaf-300: #6cc18a;
-  --color-leaf-500: #3dae6b;
-  --color-leaf-700: #23794a;
-
-  --color-coral-100: #ffe8df;
-  --color-coral-400: #ff8a65;
-
-  --color-grape-100: #eeeaf7;
-  --color-grape-500: #8e7cc3;
-  --color-grape-700: #5b4a99;
-
-  --color-mist-100: #eceff1;
-  --color-mist-300: #b0bec5;
 
   --font-display: var(--font-baloo), ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
   --font-body: var(--font-nunito), system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -142,9 +119,6 @@
   --radius-tile: 28px;
   --radius-hero: 32px;
 
-  --shadow-tactile: 0 6px 0 rgba(0, 0, 0, 0.12);
-  --shadow-tactile-pressed: 0 2px 0 rgba(0, 0, 0, 0.12);
-  --shadow-soft: 0 2px 12px rgba(38, 50, 56, 0.08);
 
   --animate-wiggle: wiggle 300ms ease-in-out;
   --animate-wobble: wobble 300ms ease-in-out;
@@ -210,7 +184,7 @@
   }
 }
 
-/* Semantic day/night colors (after the legacy block: its "--color-*: initial" would erase them). */
+/* Semantic day/night colors. Must come after the block above: its "--color-*: initial" would erase them. */
 @theme inline {
   --color-ground: var(--c-ground);
   --color-paper: var(--c-paper);
@@ -286,18 +260,6 @@
   }
   img {
     -webkit-user-drag: none;
-  }
-}
-
-/* Chunky, tappable surface: bottom shadow that shrinks when pressed. */
-@utility tactile {
-  box-shadow: var(--shadow-tactile);
-  transition: transform 120ms ease-out, box-shadow 120ms ease-out;
-  user-select: none;
-  -webkit-user-select: none;
-  &:active:not(:disabled) {
-    transform: translateY(3px) scale(0.96);
-    box-shadow: var(--shadow-tactile-pressed);
   }
 }
 
