@@ -55,7 +55,7 @@ function giftOpen() {
   const doc = new Doc();
   giftDefs(doc);
   doc.def("beam", radial("beam", [[0, "#FFF6C8", 0.95], [0.55, "#FFE27A", 0.5], [1, "#FFE27A", 0]]));
-  doc.def("ray", radial("ray", [[0, "#FFF3B0", 0.8], [1, "#FFE27A", 0]], [0.5, 0.5, 0.5], ' gradientUnits="userSpaceOnUse" cx="70" cy="74" r="64"'));
+  doc.def("ray", radial("ray", [[0, "#FFF3B0", 0.8], [1, "#FFE27A", 0]], [70, 74, 64], ' gradientUnits="userSpaceOnUse"'));
   doc.def("star", linear("star", [[0, "#FFE071"], [1, "#FFAE1A"]]));
   const R = 64;
   const beams = [-56, -28, 0, 28, 56].map((a) => `<path d="M70 74L${f(70 + R * Math.sin(((a - 7) * Math.PI) / 180))} ${f(74 - R * Math.cos(((a - 7) * Math.PI) / 180))}A${R} ${R} 0 0 1 ${f(70 + R * Math.sin(((a + 7) * Math.PI) / 180))} ${f(74 - R * Math.cos(((a + 7) * Math.PI) / 180))}Z"/>`).join("");
