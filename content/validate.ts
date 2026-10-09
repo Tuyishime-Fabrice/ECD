@@ -4,9 +4,12 @@
  */
 import { contentSchema, type Content, type Question } from "./schema.ts";
 
+/** One problem, with where it is, so a form can show it next to the field. `errors[i]` describes `issues[i]`. */
+export type ContentIssue = { path: (string | number)[]; message: string; missingPicture?: string };
+
 export type ValidationResult =
   | { ok: true; content: Content; warnings: string[]; missingAudio: string[] }
-  | { ok: false; errors: string[]; warnings: string[]; missingAudio: string[] };
+  | { ok: false; errors: string[]; issues: ContentIssue[]; warnings: string[]; missingAudio: string[] };
 
 type Path = readonly PropertyKey[];
 type Node = Record<PropertyKey, unknown> | undefined;
@@ -77,19 +80,29 @@ function allQuestions(content: Content): { question: Question; path: (string | n
  */
 export function validateContent(raw: unknown, fileExists: (publicPath: string) => boolean): ValidationResult {
   const warnings: string[] = [];
+  const errors: string[] = [];
+  const issues: ContentIssue[] = [];
+  const report = (issue: ContentIssue) => {
+    const text = `${describePath(raw, issue.path)}: ${issue.message}`;
+    if (errors.includes(text)) return;
+    errors.push(text);
+    issues.push(issue);
+  };
+
   const parsed = contentSchema.safeParse(raw);
   if (!parsed.success) {
-    const errors = parsed.error.issues.map(
-      (issue) => `${describePath(raw, issue.path)}: ${friendly(issue.message)}`,
-    );
-    return { ok: false, errors: [...new Set(errors)], warnings, missingAudio: [] };
+    for (const issue of parsed.error.issues) {
+      const path = issue.path.map((k) => (typeof k === "number" ? k : String(k)));
+      report({ path, message: friendly(issue.message) });
+    }
+    return { ok: false, errors, issues, warnings, missingAudio: [] };
   }
 
   const content = parsed.data;
-  const errors: string[] = [];
   const image = (src: string | undefined, path: (string | number)[]) => {
     if (src && src.startsWith("/") && !fileExists(src)) {
-      errors.push(`${describePath(raw, path)}: picture "${src}" was not found (expected the file public${src})`);
+      const message = `picture "${src}" was not found (expected the file public${src})`;
+      report({ path, message, missingPicture: src });
     }
   };
 
@@ -122,6 +135,6 @@ export function validateContent(raw: unknown, fileExists: (publicPath: string) =
   }
 
   const missing = [...missingAudio].sort();
-  if (errors.length) return { ok: false, errors, warnings, missingAudio: missing };
+  if (errors.length) return { ok: false, errors, issues, warnings, missingAudio: missing };
   return { ok: true, content, warnings, missingAudio: missing };
 }
