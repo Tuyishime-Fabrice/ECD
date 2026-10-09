@@ -1,8 +1,10 @@
 /**
  * Runs after `next build`: lists every prerendered page and static file to keep
  * offline, then writes public/sw.js from scripts/sw-template.js with that list
- * and a fresh version.
+ * and a fresh version. Also writes public/build-info.json ({ sha }), which the
+ * admin dashboard polls to tell when a save is live.
  */
+import { execFileSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
@@ -12,7 +14,21 @@ const root = fileURLToPath(new URL("../", import.meta.url));
 const nextDir = join(root, ".next");
 const publicDir = join(root, "public");
 const swPath = join(publicDir, "sw.js");
+const buildInfoPath = join(publicDir, "build-info.json");
 const templatePath = join(root, "scripts", "sw-template.js");
+
+function commitSha() {
+  if (process.env.VERCEL_GIT_COMMIT_SHA) return process.env.VERCEL_GIT_COMMIT_SHA;
+  try {
+    const sha = execFileSync("git", ["rev-parse", "HEAD"], { cwd: root, stdio: ["ignore", "pipe", "ignore"] });
+    return sha.toString().trim() || "dev";
+  } catch {
+    return "dev";
+  }
+}
+const sha = commitSha();
+writeFileSync(buildInfoPath, `${JSON.stringify({ sha })}\n`);
+console.log(`✔ Build info: ${sha}`);
 
 function walk(dir) {
   if (!existsSync(dir)) return [];
@@ -60,7 +76,8 @@ for (const file of walk(join(nextDir, "static")).sort()) {
 // 3. Pictures, icons and recordings from public/.
 for (const file of walk(publicDir).sort()) {
   const url = `/${rel(publicDir, file)}`;
-  if (url === "/sw.js" || url.endsWith("/.gitkeep") || url.endsWith(".map")) continue;
+  // build-info.json changes with every deploy and must always come from the network.
+  if (url === "/sw.js" || url === "/build-info.json" || url.endsWith("/.gitkeep") || url.endsWith(".map")) continue;
   add(url, file);
 }
 
