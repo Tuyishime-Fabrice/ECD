@@ -6,7 +6,6 @@ import type { LocalizedText } from "@/content/types";
 import { useHydrated, useT } from "@/lib/store";
 import { grantExtension, useTimeUp } from "@/lib/screen-time";
 import { HomeActivityCard } from "./EndScreen";
-import { Mascot } from "./Mascot";
 import { ParentGateDialog } from "./ParentGate";
 
 /** "Time to play! Come back tomorrow." — with a way for parents to add 10 minutes. */
@@ -16,16 +15,17 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
 
   return (
     <section className="mx-auto flex w-full max-w-xl animate-fade-in flex-col items-center gap-4 px-4 py-2 text-center">
-      <div className="relative w-full">
+      {/* Izuba is in the picture: waving over the children by day, asleep by night. */}
+      <picture className="block w-full">
+        <source media="(prefers-color-scheme: dark)" srcSet="/images/scenes/play-outside-night.svg" />
         <img
-          src="/images/scenes/play-outside.svg"
+          src="/images/scenes/play-outside-day.svg"
           alt=""
           width={400}
           height={260}
           className="w-full rounded-card short:mx-auto short:w-2/3"
         />
-        <Mascot pose="wave" className="absolute -top-4 right-2 w-24 sm:w-28" />
-      </div>
+      </picture>
       <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink-900">{t("timesUpTitle")}</h1>
       <p className="-mt-3 font-display text-2xl font-bold text-ink-600">{t("timesUpBody")}</p>
 
