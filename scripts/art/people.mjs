@@ -90,7 +90,7 @@ function face({ cx, cy, look = 0, mouth = "smile", hair = "#2A1810", closed = fa
  * Keza. Options: pose (arm pose), legs, look (-1..1), mouth (smile | open | o),
  * hold(hands) → markup drawn under her hands (what she carries), front → markup over everything.
  */
-export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", closed = false, hold, front = "", sit = false, id = "kz" }) {
+export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", closed = false, hold, front = "", sit = false }) {
   const skin = skinFill(doc, "keza");
   const ls = limbSkin("keza");
   doc.def("kz-dress", linear("kz-dress", [[0, "#F0558E"], [1, "#C93A72"]], [0, 0, 0.3, 1]));

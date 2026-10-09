@@ -11,7 +11,6 @@ const RAY_SHORT = "M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z";
 const arm = (d, hx, hy) =>
   `<path d="${d}" fill="none" stroke="${OUTLINE}" stroke-width="12" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#FFBE38" stroke-width="6" stroke-linecap="round"/><circle cx="${hx}" cy="${hy}" r="7.5" fill="#FFD453" stroke="${OUTLINE}" stroke-width="3"/>`;
 const ARM_R = ["M83 87C95 84 104 74 107 60", 108, 55];
-const ARM_L = ["M37 87C25 84 16 74 13 60", 12, 55];
 const eye = (x, y = 59) => `<ellipse cx="${x}" cy="${y}" rx="4.6" ry="6" fill="${INK}"/><circle cx="${x + 1.7}" cy="${y - 2.6}" r="1.8" fill="#fff"/>`;
 const SMILE = `<path d="M49.5 70.5C52 80 68 80 70.5 70.5C63 73 57 73 49.5 70.5Z" fill="#7C2D12" stroke="${OUTLINE}" stroke-width="2.6" stroke-linejoin="round"/><path d="M54.5 75.6C57.5 74 62.5 74 65.5 75.6C63 78.4 57 78.4 54.5 75.6Z" fill="#FF8467"/>`;
 
