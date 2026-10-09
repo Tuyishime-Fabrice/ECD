@@ -61,6 +61,8 @@ for (const file of walk(join(nextDir, "static")).sort()) {
 for (const file of walk(publicDir).sort()) {
   const url = `/${rel(publicDir, file)}`;
   if (url === "/sw.js" || url.endsWith("/.gitkeep") || url.endsWith(".map")) continue;
+  // The PNG app icons are fetched by the browser when the app is installed, never by a page.
+  if (/^\/icons\/.+\.png$/.test(url)) continue;
   add(url, file);
 }
 
