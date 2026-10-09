@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { CircleAlert, ImagePlus, LoaderCircle, Trash2, Upload } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { SeasonColor } from "@/content/schema";
-import { PICTURE_SPECS, type PictureKind } from "@/lib/admin/ui-images";
+import type { PictureKind } from "@/lib/admin/ui-images";
 import { fieldId, problemsFor, type Located, type Target } from "@/lib/admin/ui-issues";
 import { uploadPath } from "@/lib/admin/uploads";
 import { useAdmin } from "./AdminProvider";
@@ -64,8 +64,19 @@ export function useFocusFromHash() {
   }, []);
 }
 
+/** "Question 3 · answer B" for fields inside a question, so a problem in a list says which one. */
+export function fieldLabel(field: string): string | null {
+  const parts: string[] = [];
+  const question = /^questions\.(\d+)/.exec(field);
+  if (question) parts.push(`Question ${Number(question[1]) + 1}`);
+  if (/^pausePoints\./.test(field)) parts.push("Question during the story");
+  const answer = /\.options\.(\d+)/.exec(field);
+  if (answer) parts.push(`answer ${String.fromCharCode(65 + Number(answer[1]))}`);
+  return parts.length ? parts.join(" · ") : null;
+}
+
 /** "Fix these" at the top of an editor, each linking to its field (the GOV.UK error summary pattern). */
-export function ProblemSummary({ byField, labels }: { byField: Map<string, string[]>; labels?: (field: string) => string }) {
+export function ProblemSummary({ byField }: { byField: Map<string, string[]> }) {
   const entries = [...byField].flatMap(([field, list]) => list.map((problem) => ({ field, problem })));
   if (!entries.length) return null;
   return (
@@ -85,7 +96,7 @@ export function ProblemSummary({ byField, labels }: { byField: Map<string, strin
               }}
               className="text-[15px] font-semibold text-ink underline decoration-play-ink/50 underline-offset-2 hover:decoration-play-ink"
             >
-              {labels ? `${labels(field)}: ` : ""}
+              {fieldLabel(field) ? `${fieldLabel(field)}: ` : ""}
               {problem}
             </a>
           </li>
@@ -95,8 +106,11 @@ export function ProblemSummary({ byField, labels }: { byField: Map<string, strin
   );
 }
 
-/** Picks a file, resizes it and adds it to the save; `onPicked` gets the new picture's path. */
-export function usePictureUpload(kind: PictureKind, nameHint: string, onPicked: (path: string) => void) {
+/**
+ * Picks a file, resizes it and adds it to the save; `onPicked` gets the new picture's path.
+ * `name` describes the picture ("Keza's One Mango picture") and becomes its file name.
+ */
+export function usePictureUpload(kind: PictureKind, name: string, onPicked: (path: string) => void) {
   const { addPicture } = useAdmin();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -107,7 +121,7 @@ export function usePictureUpload(kind: PictureKind, nameHint: string, onPicked: 
     setError(null);
     try {
       const picture = await preparePicture(file, kind);
-      const path = uploadPath(`${nameHint} ${PICTURE_SPECS[kind].name}`, picture.type);
+      const path = uploadPath(name, picture.type);
       addPicture(path, { dataUrl: picture.dataUrl, bytes: picture.bytes });
       onPicked(path);
     } catch (err) {
@@ -182,12 +196,12 @@ export function PictureField({
         {optional && <span className="text-sm font-semibold text-ink-3">Optional</span>}
       </p>
       {hint && <p className="-mt-0.5 mb-2.5 text-sm text-ink-2">{hint}</p>}
-      <div className={clsx("flex gap-4", square ? "flex-row items-end" : "flex-col sm:flex-row sm:items-end")}>
+      <div className={clsx("flex gap-3", square ? "flex-row items-center gap-4" : "flex-col")}>
         <div
           className={clsx(
             "relative shrink-0 overflow-hidden rounded-xl border bg-paper-2",
             ASPECT[kind],
-            square ? "w-32" : "w-full sm:w-80",
+            square ? "w-32" : "w-full sm:w-96",
             problems.length ? "border-play-ink" : "border-line",
           )}
         >
@@ -198,7 +212,7 @@ export function PictureField({
             </span>
           )}
         </div>
-        <div className="flex min-w-0 flex-col gap-2">
+        <div className={clsx("flex min-w-0 gap-2", square ? "flex-col" : "flex-col sm:flex-row-reverse sm:items-center sm:justify-end sm:gap-3")}>
           {caption && <div className="text-sm text-ink-2">{caption}</div>}
           <div className="flex flex-wrap gap-2">
             {extraActions}

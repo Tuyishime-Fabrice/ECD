@@ -6,7 +6,7 @@
  * story and for the 5 questions of a challenge.
  */
 import clsx from "clsx";
-import { Check, ImagePlus, LoaderCircle, Mic, Plus, Trash2 } from "lucide-react";
+import { ImagePlus, LoaderCircle, Mic, Plus, Trash2 } from "lucide-react";
 import type { LocalizedText, Question } from "@/content/schema";
 import { nextOptionId } from "@/lib/admin/ui-content";
 import { fieldId } from "@/lib/admin/ui-issues";
@@ -77,7 +77,7 @@ export function QuestionEditor({
         hint="Shown above the answers, for questions like “How many bananas?”."
         optional
         kind="answer"
-        nameHint={`${nameHint} question`}
+        nameHint={`${nameHint} picture`}
         value={value.promptImage}
         onChange={(promptImage) => {
           const next = { ...value, promptImage };
@@ -204,7 +204,7 @@ function AnswerCard({
           aria-label={option.image ? `Answer ${letter} picture: replace it` : `Answer ${letter}: add a picture`}
           aria-describedby={problems.length ? `${imageId}-error` : undefined}
           className={clsx(
-            "group relative grid size-28 shrink-0 place-items-center overflow-hidden rounded-xl border bg-paper-2 transition-colors hover:border-listen",
+            "group relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-xl border bg-paper-2 transition-colors hover:border-listen",
             problems.length ? "border-play-ink" : option.image ? "border-line" : "border-dashed border-ink-3/60",
           )}
         >
@@ -241,7 +241,7 @@ function AnswerCard({
           </div>
           <label
             className={clsx(
-              "flex min-h-11 cursor-pointer items-center gap-2.5 rounded-lg px-2.5 text-[15px] font-semibold",
+              "flex min-h-11 cursor-pointer items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 text-[15px] font-semibold",
               correct ? "bg-leaf-soft text-leaf-ink" : "text-ink-2 hover:bg-ink/[0.05]",
             )}
           >
@@ -254,7 +254,6 @@ function AnswerCard({
               className="size-[18px] accent-leaf"
             />
             Right answer
-            {correct && <Check className="ml-auto size-4" strokeWidth={2.5} aria-hidden />}
           </label>
         </div>
       </div>

@@ -249,7 +249,7 @@ function Toasts() {
             aria-label="Dismiss"
             className="-my-1 grid size-11 shrink-0 place-items-center rounded-lg text-ink-3 hover:bg-ink/[0.06] hover:text-ink"
           >
-            <X className="size-4" {...ICON} />
+            <X className="size-5" {...ICON} />
           </button>
         </div>
       ))}
@@ -420,7 +420,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
           <div className="flex h-full flex-col px-3 pb-3 pt-3">
             <div className="mb-4 flex items-center justify-between pl-3">
               <BrandMark />
-              <IconButton label="Close the menu" icon={<X className="size-6" {...ICON} />} onClick={() => setMenuOpen(false)} />
+              <IconButton label="Close the menu" icon={<X className="size-7" {...ICON} />} onClick={() => setMenuOpen(false)} />
             </div>
             <nav aria-label="Dashboard" className="flex-1 overflow-y-auto">
               <NavList onNavigate={() => setMenuOpen(false)} />

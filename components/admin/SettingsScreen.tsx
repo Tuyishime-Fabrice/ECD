@@ -91,19 +91,19 @@ function FeaturedCard({ errors }: { errors?: readonly string[] }) {
                   <span className="flex shrink-0 items-center" role="group" aria-label={`Actions for ${title}`}>
                     <IconButton
                       label={`Move ${title} up`}
-                      icon={<ArrowUp className="size-5" {...ICON} />}
+                      icon={<ArrowUp className="size-[22px]" {...ICON} />}
                       disabled={i === 0}
                       onClick={() => setFeatured(moveInList(featured, i, -1))}
                     />
                     <IconButton
                       label={`Move ${title} down`}
-                      icon={<ArrowDown className="size-5" {...ICON} />}
+                      icon={<ArrowDown className="size-[22px]" {...ICON} />}
                       disabled={i === featured.length - 1}
                       onClick={() => setFeatured(moveInList(featured, i, 1))}
                     />
                     <IconButton
                       label={`Remove ${title} from featured`}
-                      icon={<X className="size-5" {...ICON} />}
+                      icon={<X className="size-[22px]" {...ICON} />}
                       onClick={() => setFeatured(featured.filter((x) => x !== id))}
                     />
                   </span>

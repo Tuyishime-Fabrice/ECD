@@ -378,7 +378,11 @@ export function TextArea({ className, ...rest }: React.TextareaHTMLAttributes<HT
   return (
     <textarea
       rows={3}
-      className={inputClass(Boolean(rest["aria-invalid"]), clsx("min-h-24 resize-y leading-relaxed", className))}
+      // Grows with the text where the browser supports it; others can drag the corner.
+      className={inputClass(
+        Boolean(rest["aria-invalid"]),
+        clsx("min-h-24 resize-y leading-relaxed [field-sizing:content]", className),
+      )}
       {...rest}
     />
   );
@@ -559,7 +563,7 @@ export function Dialog({
               </h2>
               {description && <div className="mt-1.5 text-[15px] text-ink-2">{description}</div>}
             </div>
-            <IconButton label="Close" icon={<X className="size-5" {...ICON} />} onClick={onClose} className="-mr-2 -mt-2" />
+            <IconButton label="Close" icon={<X className="size-[22px]" {...ICON} />} onClick={onClose} className="-mr-2 -mt-2" />
           </div>
           {children && <div className="min-h-0 overflow-y-auto px-5 pt-4 sm:px-6">{children}</div>}
           {footer && (
@@ -654,7 +658,6 @@ export function PictureView({
     <img
       src={src}
       alt={alt}
-      loading="lazy"
       onError={() => setFailed(src)}
       className={clsx(fit === "cover" ? "object-cover" : "object-contain", className)}
     />

@@ -50,7 +50,7 @@ function CollectionRow({ season, index, count }: { season: Season; index: number
       text: "Changed the order of collections",
     });
   return (
-    <Card as="li" className="flex flex-wrap items-center gap-x-4 gap-y-3 p-3 sm:flex-nowrap sm:p-4">
+    <Card as="li" className="flex flex-col gap-2 p-3 sm:flex-row sm:items-center sm:gap-4 sm:p-4">
       <span className="hidden w-6 shrink-0 text-center font-display text-base font-bold tabular-nums text-ink-3 sm:block">
         {index + 1}
       </span>
@@ -80,11 +80,11 @@ function CollectionRow({ season, index, count }: { season: Season; index: number
           </span>
         </span>
       </Link>
-      <div className="ml-auto flex shrink-0 items-center gap-0.5" role="group" aria-label={`Actions for ${title}`}>
-        <IconButton label={`Move ${title} up`} icon={<ArrowUp className="size-5" {...ICON} />} disabled={index === 0} onClick={() => move(-1)} />
+      <div className="flex shrink-0 items-center justify-end gap-0.5" role="group" aria-label={`Actions for ${title}`}>
+        <IconButton label={`Move ${title} up`} icon={<ArrowUp className="size-[22px]" {...ICON} />} disabled={index === 0} onClick={() => move(-1)} />
         <IconButton
           label={`Move ${title} down`}
-          icon={<ArrowDown className="size-5" {...ICON} />}
+          icon={<ArrowDown className="size-[22px]" {...ICON} />}
           disabled={index === count - 1}
           onClick={() => move(1)}
         />

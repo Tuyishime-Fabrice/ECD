@@ -154,8 +154,18 @@ function UndoDialog({
       open={commit !== null && commit !== undefined}
       onClose={busy ? () => {} : close}
       tone="danger"
-      title={commit ? `Undo “${commit.summary || "this save"}”?` : "Undo"}
-      description="This puts the stories and settings back to how they were just before this save. Pictures you uploaded stay."
+      title="Undo this save?"
+      description={
+        <>
+          {commit && (
+            <span className="mb-2 block rounded-lg border border-line bg-paper-2 px-3 py-2 text-ink">
+              <span className="block font-semibold">{commit.summary || "Saved changes"}</span>
+              <span className="block text-sm text-ink-2">{friendlyDate(commit.date)}</span>
+            </span>
+          )}
+          This puts the stories and settings back to how they were just before this save. Pictures you uploaded stay.
+        </>
+      }
       footer={
         <>
           <Button onClick={close} disabled={busy}>

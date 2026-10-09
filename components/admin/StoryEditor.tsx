@@ -107,7 +107,16 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
       (i) => i.target.kind === "story" && i.target.id === attempt.id,
     );
   }, [isNew, attempt, draft, newSeasonId, local]);
-  const { byField, errors } = useProblems("story", storyId, newIssues);
+  const problems = useProblems("story", storyId, newIssues);
+  // The length is asked for once there is a video; before that, "Paste the YouTube link" says it all.
+  const hideLength = !(isNew ? local.youtubeId : found?.value.youtubeId);
+  const byField = useMemo(() => {
+    if (!hideLength || !problems.byField.has("durationSec")) return problems.byField;
+    const copy = new Map(problems.byField);
+    copy.delete("durationSec");
+    return copy;
+  }, [hideLength, problems.byField]);
+  const errors = (field: string) => byField.get(field);
 
   const title = story?.title.en.trim() ?? "";
   const update = (change: (e: Episode) => Episode) => {
@@ -198,10 +207,9 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
         }
       />
 
-      <ProblemSummary byField={byField} />
-
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="min-w-0 space-y-6">
+          <ProblemSummary byField={byField} />
           <VideoCard story={story} update={update} errors={errors} yt={yt} />
 
           <Card>
@@ -571,7 +579,7 @@ function PictureCard({ story, update, errors, ytPicture }: SectionProps & { ytPi
           field="thumbnail"
           label="Story picture"
           kind="story"
-          nameHint={story.title.en || story.id}
+          nameHint={`${story.title.en || story.id} picture`}
           value={story.thumbnail || undefined}
           onChange={(thumbnail) => update((e) => ({ ...e, thumbnail: thumbnail ?? "" }))}
           errors={errors("thumbnail")}

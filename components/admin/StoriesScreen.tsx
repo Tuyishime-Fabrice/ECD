@@ -97,10 +97,11 @@ function CollectionStories({ season }: { season: Season }) {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-[15px] font-bold text-berry-ink">
-                        Challenge {challengeNumber}: {item.challenge.title.en || "Untitled"}
+                        {item.challenge.title.en || `Challenge ${challengeNumber}`}
                       </span>
                       <span className="block text-sm text-ink-2">
-                        After story {storiesBefore(season, item.challenge.id)} · {item.challenge.questions.length} questions
+                        Challenge · after story {storiesBefore(season, item.challenge.id)} ·{" "}
+                        {item.challenge.questions.length} questions
                       </span>
                     </span>
                     <ChevronRight className="size-5 shrink-0 text-ink-3" {...ICON} />
@@ -136,7 +137,7 @@ function StoryRow({ story, number, first, last }: { story: Episode; number: numb
       text: "Changed the order of stories",
     });
   return (
-    <li className="group flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 hover:bg-paper-2/60 sm:flex-nowrap sm:px-5">
+    <li className="group flex flex-col gap-2 px-4 py-3 hover:bg-paper-2/60 sm:flex-row sm:items-center sm:gap-4 sm:px-5">
       <span className="hidden w-6 shrink-0 text-center font-display text-base font-bold tabular-nums text-ink-3 sm:block">
         {number}
       </span>
@@ -170,16 +171,20 @@ function StoryRow({ story, number, first, last }: { story: Episode; number: numb
           </span>
         </span>
       </Link>
-      <div className="ml-auto flex shrink-0 items-center gap-0.5" role="group" aria-label={`Actions for ${title}`}>
+      <div
+        className="-mr-2 flex shrink-0 items-center justify-end gap-0.5 sm:mr-0"
+        role="group"
+        aria-label={`Actions for ${title}`}
+      >
         <IconButton
           label={`Move ${title} up`}
-          icon={<ArrowUp className="size-5" {...ICON} />}
+          icon={<ArrowUp className="size-[22px]" {...ICON} />}
           disabled={first}
           onClick={() => move(-1)}
         />
         <IconButton
           label={`Move ${title} down`}
-          icon={<ArrowDown className="size-5" {...ICON} />}
+          icon={<ArrowDown className="size-[22px]" {...ICON} />}
           disabled={last}
           onClick={() => move(1)}
         />

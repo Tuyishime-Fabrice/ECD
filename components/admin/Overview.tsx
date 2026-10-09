@@ -68,12 +68,12 @@ export function Overview() {
         }
       />
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
         {stats.map(({ href, label, value, note, icon: Icon }) => (
           <Link
             key={href}
             href={href}
-            className="group rounded-2xl border border-line bg-paper p-5 shadow-e1 transition-colors hover:border-ink-3/40"
+            className="group rounded-2xl border border-line bg-paper p-4 shadow-e1 transition-colors hover:border-ink-3/40 sm:p-5"
           >
             <div className="flex items-center justify-between">
               <p className="text-[15px] font-bold text-ink-2">{label}</p>
@@ -81,13 +81,13 @@ export function Overview() {
                 <Icon className="size-5" {...ICON} />
               </span>
             </div>
-            <p className="mt-2 font-display text-4xl font-bold leading-none tabular-nums text-ink">{value}</p>
+            <p className="mt-1 font-display text-[32px] font-bold leading-none tabular-nums text-ink sm:mt-2 sm:text-4xl">{value}</p>
             <p className="mt-2 text-sm text-ink-2">{note}</p>
           </Link>
         ))}
       </div>
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-5">
+      <div className="mt-6 grid items-start gap-6 lg:grid-cols-5">
         <Card className="lg:col-span-3">
           <CardHeader title="Shortcuts" />
           <CardBody>
@@ -96,7 +96,7 @@ export function Overview() {
                 <li key={href}>
                   <Link
                     href={href}
-                    className="group flex min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
+                    className="group flex h-full min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
                   >
                     <Icon className="size-5 shrink-0 text-ink-3 group-hover:text-listen-ink" {...ICON} />
                     <span className="min-w-0 flex-1">

@@ -14,17 +14,15 @@ export type PictureSpec = {
   crop: boolean;
   /** Aim for this many bytes so several pictures fit in one save. */
   targetBytes: number;
-  /** What the picture is for, used to name the file. */
-  name: string;
 };
 
 export const PICTURE_SPECS: Record<PictureKind, PictureSpec> = {
   // Story cards and the Home slider are 16:9.
-  story: { width: 1280, height: 720, crop: true, targetBytes: 450_000, name: "picture" },
+  story: { width: 1280, height: 720, crop: true, targetBytes: 450_000 },
   // Collection posters are 4:3, like the built-in ones.
-  poster: { width: 800, height: 600, crop: true, targetBytes: 350_000, name: "poster" },
-  sticker: { width: 512, height: 512, crop: false, targetBytes: 300_000, name: "sticker" },
-  answer: { width: 512, height: 512, crop: false, targetBytes: 250_000, name: "answer" },
+  poster: { width: 800, height: 600, crop: true, targetBytes: 350_000 },
+  sticker: { width: 512, height: 512, crop: false, targetBytes: 300_000 },
+  answer: { width: 512, height: 512, crop: false, targetBytes: 250_000 },
 };
 
 export type Rect = { x: number; y: number; width: number; height: number };
