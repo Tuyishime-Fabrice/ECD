@@ -2,9 +2,10 @@ import { TopBar } from "@/components/TopBar";
 
 export default function KidLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-dvh max-w-5xl flex-col">
+    // isolate: page scenery can sit behind the top bar with -z-10 without escaping the page.
+    <div className="relative isolate flex min-h-dvh flex-col">
       <TopBar />
-      <main id="main" className="flex-1 pb-[max(2.5rem,env(safe-area-inset-bottom))] short:pb-3">
+      <main id="main" className="flex-1 short:pb-3">
         {children}
       </main>
     </div>

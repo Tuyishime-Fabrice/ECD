@@ -16,49 +16,6 @@
  * bg-paper, text-ink, bg-play… Text pairs are checked in both themes by lib/contrast.test.ts.
  * Never use red on children's screens.
  */
-@theme inline {
-  --color-ground: var(--c-ground);
-  --color-paper: var(--c-paper);
-  --color-paper-2: var(--c-paper-2);
-  --color-line: var(--c-line);
-  --color-ink: var(--c-ink);
-  --color-ink-2: var(--c-ink-2);
-  --color-ink-3: var(--c-ink-3);
-  --color-on-accent: var(--c-on-accent);
-
-  --color-sun: var(--c-sun);
-  --color-sun-soft: var(--c-sun-soft);
-  --color-sun-lip: var(--c-sun-lip);
-  --color-sun-ink: var(--c-sun-ink);
-
-  --color-play: var(--c-play);
-  --color-play-lip: var(--c-play-lip);
-  --color-play-ink: var(--c-play-ink);
-
-  --color-listen: var(--c-listen);
-  --color-listen-lip: var(--c-listen-lip);
-  --color-listen-ink: var(--c-listen-ink);
-
-  --color-leaf: var(--c-leaf);
-  --color-leaf-soft: var(--c-leaf-soft);
-  --color-leaf-ink: var(--c-leaf-ink);
-
-  --color-berry: var(--c-berry);
-  --color-berry-soft: var(--c-berry-soft);
-  --color-berry-lip: var(--c-berry-lip);
-  --color-berry-ink: var(--c-berry-ink);
-
-  --color-coral: var(--c-coral);
-  --color-coral-soft: var(--c-coral-soft);
-  --color-coral-ink: var(--c-coral-ink);
-
-  --color-sky-top: var(--c-sky-top);
-  --color-sky-bottom: var(--c-sky-bottom);
-
-  --shadow-e1: var(--e1);
-  --shadow-e2: var(--e2);
-  --shadow-rim: var(--rim);
-}
 
 :root {
   color-scheme: light dark;
@@ -245,6 +202,51 @@
     from { opacity: 0; transform: translateY(6px); }
     to { opacity: 1; transform: translateY(0); }
   }
+}
+
+/* Semantic day/night colors (after the legacy block: its "--color-*: initial" would erase them). */
+@theme inline {
+  --color-ground: var(--c-ground);
+  --color-paper: var(--c-paper);
+  --color-paper-2: var(--c-paper-2);
+  --color-line: var(--c-line);
+  --color-ink: var(--c-ink);
+  --color-ink-2: var(--c-ink-2);
+  --color-ink-3: var(--c-ink-3);
+  --color-on-accent: var(--c-on-accent);
+
+  --color-sun: var(--c-sun);
+  --color-sun-soft: var(--c-sun-soft);
+  --color-sun-lip: var(--c-sun-lip);
+  --color-sun-ink: var(--c-sun-ink);
+
+  --color-play: var(--c-play);
+  --color-play-lip: var(--c-play-lip);
+  --color-play-ink: var(--c-play-ink);
+
+  --color-listen: var(--c-listen);
+  --color-listen-lip: var(--c-listen-lip);
+  --color-listen-ink: var(--c-listen-ink);
+
+  --color-leaf: var(--c-leaf);
+  --color-leaf-soft: var(--c-leaf-soft);
+  --color-leaf-ink: var(--c-leaf-ink);
+
+  --color-berry: var(--c-berry);
+  --color-berry-soft: var(--c-berry-soft);
+  --color-berry-lip: var(--c-berry-lip);
+  --color-berry-ink: var(--c-berry-ink);
+
+  --color-coral: var(--c-coral);
+  --color-coral-soft: var(--c-coral-soft);
+  --color-coral-ink: var(--c-coral-ink);
+
+  --color-sky-top: var(--c-sky-top);
+  --color-sky-bottom: var(--c-sky-bottom);
+
+  --shadow-e1: var(--e1);
+  --shadow-e2: var(--e2);
+  --shadow-rim: var(--rim);
 }
 
 @layer base {
