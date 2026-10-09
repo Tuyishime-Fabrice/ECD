@@ -44,6 +44,7 @@ export function friendlyProblem(raw: unknown, path: Path, problem: string): stri
   if (key === "durationSec" && typeof value === "number" && value <= 0) return "Add how long the story is.";
   if (key === "en" && empty) return ENGLISH[String(path.at(-2))] ?? "Write this in English.";
   if (key === "skill" && empty) return "Choose a skill.";
+  if (key === "whatsapp") return "Write the number with its country code, like +250 781 234 567, or leave it empty.";
   if (problem === "a question needs at least 2 options") return "Add at least 2 answers.";
   if (problem === "a question can have at most 4 options") return "A question can have at most 4 answers.";
   return problem.charAt(0).toUpperCase() + problem.slice(1);

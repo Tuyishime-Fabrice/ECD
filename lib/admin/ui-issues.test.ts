@@ -65,7 +65,7 @@ describe("checkDraft", () => {
     c.seasons[0]!.status = "published";
     const s = { ...site(), contact: { whatsapp: "call me" } };
     problems = problemsFor(locate(c, checkDraft(c, s)), "settings");
-    expect(problems.get("contact.whatsapp")?.[0]).toMatch(/^Must be a phone number with country code/);
+    expect(problems.get("contact.whatsapp")?.[0]).toMatch(/^Write the number with its country code/);
   });
 });
 
