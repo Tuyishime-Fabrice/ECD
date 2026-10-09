@@ -17,17 +17,20 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
   return (
     <section className="mx-auto flex w-full max-w-xl animate-fade-in flex-col items-center gap-4 px-4 py-2 text-center">
       <div className="relative w-full">
-        <img
-          src="/images/scenes/play-outside.svg"
-          alt=""
-          width={400}
-          height={260}
-          className="w-full rounded-card short:mx-auto short:w-2/3"
-        />
+        <picture>
+          <source media="(prefers-color-scheme: dark)" srcSet="/images/scenes/play-outside-night.svg" />
+          <img
+            src="/images/scenes/play-outside-day.svg"
+            alt=""
+            width={400}
+            height={260}
+            className="w-full rounded-card shadow-e2 short:mx-auto short:w-2/3"
+          />
+        </picture>
         <Mascot pose="wave" className="absolute -top-4 right-2 w-24 sm:w-28" />
       </div>
-      <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink-900">{t("timesUpTitle")}</h1>
-      <p className="-mt-3 font-display text-2xl font-bold text-ink-600">{t("timesUpBody")}</p>
+      <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink">{t("timesUpTitle")}</h1>
+      <p className="-mt-3 font-display text-2xl font-bold text-ink-2">{t("timesUpBody")}</p>
 
       {homeActivity && (
         <div className="w-full">
@@ -38,7 +41,7 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
       <button
         type="button"
         onClick={() => setGateOpen(true)}
-        className="mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-mist-300 px-4 text-base font-semibold text-ink-600"
+        className="tap mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-line bg-paper px-4 text-base font-semibold text-ink-2"
       >
         <Plus className="size-5" strokeWidth={2.5} aria-hidden />
         {t("addTenMinutes")}

@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx";
-import { ChevronRight, House, Lock, Play, Star } from "lucide-react";
+import { ChevronRight, House, Play, Star } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import type { ChallengeView, SeasonCard } from "@/content/types";
@@ -13,7 +13,9 @@ import { playPop, playSparkle, unlockAudio } from "@/lib/sounds";
 import { primeVoice } from "@/lib/speech";
 import { getStore, useDocumentTitle, useHydrated, useLearningState, usePick, useT } from "@/lib/store";
 import { isChallengeUnlocked, missingForChallenge } from "@/lib/unlock";
-import { itemHref, ItemThumb } from "./ItemCard";
+import { itemHref } from "./ItemCard";
+import { LockMark } from "./kid/marks";
+import { StoryCard } from "./kid/StoryCard";
 import { Mascot } from "./Mascot";
 import { QuestionHomeLink } from "./QuestionHomeLink";
 import { QuestionPanel } from "./QuestionPanel";
@@ -22,7 +24,7 @@ import { StarBurst } from "./StarBurst";
 type Phase = { kind: "intro" } | { kind: "question"; index: number } | { kind: "done"; stars: Stars; newSticker: boolean };
 
 const bigButton =
-  "tactile inline-flex min-h-16 items-center justify-center gap-3 rounded-full px-8 font-display text-[22px] font-bold";
+  "press inline-flex min-h-16 items-center justify-center gap-3 rounded-full px-8 font-display text-[22px] font-bold";
 
 export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView; seasons: SeasonCard[] }) {
   const t = useT();
@@ -71,7 +73,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
         <div className="relative grid size-48 place-items-center short:size-40">
           <svg className="absolute inset-0 size-full motion-safe:animate-spin-slow" viewBox="0 0 100 100" aria-hidden>
             {Array.from({ length: 12 }, (_, i) => (
-              <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun-400" opacity="0.45" transform={`rotate(${i * 30} 50 50)`} />
+              <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun" opacity="0.45" transform={`rotate(${i * 30} 50 50)`} />
             ))}
           </svg>
           <img
@@ -85,14 +87,14 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
           <Mascot pose="wave" className="absolute -bottom-2 -left-6 w-20 motion-safe:animate-float" />
         </div>
         <div className="flex flex-col items-center gap-5">
-          <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink-900">{t("letsPlay")}</h1>
+          <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink">{t("letsPlay")}</h1>
           <button
             type="button"
             onClick={start}
             disabled={!hydrated}
-            className={clsx(bigButton, "min-h-24 bg-sky-700 px-10 text-[28px] text-white motion-safe:animate-pulse-next")}
+            className={clsx(bigButton, "press-play min-h-24 bg-play px-10 text-[28px] text-on-accent motion-safe:animate-pulse-next")}
           >
-            <Play className="size-10 fill-white" strokeWidth={2.5} aria-hidden />
+            <Play className="size-10 fill-on-accent" strokeWidth={2.5} aria-hidden />
             {t("start")}
           </button>
         </div>
@@ -134,7 +136,7 @@ function ProgressDots({ current, total, results }: { current: number; total: num
   const t = useT();
   return (
     <div
-      className="flex items-center justify-center gap-3"
+      className="flex items-center justify-center gap-2.5 rounded-full bg-paper px-4 py-2 shadow-e1"
       role="img"
       aria-label={t("questionNofM", { n: current + 1, m: total })}
     >
@@ -142,13 +144,14 @@ function ProgressDots({ current, total, results }: { current: number; total: num
         <span
           key={i}
           className={clsx(
-            "grid place-items-center rounded-full border-[3px] border-ink-900 transition-all",
-            i === current ? "size-7 bg-sky-500" : "size-5",
-            i < current && (results[i]?.firstTryCorrect ? "bg-sun-400" : "bg-leaf-300"),
-            i > current && "bg-white",
+            "rounded-full transition-all",
+            i === current ? "size-6 bg-sun ring-4 ring-sun/30" : "size-4",
+            i < current && (results[i]?.firstTryCorrect ? "bg-sun" : "bg-leaf"),
+            i > current && "bg-paper-2 ring-2 ring-line",
           )}
         />
       ))}
+      <img src="/images/ui/gift.svg" alt="" width={28} height={28} className="ml-1 size-7" />
     </div>
   );
 }
@@ -174,7 +177,7 @@ function ChallengeDone({
 
   return (
     <section className="mx-auto flex max-w-xl flex-col items-center px-4 py-2 text-center">
-      <h1 className="font-display text-[36px] font-extrabold text-ink-900">{t("wellDone")}</h1>
+      <h1 className="font-display text-[36px] font-extrabold text-ink">{t("wellDone")}</h1>
 
       <div className="mt-2 flex items-end gap-2" role="img" aria-label={t("starsN", { n: stars })}>
         {[1, 2, 3].map((i) => (
@@ -184,9 +187,9 @@ function ChallengeDone({
             strokeWidth={2.5}
             style={{ animationDelay: `${i * 180}ms` }}
             className={clsx(
-              "animate-pop text-ink-900",
+              "animate-pop",
               i === 2 ? "size-20" : "size-16",
-              i <= stars ? "fill-sun-400" : "fill-mist-100 text-mist-300",
+              i <= stars ? "fill-sun text-sun-lip" : "fill-paper-2 text-line",
             )}
           />
         ))}
@@ -195,7 +198,7 @@ function ChallengeDone({
       <div className="relative mt-4 grid size-56 place-items-center short:size-40">
         <svg className="absolute inset-0 size-full motion-safe:animate-spin-slow" viewBox="0 0 100 100" aria-hidden>
           {Array.from({ length: 12 }, (_, i) => (
-            <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun-400" opacity="0.55" transform={`rotate(${i * 30} 50 50)`} />
+            <path key={i} d="M50 50 L46 0 L54 0 Z" className="fill-sun" opacity="0.55" transform={`rotate(${i * 30} 50 50)`} />
           ))}
         </svg>
         <StarBurst />
@@ -208,7 +211,7 @@ function ChallengeDone({
         />
       </div>
       {newSticker && (
-        <p className="mt-1 animate-fade-in font-display text-2xl font-bold text-sky-700 [animation-delay:900ms]">
+        <p className="mt-1 animate-fade-in font-display text-2xl font-bold text-play-ink [animation-delay:900ms]">
           {t("newSticker")}
         </p>
       )}
@@ -216,12 +219,12 @@ function ChallengeDone({
 
       <div className="mt-6 flex w-full flex-col items-center gap-4 sm:flex-row sm:justify-center">
         {next && (
-          <Link href={itemHref(next)} onClick={playPop} className={clsx(bigButton, "w-full bg-sky-700 text-white sm:w-auto")}>
+          <Link href={itemHref(next)} onClick={playPop} className={clsx(bigButton, "press-play w-full bg-play text-on-accent sm:w-auto")}>
             {next.type === "episode" ? t("nextEpisode") : t("next")}
             <ChevronRight className="size-8" strokeWidth={3} aria-hidden />
           </Link>
         )}
-        <Link href="/" onClick={playPop} className={clsx(bigButton, "bg-white text-ink-900")}>
+        <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper bg-paper text-ink")}>
           <House className="size-8" strokeWidth={2.5} aria-hidden />
           {t("home")}
         </Link>
@@ -239,25 +242,22 @@ function LockedChallenge({ challenge, seasons }: { challenge: ChallengeView; sea
 
   return (
     <section className="mx-auto flex max-w-xl flex-col items-center gap-4 px-4 py-4 text-center">
-      <span className="grid size-24 place-items-center rounded-full bg-sun-400 shadow-tactile">
-        <Lock className="size-12 text-ink-900" strokeWidth={2.5} aria-hidden />
+      <span className="relative grid size-28 place-items-center rounded-full bg-berry-soft shadow-e2">
+        <img src="/images/ui/gift.svg" alt="" width={72} height={72} className="size-[68%]" />
+        <LockMark className="absolute -right-1 -top-1" />
       </span>
-      <h1 className="font-display text-[32px] font-extrabold leading-tight">{t("watchFirst")}</h1>
+      <h1 className="font-display text-[32px] font-extrabold leading-tight text-ink">{t("watchFirst")}</h1>
       <ul className="grid w-full grid-cols-2 gap-3">
-        {items.map((item) => (
-          <li key={item.id}>
-            <Link
-              href={itemHref(item)}
-              onClick={playPop}
-              aria-label={item.type === "episode" ? t("episodeN", { n: item.number }) : t("challenge")}
-              className="tactile block overflow-hidden rounded-card bg-white"
-            >
-              <ItemThumb item={item} status={itemStatus(item, learning)} color={season?.color ?? "sky"} compact />
-            </Link>
-          </li>
-        ))}
+        {items.map((item) => {
+          const status = itemStatus(item, learning);
+          return item.type === "episode" && status.type === "episode" ? (
+            <li key={item.id} className="flex">
+              <StoryCard story={item} status={status} className="w-full md:w-full" />
+            </li>
+          ) : null;
+        })}
       </ul>
-      <Link href="/" onClick={playPop} className={clsx(bigButton, "mt-2 bg-white text-ink-900")}>
+      <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper mt-2 bg-paper text-ink")}>
         <House className="size-8" strokeWidth={2.5} aria-hidden />
         {t("home")}
       </Link>

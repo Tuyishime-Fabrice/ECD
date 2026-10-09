@@ -1,11 +1,11 @@
 import clsx from "clsx";
 
 const COLORS = [
-  "var(--color-sun-400)",
-  "var(--color-sky-500)",
-  "var(--color-coral-400)",
-  "var(--color-leaf-500)",
-  "var(--color-grape-500)",
+  "var(--c-sun)",
+  "var(--c-listen)",
+  "var(--c-coral)",
+  "var(--c-leaf)",
+  "var(--c-berry)",
 ];
 
 // Fixed layout (no randomness) so server and client render the same thing.

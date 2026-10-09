@@ -9,11 +9,12 @@ import { duePausePoint, effectiveDuration, initialTriggered } from "@/lib/playba
 import { resumePosition } from "@/lib/progress";
 import { timeUpNow, useUsageTicker } from "@/lib/screen-time";
 import { nextAfter } from "@/lib/recommend";
-import { getStore, useDocumentTitle, useHydrated, useLang, useLearningState, usePick } from "@/lib/store";
+import { getStore, useDocumentTitle, useHydrated, useLang, useLearningState, usePick, useT } from "@/lib/store";
 import { PlayerState, type YTPlayer } from "@/lib/youtube";
 import { BigControls } from "./BigControls";
 import { EndScreen } from "./EndScreen";
 import { FriendlyError } from "./FriendlyError";
+import { Backdrop } from "./kid/Scene";
 import { QuestionHomeLink } from "./QuestionHomeLink";
 import { QuestionPanel } from "./QuestionPanel";
 import { TimesUp } from "./TimesUp";
@@ -188,66 +189,86 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
   const showVideo = phase === "video";
 
   return (
-    <div className="relative mx-auto w-full max-w-5xl sm:px-4">
-      <h1 className="sr-only">{pick(episode.title)}</h1>
+    <div className="relative min-h-[calc(100dvh-5rem)] pb-40 short:min-h-0 short:pb-2">
+      {/* The world around the player: sky above, hills along the bottom of the screen. */}
+      <Backdrop scene="watch" sceneClassName="h-36 md:h-56" />
 
-      {/* The player stays mounted; while a question or the end screen shows, it is hidden, not covered. */}
-      <div
-        aria-hidden={!showVideo}
-        className={clsx(
-          "mx-auto aspect-video w-full max-w-[calc((100dvh-232px)*16/9)] overflow-hidden bg-ink-900 sm:rounded-card",
-          "short:max-w-[calc((100dvh-100px)*16/9)]",
-          showVideo ? "relative" : "pointer-events-none invisible absolute inset-x-0 top-0",
-        )}
-      >
-        <img
-          src={episode.thumbnail}
-          alt=""
-          width={320}
-          height={180}
-          className="absolute inset-0 size-full object-cover opacity-60"
-        />
-        {hydrated && phase !== "error" && (
-          <YouTubePlayer
-            key={attempt}
-            videoId={episode.videoId}
-            lang={lang}
-            onReady={handleReady}
-            onStateChange={handleStateChange}
-            onError={handleError}
+      <div className="relative mx-auto w-full max-w-5xl px-3 sm:px-4">
+        <h1 className="sr-only">{pick(episode.title)}</h1>
+
+        {/* The player stays mounted; while a question or the end screen shows, it is hidden, not covered. */}
+        <div
+          aria-hidden={!showVideo}
+          className={clsx(
+            "mx-auto w-full max-w-[calc((100dvh-290px)*16/9+16px)] rounded-[26px] bg-paper p-2 shadow-e2 shadow-rim",
+            "short:max-w-[calc((100dvh-100px)*16/9)] short:rounded-none short:bg-transparent short:p-0 short:shadow-none",
+            showVideo ? "relative" : "pointer-events-none invisible absolute inset-x-3 top-0",
+          )}
+        >
+          <div className="relative aspect-video overflow-hidden rounded-[18px] bg-black short:rounded-none">
+            <img
+              src={episode.thumbnail}
+              alt=""
+              width={320}
+              height={180}
+              className="absolute inset-0 size-full object-cover opacity-60"
+            />
+            {hydrated && phase !== "error" && (
+              <YouTubePlayer
+                key={attempt}
+                videoId={episode.videoId}
+                lang={lang}
+                onReady={handleReady}
+                onStateChange={handleStateChange}
+                onError={handleError}
+              />
+            )}
+          </div>
+        </div>
+
+        {showVideo && <StoryCaption number={episode.number} title={pick(episode.title)} />}
+
+        {showVideo && (
+          <BigControls
+            ready={ready}
+            playing={playing}
+            needsTap={needsTap}
+            onHome={() => router.push("/")}
+            onTogglePlay={togglePlay}
+            onReplay={replay}
           />
         )}
+
+        {phase === "question" && question && (
+          <div className="py-4 short:py-2">
+            <QuestionHomeLink className="mb-2 ml-4" />
+            <QuestionPanel key={question.id} question={question} onComplete={resumeAfterQuestion} />
+          </div>
+        )}
+
+        {phase === "ended" && (
+          <EndScreen
+            homeActivity={episode.homeActivity}
+            next={nextAfter(seasons, episode.id, learning)}
+            onWatchAgain={replay}
+          />
+        )}
+
+        {phase === "timesup" && <TimesUp homeActivity={episode.homeActivity} onExtended={() => setPhase("ended")} />}
+
+        {phase === "error" && <FriendlyError offline={error === "offline"} onRetry={retry} />}
       </div>
+    </div>
+  );
+}
 
-      {showVideo && (
-        <BigControls
-          ready={ready}
-          playing={playing}
-          needsTap={needsTap}
-          onHome={() => router.push("/")}
-          onTogglePlay={togglePlay}
-          onReplay={replay}
-        />
-      )}
-
-      {phase === "question" && question && (
-        <div className="py-4 short:py-2">
-          <QuestionHomeLink className="mb-2 ml-4" />
-          <QuestionPanel key={question.id} question={question} onComplete={resumeAfterQuestion} />
-        </div>
-      )}
-
-      {phase === "ended" && (
-        <EndScreen
-          homeActivity={episode.homeActivity}
-          next={nextAfter(seasons, episode.id, learning)}
-          onWatchAgain={replay}
-        />
-      )}
-
-      {phase === "timesup" && <TimesUp homeActivity={episode.homeActivity} onExtended={() => setPhase("ended")} />}
-
-      {phase === "error" && <FriendlyError offline={error === "offline"} onRetry={retry} />}
+/** Which story is playing, under the player (hidden on phones held sideways). */
+function StoryCaption({ number, title }: { number: number; title: string }) {
+  const t = useT();
+  return (
+    <div aria-hidden className="mx-auto mt-3 max-w-2xl text-center short:hidden">
+      <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2">{t("episodeN", { n: number })}</p>
+      <p className="line-clamp-1 font-display text-[22px] font-extrabold leading-tight text-ink">{title}</p>
     </div>
   );
 }

@@ -45,3 +45,20 @@ export function Scene({
 export function Sky({ className }: { className?: string }) {
   return <div aria-hidden className={clsx("bg-gradient-to-b from-sky-top to-sky-bottom", className)} />;
 }
+
+/**
+ * The full-screen world behind a kid page: sky from under the top bar down,
+ * with a scene along the bottom edge. Put it first inside a `relative` page wrapper.
+ */
+export function Backdrop({ scene, sceneClassName }: { scene: SceneName; sceneClassName?: string }) {
+  return (
+    <div aria-hidden className="absolute inset-x-0 -top-24 bottom-0 -z-10 overflow-hidden">
+      <Sky className="absolute inset-0" />
+      <Scene
+        name={scene}
+        className="absolute inset-x-0 bottom-0 block"
+        imgClassName={clsx("block w-full object-cover object-top", sceneClassName ?? "h-40 md:h-56")}
+      />
+    </div>
+  );
+}

@@ -7,6 +7,7 @@ import type { Question } from "@/content/types";
 import { playCheer, playTryAgain } from "@/lib/sounds";
 import { playPrompt, sayLine, stopVoice } from "@/lib/speech";
 import { usePick, useSettings, useT } from "@/lib/store";
+import { Mascot } from "./Mascot";
 
 const ADVANCE_MS = 1200;
 /** Taps this soon after a question appears are the tail of a double-tap on the button it replaced. */
@@ -75,16 +76,24 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
       )}
     >
       <div className="flex w-full flex-col items-center gap-3 short:w-48 short:shrink-0">
-        <div className="flex w-full items-center gap-3">
-          <button
-            type="button"
-            onClick={() => playPrompt(question, voice)}
-            aria-label={t("listenAgain")}
-            className="tactile grid size-16 shrink-0 place-items-center rounded-full bg-sun-400"
-          >
-            <Volume2 className="size-9 text-ink-900" strokeWidth={2.5} aria-hidden />
-          </button>
-          <p className="text-base font-semibold leading-snug text-ink-600">{pick(question.promptText)}</p>
+        {/* Izuba asks the question in a speech bubble; the blue button says it again. */}
+        <div className="flex w-full items-center gap-2">
+          <Mascot pose="happy" className="w-16 shrink-0 short:hidden tight:w-12" />
+          <div className="relative flex min-w-0 flex-1 items-center gap-3 rounded-tile bg-paper p-2.5 pr-4 shadow-e2 shadow-rim short:flex-col short:p-3 short:text-center">
+            <span
+              aria-hidden
+              className="absolute -left-2 top-1/2 size-5 -translate-y-1/2 rotate-45 rounded-[4px] bg-paper short:hidden"
+            />
+            <button
+              type="button"
+              onClick={() => playPrompt(question, voice)}
+              aria-label={t("listenAgain")}
+              className="press press-listen relative grid size-[72px] shrink-0 place-items-center rounded-full bg-listen"
+            >
+              <Volume2 className="size-9 text-on-accent" strokeWidth={2.5} aria-hidden />
+            </button>
+            <p className="relative font-display text-[20px] font-extrabold leading-tight text-ink">{pick(question.promptText)}</p>
+          </div>
         </div>
         {question.promptImage && (
           <img
@@ -92,7 +101,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             alt=""
             width={240}
             height={240}
-            className="h-36 w-auto rounded-card bg-white p-2 shadow-soft tight:h-[min(8rem,20dvh)] short:h-28"
+            className="h-36 w-auto rounded-card bg-paper p-2 shadow-e1 tight:h-[min(8rem,20dvh)] short:h-28"
           />
         )}
       </div>
@@ -127,20 +136,22 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
               aria-label={option.label ?? `${i + 1}`}
               onAnimationEnd={() => setWobbling((w) => (w === option.id ? null : w))}
               className={clsx(
-                "tactile relative aspect-square min-h-[120px] w-full rounded-card border-4 bg-white p-2 transition-[opacity,filter,border-color] duration-300 short:min-h-0",
+                "press press-paper relative grid aspect-square min-h-[120px] w-full place-items-center rounded-tile bg-paper p-2 transition-[opacity,filter] duration-300 short:min-h-0",
                 question.promptImage && "tight:min-h-[112px]",
-                won ? "border-leaf-500 shadow-[0_0_0_8px_rgba(61,174,107,0.35)]" : "border-transparent",
-                faded && "bg-mist-100 opacity-40 grayscale",
+                won && "ring-4 ring-sun outline-8 outline-sun/30",
+                faded && "bg-paper-2 opacity-40 grayscale",
                 wobbling === option.id && "animate-wobble",
                 // The hint after two misses; a steady gold outline when motion is reduced.
-                scaffold && isRight && "motion-safe:animate-glow motion-reduce:outline-4 motion-reduce:outline-offset-2 motion-reduce:outline-sky-700",
+                scaffold && isRight && "motion-safe:animate-glow motion-reduce:outline-4 motion-reduce:outline-offset-2 motion-reduce:outline-sun",
                 correct && !isRight && "opacity-60",
               )}
             >
-              <img src={option.image} alt="" width={240} height={240} className="size-full object-contain" />
+              {/* A woven agaseke plate under each picture. */}
+              <img src="/images/ui/plate.svg" alt="" width={240} height={240} className="absolute inset-[6%] size-[88%]" />
+              <img src={option.image} alt="" width={240} height={240} className="relative size-[74%] object-contain" />
               {won && (
                 <Star
-                  className="absolute -right-3 -top-3 size-14 animate-pop fill-sun-400 text-ink-900"
+                  className="absolute -right-3 -top-3 size-14 animate-pop fill-sun text-sun-lip"
                   strokeWidth={2.5}
                   aria-hidden
                 />
