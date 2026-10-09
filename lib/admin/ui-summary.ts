@@ -3,8 +3,8 @@
  * One Mango” and moved stories"). Built from what the person did, in order.
  */
 
-/** The server keeps the first 100 characters of a summary. */
-export const MAX_SUMMARY = 100;
+/** The server keeps 100 characters of a summary, but an undo quotes only 80 of them, so stay within 80. */
+export const MAX_SUMMARY = 80;
 
 export function summarize(changes: readonly string[]): string {
   const list = [...new Set(changes.map((c) => c.trim()).filter(Boolean))];

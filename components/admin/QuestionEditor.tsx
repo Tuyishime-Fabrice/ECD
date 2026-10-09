@@ -94,7 +94,7 @@ export function QuestionEditor({
         </p>
         <FieldErrors id={`${fieldId(f("options"))}-error`} errors={errors(f("options"))} />
         <FieldErrors id={`${fieldId(f("correctOptionId"))}-error`} errors={errors(f("correctOptionId"))} />
-        <ul className="mt-3 grid gap-3 sm:grid-cols-2">
+        <ul className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           {options.map((option, i) => (
             <AnswerCard
               key={option.id}

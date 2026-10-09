@@ -436,7 +436,7 @@ export function Bilingual({
     <fieldset>
       <legend className="mb-1 text-[15px] font-bold text-ink">{label}</legend>
       {hint && <p className="mb-2 text-sm text-ink-2">{hint}</p>}
-      <div className="mt-2 grid gap-3 sm:grid-cols-2">
+      <div className="mt-2 grid grid-cols-1 gap-3 sm:grid-cols-2">
         {(["en", "rw"] as const).map((lang) => (
           <Field
             key={lang}

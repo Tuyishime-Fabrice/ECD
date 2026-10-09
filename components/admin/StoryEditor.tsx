@@ -207,7 +207,7 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
         }
       />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="min-w-0 space-y-6">
           <ProblemSummary byField={byField} />
           <VideoCard story={story} update={update} errors={errors} yt={yt} />
@@ -282,7 +282,7 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
             <CardBody>
               <fieldset>
                 <legend className="sr-only">Skills</legend>
-                <div id="f-skills" className="grid gap-2 sm:grid-cols-2">
+                <div id="f-skills" className="grid grid-cols-1 gap-2 sm:grid-cols-2">
                   {Object.entries(skills).map(([skill, label]) => (
                     <Choice
                       key={skill}

@@ -17,7 +17,7 @@ describe("summarize", () => {
     expect(summarize(["One", "Two", "Three", "Four", "Five"])).toBe("One, two, three and 2 more changes");
     expect(summarize(["One", "Two", "Three", "Four"])).toBe("One, two, three and 1 more change");
   });
-  it("stays within 100 characters", () => {
+  it("stays short enough for History and Undo", () => {
     const long = Array.from({ length: 5 }, (_, i) => `Changed story ${quoteTitle(`A rather long story title number ${i}`)}`);
     const text = summarize(long);
     expect(text.length).toBeLessThanOrEqual(MAX_SUMMARY);

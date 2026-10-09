@@ -77,18 +77,20 @@ function FeaturedCard({ errors }: { errors?: readonly string[] }) {
               const found = findStory(draft.seasons, id);
               const title = found?.value.title.en || id;
               return (
-                <li key={id} className="flex items-center gap-3 px-3 py-2.5 sm:gap-4 sm:px-4">
-                  <span className="w-5 shrink-0 text-center font-display font-bold tabular-nums text-ink-3">{i + 1}</span>
-                  <PictureView
-                    src={found?.value.thumbnail ? pictureSrc(found.value.thumbnail) : ""}
-                    alt=""
-                    className="aspect-video w-20 shrink-0 rounded-lg ring-1 ring-line sm:w-24"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="line-clamp-2 font-semibold leading-snug text-ink sm:line-clamp-1">{title}</span>
-                    <span className="block truncate text-sm text-ink-2">{found?.season.title.en}</span>
+                <li key={id} className="flex flex-col gap-1 px-3 py-2.5 sm:flex-row sm:items-center sm:gap-4 sm:px-4">
+                  <span className="flex min-w-0 flex-1 items-center gap-3 sm:gap-4">
+                    <span className="w-5 shrink-0 text-center font-display font-bold tabular-nums text-ink-3">{i + 1}</span>
+                    <PictureView
+                      src={found?.value.thumbnail ? pictureSrc(found.value.thumbnail) : ""}
+                      alt=""
+                      className="aspect-video w-20 shrink-0 rounded-lg ring-1 ring-line sm:w-24"
+                    />
+                    <span className="min-w-0 flex-1">
+                      <span className="line-clamp-2 font-semibold leading-snug text-ink sm:line-clamp-1">{title}</span>
+                      <span className="block truncate text-sm text-ink-2">{found?.season.title.en}</span>
+                    </span>
                   </span>
-                  <span className="flex shrink-0 items-center" role="group" aria-label={`Actions for ${title}`}>
+                  <span className="-mr-1 flex shrink-0 items-center justify-end" role="group" aria-label={`Actions for ${title}`}>
                     <IconButton
                       label={`Move ${title} up`}
                       icon={<ArrowUp className="size-[22px]" {...ICON} />}

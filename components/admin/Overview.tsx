@@ -2,11 +2,70 @@
 
 import { ArrowRight, Clapperboard, Gift, History, Library, LifeBuoy, Plus, Settings, Star } from "lucide-react";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { challengesOf, sortedSeasons, storiesOf } from "@/lib/admin/ui-content";
-import { timeAgo } from "@/lib/admin/ui-time";
+import { friendlyDate, timeAgo } from "@/lib/admin/ui-time";
 import { useDraft } from "./AdminProvider";
+import { api, type HistoryEntry } from "./api";
 import { LiveChip } from "./Shell";
 import { ButtonLink, Card, CardBody, CardHeader, ICON, PageHeader } from "./ui";
+
+const RECENT = 4;
+
+/** The latest saves, so the overview shows what changed lately. */
+function RecentSaves() {
+  const { deployed } = useDraft();
+  const [commits, setCommits] = useState<HistoryEntry[] | null>(null);
+  useEffect(() => {
+    let cancelled = false;
+    void api.history().then((res) => {
+      if (!cancelled) setCommits(res.ok ? res.data.commits.slice(0, RECENT) : []);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  return (
+    <Card>
+      <CardHeader
+        title="Recent saves"
+        actions={
+          <Link href="/admin/history" className="inline-flex min-h-11 items-center text-[15px] font-semibold text-listen-ink hover:underline">
+            See all
+          </Link>
+        }
+      />
+      <CardBody className="pt-1">
+        {commits === null ? (
+          <ul className="space-y-3" aria-hidden>
+            {Array.from({ length: 3 }, (_, i) => (
+              <li key={i} className="h-11 animate-pulse rounded-lg bg-paper-2" />
+            ))}
+          </ul>
+        ) : commits.length === 0 ? (
+          <p className="text-[15px] text-ink-2">Saves you make show up here.</p>
+        ) : (
+          <ol className="divide-y divide-line">
+            {commits.map((c) => (
+              <li key={c.sha} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
+                <History className="mt-0.5 size-[18px] shrink-0 text-ink-3" {...ICON} />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate font-semibold text-ink">{c.summary || "Saved changes"}</p>
+                  <p className="text-sm text-ink-2">
+                    <time dateTime={c.date} title={friendlyDate(c.date)}>
+                      {timeAgo(c.date)}
+                    </time>
+                    {c.sha === deployed && <span className="text-leaf-ink"> · live now</span>}
+                  </p>
+                </div>
+              </li>
+            ))}
+          </ol>
+        )}
+      </CardBody>
+    </Card>
+  );
+}
 
 export function Overview() {
   const { draft, live, lastSavedAt, dirty } = useDraft();
@@ -68,7 +127,7 @@ export function Overview() {
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-3 sm:gap-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
         {stats.map(({ href, label, value, note, icon: Icon }) => (
           <Link
             key={href}
@@ -87,11 +146,12 @@ export function Overview() {
         ))}
       </div>
 
-      <div className="mt-6 grid items-start gap-6 lg:grid-cols-5">
-        <Card className="lg:col-span-3">
+      <div className="mt-6 grid grid-cols-1 items-start gap-6 lg:grid-cols-5">
+        <div className="space-y-6 lg:col-span-3">
+        <Card>
           <CardHeader title="Shortcuts" />
           <CardBody>
-            <ul className="grid gap-2 sm:grid-cols-2">
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
               {shortcuts.map(({ href, label, note, icon: Icon }) => (
                 <li key={href}>
                   <Link
@@ -110,6 +170,8 @@ export function Overview() {
             </ul>
           </CardBody>
         </Card>
+        <RecentSaves />
+        </div>
 
         <div className="space-y-6 lg:col-span-2">
           <Card>

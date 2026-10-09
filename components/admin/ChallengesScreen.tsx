@@ -54,7 +54,7 @@ export function ChallengesScreen() {
                   </EmptyState>
                 </div>
               ) : (
-                <ul className="grid gap-3 p-4 sm:grid-cols-2 sm:p-5">
+                <ul className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 sm:p-5">
                   {list.map((challenge, i) => {
                     const problems = issues.filter(
                       (x) => x.target.kind === "challenge" && x.target.id === challenge.id,

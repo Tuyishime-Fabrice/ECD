@@ -165,13 +165,19 @@ function SaveBar() {
         <div
           role="region"
           aria-label="Unsaved changes"
-          className="pointer-events-auto mx-auto flex max-w-3xl flex-wrap items-center gap-x-4 gap-y-2 rounded-2xl bg-ink py-2.5 pl-4 pr-2.5 text-paper shadow-e2 sm:flex-nowrap sm:py-3 sm:pl-5"
+          // Dark brown in day mode; at night a lit paper bar, since a cream one would glare.
+          className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-3 rounded-2xl bg-ink py-2.5 pl-4 pr-2.5 text-paper shadow-e2 sm:gap-4 sm:py-3 sm:pl-5 dark:bg-paper dark:text-ink dark:ring-1 dark:ring-listen/40"
         >
           <div className="flex min-w-0 flex-1 items-center gap-3">
             <span className="hidden size-2.5 shrink-0 rounded-full bg-sun sm:block" aria-hidden />
             <div className="min-w-0">
               <p className="font-display text-base font-bold leading-tight">
-                {saving ?? "You have unsaved changes"}
+                {saving ?? (
+                  <>
+                    <span className="sm:hidden">Unsaved changes</span>
+                    <span className="hidden sm:inline">You have unsaved changes</span>
+                  </>
+                )}
               </p>
               {!saving &&
                 (problems ? (
@@ -184,7 +190,7 @@ function SaveBar() {
                     {problems === 1 ? "1 thing to fix" : `${problems} things to fix`}
                   </button>
                 ) : (
-                  <p className="mt-0.5 text-sm text-paper/75">
+                  <p className="mt-0.5 hidden text-sm text-paper/75 sm:block dark:text-ink-2">
                     {changeCount > 1 ? `${changeCount} changes. ` : ""}Children see them after you save.
                   </p>
                 ))}
@@ -195,11 +201,11 @@ function SaveBar() {
               type="button"
               onClick={() => setConfirmDiscard(true)}
               disabled={Boolean(saving)}
-              className="min-h-11 rounded-xl px-3.5 font-display text-[15px] font-semibold text-paper/85 hover:bg-paper/10 hover:text-paper disabled:opacity-50"
+              className="min-h-11 rounded-xl px-3 font-display text-[15px] font-semibold text-paper/85 hover:bg-paper/10 hover:text-paper disabled:opacity-50 sm:px-3.5 dark:text-ink-2 dark:hover:bg-ink/10 dark:hover:text-ink"
             >
               Discard
             </button>
-            <Button variant="primary" onClick={() => void save()} loading={Boolean(saving)} className="min-w-24">
+            <Button variant="primary" onClick={() => void save()} loading={Boolean(saving)} className="min-w-20 sm:min-w-24">
               Save
             </Button>
           </div>

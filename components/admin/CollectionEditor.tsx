@@ -101,7 +101,7 @@ export function CollectionEditor({ id }: { id: string }) {
           <CardBody>
             <fieldset aria-describedby={statusErrors.length ? `${fieldId("status")}-error` : undefined}>
               <legend className="sr-only">Live or Coming soon</legend>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <StatusOption
                   id={fieldId("items")}
                   checked={season.status === "published"}
