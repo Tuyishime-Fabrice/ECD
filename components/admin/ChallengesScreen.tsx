@@ -77,7 +77,7 @@ export function ChallengesScreen() {
                             <span className="block text-xs font-extrabold uppercase tracking-[0.08em] text-berry-ink">
                               Challenge {i + 1}
                             </span>
-                            <span className="block truncate font-semibold text-ink group-hover:underline">
+                            <span className="line-clamp-2 font-semibold leading-snug text-ink group-hover:underline">
                               {challenge.title.en || "Untitled challenge"}
                             </span>
                             <span className="mt-0.5 block text-sm text-ink-2">

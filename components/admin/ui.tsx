@@ -529,7 +529,11 @@ export function Dialog({
   useEffect(() => {
     const dialog = ref.current;
     if (!dialog) return;
-    if (open && !dialog.open) dialog.showModal();
+    if (open && !dialog.open) {
+      dialog.showModal();
+      // Start on the safe choice (Cancel), not on the close button.
+      dialog.querySelector<HTMLElement>("[data-autofocus]")?.focus();
+    }
     if (!open && dialog.open) dialog.close();
   }, [open]);
   return (
@@ -607,7 +611,7 @@ export function ConfirmDialog({
       tone={tone}
       footer={
         <>
-          <Button onClick={onCancel} disabled={busy}>
+          <Button onClick={onCancel} disabled={busy} data-autofocus>
             Cancel
           </Button>
           <Button variant={tone === "danger" ? "danger" : "primary"} onClick={onConfirm} loading={busy}>

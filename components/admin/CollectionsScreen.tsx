@@ -81,10 +81,10 @@ function CollectionRow({ season, index, count }: { season: Season; index: number
         </span>
       </Link>
       <div className="flex shrink-0 items-center justify-end gap-0.5" role="group" aria-label={`Actions for ${title}`}>
-        <IconButton label={`Move ${title} up`} icon={<ArrowUp className="size-[22px]" {...ICON} />} disabled={index === 0} onClick={() => move(-1)} />
+        <IconButton label={`Move ${title} up`} icon={<ArrowUp className="size-6" {...ICON} strokeWidth={2.5} />} disabled={index === 0} onClick={() => move(-1)} />
         <IconButton
           label={`Move ${title} down`}
-          icon={<ArrowDown className="size-[22px]" {...ICON} />}
+          icon={<ArrowDown className="size-6" {...ICON} strokeWidth={2.5} />}
           disabled={index === count - 1}
           onClick={() => move(1)}
         />

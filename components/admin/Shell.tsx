@@ -329,6 +329,7 @@ function ConflictDialog() {
           <Button
             variant="primary"
             loading={busy}
+            data-autofocus
             onClick={async () => {
               setBusy(true);
               await reload();

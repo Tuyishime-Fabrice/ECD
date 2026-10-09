@@ -168,7 +168,7 @@ function UndoDialog({
       }
       footer={
         <>
-          <Button onClick={close} disabled={busy}>
+          <Button onClick={close} disabled={busy} data-autofocus>
             Cancel
           </Button>
           <Button
