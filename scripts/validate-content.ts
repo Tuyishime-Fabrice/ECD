@@ -3,6 +3,7 @@
  * Stops the build with a numbered, plain-language list of problems.
  */
 import { existsSync, readFileSync } from "node:fs";
+import { validateSite } from "../content/site.ts";
 import { validateContent } from "../content/validate.ts";
 
 const root = new URL("../", import.meta.url);
@@ -46,4 +47,21 @@ if (!result.ok) {
 const seasons = result.content.seasons;
 const episodes = seasons.flatMap((s) => s.items.filter((i) => i.type === "episode")).length;
 const challenges = seasons.flatMap((s) => s.items.filter((i) => i.type === "challenge")).length;
-console.log(green(`✔ ${FILE} is valid: ${seasons.length} seasons, ${episodes} episodes, ${challenges} challenges.`));
+console.log(green(`✔ ${FILE} is valid: ${seasons.length} collections, ${episodes} stories, ${challenges} challenges.`));
+
+const SITE = "content/site.json";
+let rawSite: unknown;
+try {
+  rawSite = JSON.parse(readFileSync(new URL(SITE, root), "utf8"));
+} catch (err) {
+  console.error(red(`\n✖ ${SITE} is not valid JSON.`));
+  console.error(`  ${(err as Error).message}\n`);
+  process.exit(1);
+}
+const site = validateSite(rawSite, result.content);
+if (!site.ok) {
+  console.error(red(`\n✖ Found ${site.errors.length} problem(s) in ${SITE}:\n`));
+  site.errors.forEach((e, i) => console.error(`  ${i + 1}. ${e}`));
+  process.exit(1);
+}
+console.log(green(`✔ ${SITE} is valid: ${site.site.featured.length} featured stories.`));

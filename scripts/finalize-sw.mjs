@@ -1,58 +1,76 @@
 /**
- * Runs after `next build`: writes the list of files to keep offline and a
- * fresh version into out/sw.js.
+ * Runs after `next build`: lists every prerendered page and static file to keep
+ * offline, then writes public/sw.js from scripts/sw-template.js with that list
+ * and a fresh version.
  */
 import { createHash } from "node:crypto";
-import { readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
-const out = fileURLToPath(new URL("../out/", import.meta.url));
-const swPath = join(out, "sw.js");
+const root = fileURLToPath(new URL("../", import.meta.url));
+const nextDir = join(root, ".next");
+const publicDir = join(root, "public");
+const swPath = join(publicDir, "sw.js");
+const templatePath = join(root, "scripts", "sw-template.js");
 
 function walk(dir) {
+  if (!existsSync(dir)) return [];
   return readdirSync(dir).flatMap((name) => {
     const full = join(dir, name);
     return statSync(full).isDirectory() ? walk(full) : [full];
   });
 }
-
-// Legacy-browser polyfills (loaded with nomodule): phones that can run the service worker never need them.
-const legacyOnly = new Set(
-  [...readFileSync(join(out, "index.html"), "utf8").matchAll(/<script src="([^"]+)" noModule/gi)].map((m) => m[1]),
-);
-
+const rel = (from, file) => relative(from, file).split(sep).join("/");
 // "#", "?" and "%" mean something in a URL: escape them so files named with them still load.
 const urlPath = (p) => p.replace(/[%#?]/g, (c) => encodeURIComponent(c));
 
 const urls = [];
 const hash = createHash("sha256");
-for (const file of walk(out).sort()) {
-  const rel = relative(out, file).split(sep).join("/");
-  if (rel === "sw.js" || rel === "404.html" || rel.endsWith(".map")) continue;
-  // Navigation data (.txt) is cached as pages are visited; offline, Next falls back to the cached HTML.
-  if (rel.endsWith(".txt")) continue;
-  if (legacyOnly.has(`/${rel}`)) continue;
-  if (rel.startsWith("_not-found") || rel.includes("/.gitkeep") || rel === ".gitkeep") continue;
+const add = (url, file) => {
+  urls.push(urlPath(url));
+  hash.update(url).update(readFileSync(file));
+};
+
+// 1. Prerendered pages (the kid app, the parent area and the offline page). Never the admin.
+const { routes } = JSON.parse(readFileSync(join(nextDir, "prerender-manifest.json"), "utf8"));
+const appDir = join(nextDir, "server", "app");
+for (const route of Object.keys(routes).sort()) {
+  if (/^\/(_|admin|api)/.test(route)) continue;
+  const base = route === "/" ? "index" : route.slice(1);
+  const file = [`${base}.html`, `${base}.body`].map((f) => join(appDir, f)).find(existsSync);
+  if (!file) throw new Error(`finalize-sw: no prerendered file for ${route}`);
+  add(route, file);
+}
+
+// Legacy-browser polyfills (loaded with nomodule): phones that can run the service worker never need them.
+const legacyOnly = new Set(
+  [...readFileSync(join(appDir, "index.html"), "utf8").matchAll(/<script src="([^"]+)" noModule/gi)].map((m) => m[1]),
+);
+
+// 2. Versioned JS, CSS and fonts.
+for (const file of walk(join(nextDir, "static")).sort()) {
+  const url = `/_next/static/${rel(join(nextDir, "static"), file)}`;
+  if (url.endsWith(".map") || legacyOnly.has(url)) continue;
   // Font subsets for other alphabets load only if such characters ever appear; only preloaded (".p.") ones are kept.
-  if (rel.startsWith("_next/static/media/") && rel.endsWith(".woff2") && !rel.includes(".p.")) continue;
-  hash.update(rel).update(readFileSync(file));
-  if (rel.endsWith(".html")) {
-    // Clean URLs, as served by Vercel/Netlify: /season/numbers.html → /season/numbers
-    const path = rel === "index.html" ? "/" : `/${rel.replace(/(\/index)?\.html$/, "")}`;
-    urls.push(urlPath(path));
-  } else {
-    urls.push(urlPath(`/${rel}`));
-  }
+  if (url.startsWith("/_next/static/media/") && url.endsWith(".woff2") && !url.includes(".p.")) continue;
+  add(url, file);
+}
+
+// 3. Pictures, icons and recordings from public/.
+for (const file of walk(publicDir).sort()) {
+  const url = `/${rel(publicDir, file)}`;
+  if (url === "/sw.js" || url.endsWith("/.gitkeep") || url.endsWith(".map")) continue;
+  add(url, file);
 }
 
 const version = hash.digest("hex").slice(0, 12);
-const template = readFileSync(swPath, "utf8");
+const template = readFileSync(templatePath, "utf8");
 const sw = template
   .replace('const VERSION = "dev";', `const VERSION = "${version}";`)
   .replace("const PRECACHE = [];", `const PRECACHE = ${JSON.stringify(urls)};`);
 if (!sw.includes(`const VERSION = "${version}";`) || sw.includes("const PRECACHE = [];")) {
-  throw new Error("out/sw.js: could not fill in VERSION / PRECACHE");
+  throw new Error("finalize-sw: could not fill in VERSION / PRECACHE");
 }
 writeFileSync(swPath, sw);
 console.log(`✔ Service worker: ${urls.length} files kept for offline use (version ${version}).`);

@@ -1,9 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Fully static site: `next build` writes plain HTML/CSS/JS to /out.
-  output: "export",
-  // Static export has no image server; our images are small SVGs anyway.
+  // Kid pages are prerendered to static HTML at build time; only /api/admin runs on the server.
+  // Our images are small SVGs or pre-sized pictures; no image server needed.
   images: { unoptimized: true },
   reactStrictMode: true,
   poweredByHeader: false,

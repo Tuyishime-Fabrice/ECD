@@ -14,7 +14,7 @@ export default defineConfig([
   },
   {
     // The service worker runs in its own global scope.
-    files: ["public/sw.js"],
+    files: ["scripts/sw-template.js"],
     languageOptions: { globals: { self: "readonly", caches: "readonly" } },
   },
   globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),

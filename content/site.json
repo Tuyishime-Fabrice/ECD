@@ -1,0 +1,5 @@
+{
+  "_note": "App settings edited from the admin dashboard (/admin). featured: the stories shown in the big slider at the top of Home (story ids, in order). contact.whatsapp: the parents' WhatsApp number with country code, e.g. \"+250781234567\"; leave empty to hide the Contact card.",
+  "featured": ["s1e1", "s1e3", "s1e5"],
+  "contact": { "whatsapp": "" }
+}

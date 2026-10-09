@@ -18,7 +18,12 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: brand.themeColor,
+  // Browser bar matches the sky: morning in light mode, night in dark mode.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#9fd6f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1533" },
+  ],
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

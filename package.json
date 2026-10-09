@@ -12,7 +12,7 @@
     "prebuild": "npm run validate",
     "build": "next build",
     "postbuild": "node scripts/finalize-sw.mjs",
-    "start": "npx serve@14 -l 4173 out",
+    "start": "next start -p 4173",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",

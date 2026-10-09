@@ -1,6 +1,7 @@
 /**
  * All brand values live here. Change them and the whole app follows:
  * page titles, the header, the install manifest and the parent area.
+ * The WhatsApp number and featured stories live in content/site.json (admin dashboard).
  *
  * Colors live in app/globals.css (the @theme block) — see README.
  */
@@ -19,14 +20,6 @@ export const brand = {
   themeColor: "#1572A8",
   /** Splash-screen background (cream-50). */
   backgroundColor: "#FFF9EE",
-  /**
-   * Parent area only. The Contact card stays hidden while this is empty.
-   * Fill in your WhatsApp number to show it, e.g.
-   *   contactLink: "https://wa.me/250781234567",
-   *   contactLabel: "+250 781 234 567",
-   */
-  contactLink: "",
-  contactLabel: "",
   /**
    * Prefix for everything saved on the device. Changing it starts every
    * family from zero, so leave it alone after launch.

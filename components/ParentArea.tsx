@@ -14,7 +14,9 @@ import { grantExtension } from "@/lib/screen-time";
 import { dailyLimitSec, kigaliDate, usageToday } from "@/lib/timer";
 import { ParentGate } from "./ParentGate";
 
-export function ParentPage({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillInfo[] }) {
+type Contact = { link: string; label: string } | null;
+
+export function ParentPage({ seasons, skills, contact }: { seasons: SeasonCard[]; skills: SkillInfo[]; contact: Contact }) {
   const t = useT();
   const [unlocked, setUnlocked] = useState(false);
   useDocumentTitle(t("parentArea"));
@@ -30,7 +32,7 @@ export function ParentPage({ seasons, skills }: { seasons: SeasonCard[]; skills:
       </main>
     );
   }
-  return <ParentArea seasons={seasons} skills={skills} />;
+  return <ParentArea seasons={seasons} skills={skills} contact={contact} />;
 }
 
 function BackLink() {
@@ -147,7 +149,7 @@ const STATUS_STYLE: Record<SkillStatus, string> = {
 };
 const STATUS_KEY = { mastered: "mastered", practicing: "practicing", not_started: "notStarted" } as const;
 
-function ParentArea({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillInfo[] }) {
+function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skills: SkillInfo[]; contact: Contact }) {
   const t = useT();
   const pick = usePick();
   const settings = useSettings();
@@ -303,19 +305,19 @@ function ParentArea({ seasons, skills }: { seasons: SeasonCard[]; skills: SkillI
       <Card title={t("privacy")} icon={<ShieldCheck className="size-5" strokeWidth={2.5} aria-hidden />}>
         <p className="leading-relaxed">{t("privacyBody")}</p>
       </Card>
-      {/* Hidden until a real number is set in lib/brand.ts. */}
-      {brand.contactLink && (
+      {/* Hidden until a WhatsApp number is set in the admin dashboard (content/site.json). */}
+      {contact && (
         <Card title={t("contact")} icon={<MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />}>
           <p>{t("contactBody")}</p>
           <a
-            href={brand.contactLink}
+            href={contact.link}
             target="_blank"
             rel="noopener noreferrer"
             className="mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-leaf-700 px-5 font-semibold text-white"
           >
             <MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />
             {t("whatsapp")}
-            {brand.contactLabel && ` · ${brand.contactLabel}`}
+            {` · ${contact.label}`}
           </a>
         </Card>
       )}

@@ -3,8 +3,8 @@
  * device so the app opens without internet. Videos are never cached
  * (they stream from YouTube).
  *
- * VERSION and PRECACHE are filled in after each build by
- * scripts/finalize-sw.mjs (this template stays valid JavaScript).
+ * This is the template. After each build, scripts/finalize-sw.mjs fills in
+ * VERSION and PRECACHE and writes the result to public/sw.js.
  */
 const VERSION = "dev";
 const PRECACHE = [];
@@ -119,6 +119,11 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   if (url.origin !== self.location.origin) return; // YouTube, thumbnails: straight to the network.
+  // The admin dashboard is always live; never cache it.
+  if (/^\/(admin|api)(\/|$)/.test(url.pathname)) return;
+  // In-app navigation data: online only. Offline, Next.js falls back to a full page load,
+  // which is answered from the cached HTML below.
+  if (request.headers.has("RSC") || url.searchParams.has("_rsc")) return;
 
   if (request.mode === "navigate") {
     event.respondWith(networkFirst(request, OFFLINE_URL));
