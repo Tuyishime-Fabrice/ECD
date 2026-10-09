@@ -17,5 +17,5 @@ export default defineConfig([
     files: ["scripts/sw-template.js"],
     languageOptions: { globals: { self: "readonly", caches: "readonly" } },
   },
-  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts"]),
+  globalIgnores([".next/**", "out/**", "build/**", "next-env.d.ts", ".claude/**"]),
 ]);
