@@ -66,6 +66,81 @@ Publish status: the build writes `public/build-info.json` (`{ sha }`, from
 `VERCEL_GIT_COMMIT_SHA`; gitignored and not precached). After a save, the dashboard polls it
 and shows: "Saving… → Going live (about 2 min) → Live ✓".
 
+## Admin API: details and differences from the table above
+
+The server side lives in `lib/admin/` (`env`, `session`, `github`, `youtube`, `uploads`, `save`,
+`undo`, `wording`, `http`); the route files only wire them together. `lib/admin/uploads.ts` has no
+Node imports, so the dashboard can use it too.
+
+- **Every reply** is JSON with `Cache-Control: no-store` (also set in `next.config.ts`, which
+  covers Next.js's own 405s and `/build-info.json`). Errors are `{ error }` or
+  `{ errors: string[] }`.
+- **Status codes:** 400 malformed request · 401 not signed in, or wrong password · 403 not
+  same-origin · 409 someone else saved · 413 body too big · 415 not JSON · 422 refused, with
+  reasons · 502 GitHub or YouTube trouble · 503 not set up yet, or GitHub rate limit. On 401, show
+  the login screen. On 409, reload the content.
+- **Setup:** `ADMIN_PASSWORD` under 12 characters, or an `ADMIN_SESSION_SECRET` under 32,
+  counts as not set up. `GET /session` returns `setup.problems`: plain sentences naming each
+  missing or broken variable, for the setup screen.
+- **Login and logout** need same-origin JSON too. Logout works even with an expired session.
+  The cookie is `Secure` in production except on `localhost`/`127.0.0.1`, so `next start` works
+  over plain http.
+- **Save** `{ seasons, site, uploads, summary, baseSha }`:
+  - `uploads[].path` is the public path used in `seasons.json`:
+    `/images/uploads/<lowercase-letters-digits-and-dashes>.<jpg|jpeg|png|webp>`, no subfolders.
+    `base64` may start with `data:…;base64,`. Make names with `uploadPath(name, type)`.
+  - Names are never reused: a different picture under an existing name is refused (the same
+    bytes are fine). One save carries at most 40 pictures and 3 MB, because Vercel refuses
+    requests over 4.5 MB. Resize in the browser (story pictures about 1280×720, answer pictures
+    about 512px).
+  - 422 adds `issues: [{ file: "seasons" | "site" | "uploads", path, message, problem }]`, with
+    `errors[i] === issues[i].message`. `path` points into the JSON you sent (`["seasons", 0,
+    "items", 3, "episode", "thumbnail"]`) or the upload index; `problem` is the short text for
+    next to that field. Messages use the dashboard's words ("Collection 1 "…" › story 2 "…" ›
+    picture: …"). Shape problems come first; missing pictures and unknown skills are reported
+    once the shape is right.
+  - Only files that really change are committed. If nothing changed: 200
+    `{ commitSha: <head>, unchanged: true }`, and no commit. If the branch moves during the
+    commit for any other reason, the save starts over once on top of it.
+  - The JSON is written with 2-space indents and a final newline. Send `seasons` back with its
+    `_note`.
+  - Keep the data consistent before saving: renumber `episode.number` within a collection
+    after a move, and take deleted or "Coming soon" stories out of `site.featured`. Otherwise
+    the save is refused with a reason.
+- **YouTube** `GET /youtube?url=…` → `{ id, title, thumbnail: { base64, type } | null }`. The
+  picture is `maxresdefault` (1280×720) when YouTube has it, else `hqdefault` (480×360 with black
+  bars: crop it to 16:9). Upload it with the save. Refusals: 400 not a video link, 404 private
+  or deleted, 422 the owner turned off embedding (it would not play in the app).
+- **History** → `{ commits: [{ sha, summary, date }] }`, newest first. It lists commits that
+  changed `content/seasons.json`, `content/site.json` or `public/images/uploads/`, not code
+  changes elsewhere in `content/`.
+- **Undo** `{ sha, baseSha? }` puts `content/seasons.json` and `content/site.json` back
+  byte-for-byte as they were before `sha`, as a new commit. **Saves made after it are undone too**,
+  so say so in the confirm. It is refused (422) if that commit changed neither file, if it is the
+  first commit, if nothing would change, or if the old version no longer passes the checks
+  (for example, a picture it uses was deleted). Unknown sha: 404. With `baseSha`, a 409 works as
+  in save. Uploaded pictures are never deleted.
+- **Going live:** poll `/build-info.json` with `cache: "no-store"`. It is live when its `sha`
+  equals the save's `commitSha`, or is a newer commit from History. The file is missing in
+  `next dev`.
+
+### Trying it locally
+
+```sh
+npm run build
+node scripts/dev/fake-github.mjs            # fake GitHub + YouTube on :4010, seeded from this checkout
+ADMIN_PASSWORD='correct horse battery' GITHUB_TOKEN=test-token \
+  GITHUB_API_URL=http://127.0.0.1:4010 \
+  YOUTUBE_OEMBED_URL=http://127.0.0.1:4010/oembed YOUTUBE_THUMBNAIL_URL=http://127.0.0.1:4010/vi \
+  npx next start -p 4187
+scripts/dev/admin-smoke.sh                  # curl: login → content → YouTube → save → history → undo → 422 → 409
+```
+
+The fake keeps its repository in memory (restart it to start over). `POST /__fake/commit
+{ message, files }` commits as "someone else". The YouTube stand-in treats video ids that start
+with `NoEmbed` as embedding turned off, and ids that start with `Missing` as deleted.
+`YOUTUBE_OEMBED_URL` and `YOUTUBE_THUMBNAIL_URL` exist only for this; leave them unset in Vercel.
+
 ## Screens (plain English, no jargon)
 
 The UI is calm and professional, in the same day/night tokens as the app (see

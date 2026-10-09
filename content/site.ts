@@ -21,28 +21,36 @@ export const siteSchema = z.strictObject({
 
 export type Site = z.infer<typeof siteSchema>;
 
-export type SiteResult = { ok: true; site: Site } | { ok: false; errors: string[] };
+/** `errors[i]` describes `issues[i]`; issue paths are 0-based, the error text counts from 1. */
+export type SiteIssue = { path: (string | number)[]; message: string };
+
+export type SiteResult = { ok: true; site: Site } | { ok: false; errors: string[]; issues: SiteIssue[] };
+
+const siteError = ({ path, message }: SiteIssue) =>
+  `site.json › ${path.map((k) => (typeof k === "number" ? k + 1 : k)).join(" › ") || "top"}: ${message}`;
 
 /** Checks site.json against the content: featured stories must exist and be published. */
 export function validateSite(raw: unknown, content: Content): SiteResult {
   const parsed = siteSchema.safeParse(raw);
   if (!parsed.success) {
-    return {
-      ok: false,
-      errors: parsed.error.issues.map((i) => `site.json › ${i.path.join(" › ") || "top"}: ${i.message}`),
-    };
+    const issues = parsed.error.issues.map((i) => ({
+      path: i.path.map((k) => (typeof k === "number" ? k : String(k))),
+      message: i.message,
+    }));
+    return { ok: false, errors: issues.map(siteError), issues };
   }
   const published = new Set(
     content.seasons
       .filter((s) => s.status === "published")
       .flatMap((s) => s.items.flatMap((i) => (i.type === "episode" ? [i.episode.id] : []))),
   );
-  const errors = parsed.data.featured.flatMap((id, i) =>
-    published.has(id) ? [] : [`site.json › featured › ${i + 1}: "${id}" is not a story in a published collection`],
+  const notLive = (id: string) => `"${id}" is not a story in a published collection`;
+  const issues: SiteIssue[] = parsed.data.featured.flatMap((id, i) =>
+    published.has(id) ? [] : [{ path: ["featured", i], message: notLive(id) }],
   );
   const dup = parsed.data.featured.find((id, i) => parsed.data.featured.indexOf(id) !== i);
-  if (dup) errors.push(`site.json › featured: "${dup}" is listed twice`);
-  return errors.length ? { ok: false, errors } : { ok: true, site: parsed.data };
+  if (dup) issues.push({ path: ["featured"], message: `"${dup}" is listed twice` });
+  return issues.length ? { ok: false, errors: issues.map(siteError), issues } : { ok: true, site: parsed.data };
 }
 
 /** "+250 781 234 567" → { link: "https://wa.me/250781234567", label: "+250 781 234 567" } */
