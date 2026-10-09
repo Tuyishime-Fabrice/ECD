@@ -146,6 +146,12 @@ export function write(rel, { w, h, body, doc, par, kind = "object", root = "" })
   const problems = [];
   if (/<text[\s>]/.test(svg)) problems.push("contains <text>");
   if (/<image[\s>]|data:image/.test(svg)) problems.push("embeds a raster image");
+  // A repeated attribute makes the whole file invalid XML, and browsers then show nothing.
+  for (const [tag] of svg.matchAll(/<[a-zA-Z][^>]*>/g)) {
+    const names = [...tag.matchAll(/\s([\w:-]+)=/g)].map((m) => m[1]);
+    const twice = names.filter((n, i) => names.indexOf(n) !== i);
+    if (twice.length) problems.push(`repeated attribute ${twice[0]} in ${tag.slice(0, 40)}…`);
+  }
   const ids = [...svg.matchAll(/\sid="([^"]+)"/g)].map((m) => m[1]);
   const dupes = ids.filter((id, i) => ids.indexOf(id) !== i);
   if (dupes.length) problems.push(`duplicate ids: ${[...new Set(dupes)].join(", ")}`);

@@ -1,6 +1,7 @@
 /**
- * Izuba, the sun mascot, for the SVG files (logo, empty states, the time's-up scene).
- * The app draws Izuba inline with components/Mascot.tsx: keep the two in step.
+ * Izuba, the sun mascot, for the SVG files (logo, empty states, the time's-up scenes).
+ * The app draws Izuba inline with components/Mascot.tsx: keep the two in step
+ * (components/Mascot.test.tsx compares them).
  */
 import { GLYPHS, INK, OUTLINE, linear, radial } from "./lib.mjs";
 
@@ -10,14 +11,10 @@ const RAY_SHORT = "M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z";
 const arm = (d, hx, hy) =>
   `<path d="${d}" fill="none" stroke="${OUTLINE}" stroke-width="12" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#FFBE38" stroke-width="6" stroke-linecap="round"/><circle cx="${hx}" cy="${hy}" r="7.5" fill="#FFD453" stroke="${OUTLINE}" stroke-width="3"/>`;
 const ARM_R = ["M83 87C95 84 104 74 107 60", 108, 55];
-const ARM_L = ["M37 87C25 84 16 74 13 60", 12, 55];
 const eye = (x, y = 59) => `<ellipse cx="${x}" cy="${y}" rx="4.6" ry="6" fill="${INK}"/><circle cx="${x + 1.7}" cy="${y - 2.6}" r="1.8" fill="#fff"/>`;
 const SMILE = `<path d="M49.5 70.5C52 80 68 80 70.5 70.5C63 73 57 73 49.5 70.5Z" fill="#7C2D12" stroke="${OUTLINE}" stroke-width="2.6" stroke-linejoin="round"/><path d="M54.5 75.6C57.5 74 62.5 74 65.5 75.6C63 78.4 57 78.4 54.5 75.6Z" fill="#FF8467"/>`;
 
-/**
- * Izuba in a 120×120 box. Poses: happy, wave, cheer, oops, sleep; "hold" raises both hands in
- * front of the face (for holding a map or a cloud). `p` prefixes gradient ids.
- */
+/** Izuba in a 120×120 box. Poses: happy, wave, cheer, oops, sleep. `p` prefixes gradient ids. */
 export function mascot(doc, pose = "happy", p = "m") {
   doc.def(`${p}f`, radial(`${p}f`, [[0, "#FFEB97"], [0.55, "#FFCB3D"], [1, "#FFA81E"]], [0.38, 0.32, 0.8]));
   doc.def(`${p}r`, linear(`${p}r`, [[0, "#FFC93F"], [1, "#FF9F1A"]]));

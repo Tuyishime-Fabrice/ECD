@@ -158,8 +158,12 @@ its path, e.g. `tryAgain: { audio: { rw: "/audio/ui/try-again.rw.mp3" }, … }`.
   The Contact card in the parent area stays hidden until you fill in `contactLink`.
   The page title, header, installed-app name and parent area all follow.
   (Leave `storagePrefix` alone after launch; changing it starts every family over.)
-- **Logo:** replace `public/icons/logo.svg`, then regenerate the app icons:
-  `npm i --no-save playwright && node scripts/make-icons.mjs`.
+- **Logo and pictures:** all the art in `public/images` and `public/icons/logo.svg` is drawn
+  by `scripts/art/*.mjs`. Change it there and run `node scripts/art/build.mjs`. Izuba is
+  drawn twice, in `scripts/art/mascot.mjs` and `components/Mascot.tsx`, and `npm test`
+  checks that they match. Then regenerate the app icons:
+  `npm i --no-save playwright && node scripts/make-icons.mjs` (or point `PLAYWRIGHT_MODULE`
+  at a Playwright install you already have).
 - **Colors:** the `@theme` block at the top of `app/globals.css`
   (`--color-sky-500: #29a9e0;` and so on). Keep the same names. `npm test` checks
   that text stays readable (WCAG AA contrast) for every color pair the app uses.
@@ -207,7 +211,7 @@ Each change goes live by itself.
 - [ ] **Real videos:** replace `"DEMO"` with each episode's YouTube ID in `content/seasons.json`.
   Until then every episode plays YouTube's sample video. Embedding must be allowed on each video.
 - [ ] **WhatsApp:** fill in `contactLink` and `contactLabel` in `lib/brand.ts`. The Contact card then appears.
-- [ ] **Name, logo and mascot:** `lib/brand.ts`, `public/icons/logo.svg`, `components/Mascot.tsx`.
+- [ ] **Name, logo and mascot:** `lib/brand.ts`, `scripts/art/mascot.mjs`, `components/Mascot.tsx`.
 - [ ] **Kinyarwanda review** by a native speaker (`content/seasons.json`, `lib/i18n.ts`).
 - [ ] **Question recordings:** the build log lists the missing files.
 - [ ] Run the checklist below on the live link, on one Android phone and one iPhone.
@@ -245,8 +249,8 @@ Node 22.18+ (the content validator runs as TypeScript directly on Node).
 | `validate` | Checks `content/seasons.json` (runs before every build) |
 | `build` | `next build` with `output: "export"` → static files in `out/` |
 | `postbuild` | `scripts/finalize-sw.mjs`: fills in the offline file list and version in `out/sw.js` |
-| `test` | Vitest unit tests for `lib/` and `content/` |
-| `node scripts/make-images.mjs` | Regenerates the placeholder SVG art in `public/images` |
+| `test` | Vitest unit tests for `lib/`, `content/` and `components/` |
+| `node scripts/art/build.mjs` | Redraws the SVG art in `public/images` and the logo (`… world ui` for some groups only) |
 
 ### Deploy
 
@@ -273,7 +277,7 @@ content/      seasons.json, schema.ts (zod), validate.ts, index.ts (build-time l
 lib/          brand, i18n, progress (ProgressStore), recommend, unlock, skills, timer,
               screen-time, sounds (Web Audio), speech, youtube, playback
 public/       images/ (original SVGs), audio/, icons/, sw.js
-scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.mjs
+scripts/      validate-content.ts, finalize-sw.mjs, make-icons.mjs, art/ (the SVG art)
 ```
 
 - **Content is data.** Pages are prerendered from `seasons.json` at build time; `zod`
@@ -313,6 +317,6 @@ scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.
 ### Known placeholders / next steps
 
 - Brand name "Izuba", WhatsApp number (Contact card hidden until set), demo video ID: `lib/brand.ts`.
-- Sun mascot, thumbnails, posters and stickers are simple placeholder SVGs.
+- Story thumbnails are drawn stand-ins until the real videos' pictures replace them.
 - Kinyarwanda strings (`content/seasons.json`, `lib/i18n.ts`) need native review.
 - Question recordings (list printed by `npm run build`) and app voice lines.

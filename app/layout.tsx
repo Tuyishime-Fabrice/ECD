@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   title: { default: brand.name, template: `%s · ${brand.name}` },
   description: brand.tagline.en,
   applicationName: brand.name,
-  icons: { icon: brand.logo },
+  icons: { icon: brand.logo, apple: "/icons/apple-touch-icon.png" },
   // No external links, no tracking: keep crawlers from following anything.
   referrer: "strict-origin-when-cross-origin",
 };

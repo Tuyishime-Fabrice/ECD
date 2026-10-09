@@ -46,12 +46,15 @@ const ARMS = {
   cheer: [[[-19, -98], [-38, -114], [-46, -140]], [[19, -98], [38, -114], [46, -140]]],
   hold: [[[-19, -98], [-30, -84], [-20, -68]], [[19, -98], [30, -84], [20, -68]]],
   point: [[[-19, -98], [-26, -80], [-28, -62]], [[19, -98], [38, -100], [56, -108]]],
+  balance: [[[-19, -98], [-38, -104], [-54, -118]], [[19, -98], [34, -86], [42, -70]]],
+  rope: [[[-19, -98], [-36, -90], [-48, -80]], [[19, -98], [36, -90], [48, -80]]],
 };
 const LEGS = {
   stand: [[[-10, -44], [-11, -24], [-12, -8]], [[10, -44], [11, -24], [12, -8]]],
   walk: [[[-10, -44], [-17, -26], [-22, -8]], [[10, -44], [12, -24], [17, -8]]],
   tiptoe: [[[-10, -44], [-10, -26], [-10, -12]], [[10, -44], [10, -26], [10, -12]]],
   jump: [[[-10, -44], [-20, -30], [-14, -16]], [[10, -44], [20, -30], [14, -16]]],
+  kick: [[[-10, -44], [-12, -24], [-14, -8]], [[10, -44], [26, -32], [42, -30]]],
 };
 
 /** Face features centered on (cx, cy); `look` shifts them for a three-quarter turn. */
@@ -87,7 +90,7 @@ function face({ cx, cy, look = 0, mouth = "smile", hair = "#2A1810", closed = fa
  * Keza. Options: pose (arm pose), legs, look (-1..1), mouth (smile | open | o),
  * hold(hands) → markup drawn under her hands (what she carries), front → markup over everything.
  */
-export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", closed = false, hold, front = "", sit = false, id = "kz" }) {
+export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", closed = false, hold, front = "", sit = false }) {
   const skin = skinFill(doc, "keza");
   const ls = limbSkin("keza");
   doc.def("kz-dress", linear("kz-dress", [[0, "#F0558E"], [1, "#C93A72"]], [0, 0, 0.3, 1]));

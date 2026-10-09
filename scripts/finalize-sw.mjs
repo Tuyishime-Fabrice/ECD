@@ -78,6 +78,8 @@ for (const file of walk(publicDir).sort()) {
   const url = `/${rel(publicDir, file)}`;
   // build-info.json changes with every deploy and must always come from the network.
   if (url === "/sw.js" || url === "/build-info.json" || url.endsWith("/.gitkeep") || url.endsWith(".map")) continue;
+  // The PNG app icons are fetched by the browser when the app is installed, never by a page.
+  if (/^\/icons\/.+\.png$/.test(url)) continue;
   add(url, file);
 }
 
