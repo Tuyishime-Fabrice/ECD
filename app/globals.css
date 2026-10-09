@@ -51,6 +51,9 @@
   --c-sky-top: #9fd6f0;
   --c-sky-bottom: #ffe5c2;
   /* end */
+  --c-road: #f4e2bb;
+  --c-road-edge: #d6b178;
+  --c-road-dots: #dfc392;
   --e1: 0 1px 2px rgb(110 58 16 / 0.1), 0 6px 14px -6px rgb(110 58 16 / 0.22);
   --e2: 0 1px 2px rgb(110 58 16 / 0.08), 0 10px 22px -8px rgb(110 58 16 / 0.26), 0 28px 52px -26px rgb(110 58 16 / 0.34);
   --rim: inset 0 1px 0 rgb(255 255 255 / 0.9), inset 0 -2px 0 rgb(150 90 30 / 0.06);
@@ -90,6 +93,9 @@
     --c-sky-top: #0b1533;
     --c-sky-bottom: #2b2f63;
     /* end */
+    --c-road: #3b416e;
+    --c-road-edge: #262b52;
+    --c-road-dots: #555c8f;
     --e1: 0 1px 2px rgb(0 0 0 / 0.4), 0 6px 14px -6px rgb(0 0 0 / 0.5);
     --e2: 0 1px 2px rgb(0 0 0 / 0.35), 0 10px 22px -8px rgb(0 0 0 / 0.5), 0 28px 52px -26px rgb(0 0 0 / 0.6);
     --rim: inset 0 1px 0 rgb(255 255 255 / 0.07), inset 0 -2px 0 rgb(0 0 0 / 0.15);
@@ -241,6 +247,9 @@
   --color-coral-soft: var(--c-coral-soft);
   --color-coral-ink: var(--c-coral-ink);
 
+  --color-road: var(--c-road);
+  --color-road-edge: var(--c-road-edge);
+  --color-road-dots: var(--c-road-dots);
   --color-sky-top: var(--c-sky-top);
   --color-sky-bottom: var(--c-sky-bottom);
 
