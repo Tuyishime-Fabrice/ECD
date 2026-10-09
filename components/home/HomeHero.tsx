@@ -170,7 +170,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
               loading={eager ? "eager" : "lazy"}
               fetchPriority={eager ? "high" : "auto"}
               decoding="async"
-              className="size-full object-cover"
+              className="size-full object-cover md:object-[50%_30%]"
             />
           ) : (
             <span className="grid size-full place-items-center bg-berry-soft">

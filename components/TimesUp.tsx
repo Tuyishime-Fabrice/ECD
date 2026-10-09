@@ -6,6 +6,7 @@ import type { LocalizedText } from "@/content/types";
 import { useHydrated, useT } from "@/lib/store";
 import { grantExtension, useTimeUp } from "@/lib/screen-time";
 import { HomeActivityCard } from "./EndScreen";
+import { Backdrop } from "./kid/Scene";
 import { Mascot } from "./Mascot";
 import { ParentGateDialog } from "./ParentGate";
 
@@ -76,6 +77,12 @@ export function TimeGate({ mode, children }: { mode: "live" | "start"; children:
 
   const blocked = mode === "live" ? up : upWhenOpened === true && up;
   // Once a parent adds time, this page counts as opened in time: its video or challenge may finish.
-  return blocked ? <TimesUp onExtended={() => setUpWhenOpened(false)} /> : <>{children}</>;
+  if (!blocked) return <>{children}</>;
+  return (
+    <div className="relative min-h-[calc(100dvh-5rem)] pb-44">
+      <Backdrop scene="home-hills" />
+      <TimesUp onExtended={() => setUpWhenOpened(false)} />
+    </div>
+  );
 }
 
