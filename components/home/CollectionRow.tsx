@@ -60,7 +60,7 @@ export function CollectionRow({
         <Link
           href={`/season/${season.slug}`}
           onClick={playPop}
-          className="press press-paper flex h-14 shrink-0 items-center gap-2 rounded-full bg-paper px-4 font-display text-[17px] font-extrabold text-ink"
+          className="press press-paper flex h-16 shrink-0 items-center gap-2 rounded-full bg-paper px-5 font-display text-[17px] font-extrabold text-ink"
         >
           <MapIcon className="size-6 text-play" strokeWidth={2.5} aria-hidden />
           {t("path")}

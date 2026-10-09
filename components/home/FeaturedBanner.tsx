@@ -39,7 +39,7 @@ export function FeaturedBanner({ seasons }: { seasons: SeasonCard[] }) {
           <span className="font-display text-[28px] font-extrabold leading-[1.05] text-ink md:text-[40px]">
             {t("storyPath")}
           </span>
-          <span className="press press-play mt-2 inline-flex h-14 items-center gap-2 self-start rounded-full bg-play px-5 font-display text-lg font-extrabold text-on-accent">
+          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start rounded-full bg-play px-5 font-display text-lg font-extrabold text-on-accent">
             <MapIcon className="size-6" strokeWidth={2.5} aria-hidden />
             {t("openPath")}
           </span>

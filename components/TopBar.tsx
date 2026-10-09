@@ -40,7 +40,7 @@ export function TopBar() {
           href="/"
           aria-label={`${brand.name}, ${t("home")}`}
           onClick={playPop}
-          className="tap flex min-h-14 items-center gap-2 rounded-full pr-3"
+          className="tap flex min-h-16 items-center gap-2 rounded-full pr-3"
         >
           <img src={brand.logo} alt="" width={44} height={44} className="size-11" />
           <span className="font-display text-[28px] font-extrabold leading-none tracking-[-0.02em] text-ink">
@@ -53,7 +53,7 @@ export function TopBar() {
             href="/stickers"
             aria-label={t("myStickers")}
             onClick={playPop}
-            className="tap relative grid size-14 place-items-center rounded-full bg-sun-soft shadow-e1 shadow-rim"
+            className="tap relative grid size-16 place-items-center rounded-full bg-sun-soft shadow-e1 shadow-rim"
           >
             <Star className="size-8 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
             {stickers > 0 && (
@@ -68,7 +68,7 @@ export function TopBar() {
           <Link
             href="/parents"
             aria-label={t("parents")}
-            className="tap grid size-14 place-items-center rounded-full bg-paper shadow-e1 shadow-rim"
+            className="tap grid size-16 place-items-center rounded-full bg-paper shadow-e1 shadow-rim"
           >
             <Lock className="size-6 text-ink-2" strokeWidth={2.5} aria-hidden />
           </Link>
