@@ -233,7 +233,11 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
   are found by id), never into the copy that was on screen when the file was picked.
 - **YouTube:** the link is looked up with `/api/admin/youtube` (title and picture). The story
   editor alone loads the YouTube IFrame API, in a hidden player, to read the length; if that
-  fails it asks for minutes:seconds.
+  fails it asks for minutes:seconds. Only the latest lookup counts: answers to a link pasted
+  before it are ignored. A different video always clears the old length, and its title and
+  picture replace what the last lookup filled in (`applyVideoLookup`); a title the person typed,
+  a picture they uploaded, or what an existing story already had stays, and the message says
+  which ("The title stays as it was").
 - **Live status** (`lib/admin/ui-live.ts`): after a save the header chip says "Going live…" and
   polls `/build-info.json` every 10 seconds until the build is that save or newer, then "Live ✓".
   A save split into batches waits for its **last** commit (the one with the stories): a build of

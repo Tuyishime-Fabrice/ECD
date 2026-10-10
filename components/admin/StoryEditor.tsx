@@ -27,6 +27,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Episode } from "@/content/schema";
 import {
   addStory,
+  applyVideoLookup,
   blankQuestion,
   blankStory,
   deleteItem,
@@ -36,6 +37,8 @@ import {
   newStoryId,
   sortedSeasons,
   updateStory,
+  type Filled,
+  type FoundVideo,
 } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located } from "@/lib/admin/ui-issues";
 import { quoteTitle } from "@/lib/admin/ui-summary";
@@ -72,7 +75,7 @@ type Lookup =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; error: string }
-  | { status: "done"; info: VideoInfo; picture: string | null };
+  | { status: "done"; info: VideoInfo; picture: string | null; filled: { title: Filled; picture: Filled } };
 
 type Length = "idle" | "reading" | "read" | "failed";
 
@@ -154,7 +157,7 @@ function StoryScreen({ id, collection, onStartOver }: Props & { onStartOver: () 
         text: `Changed story ${quoteTitle(title)}`,
       });
   };
-  const yt = useYouTubeLookup(update);
+  const yt = useYouTubeLookup(story, update);
 
   if (!story) {
     return (
@@ -407,19 +410,33 @@ type SectionProps = {
   errors: (field: string) => readonly string[] | undefined;
 };
 
-/** Keeps the YouTube result (title, picture) for this screen; the picture is already resized and waiting to be saved. */
-function useYouTubeLookup(update: SectionProps["update"]) {
+/**
+ * Keeps the YouTube result (title, picture) for this screen; the picture is already resized
+ * and waiting to be saved. Links can be pasted one after another faster than YouTube answers,
+ * so only the latest lookup may change the story; answers to older ones are ignored.
+ */
+function useYouTubeLookup(story: Episode | undefined, update: SectionProps["update"]) {
   const { addPicture, handleFailure } = useDraft();
   const [lookup, setLookup] = useState<Lookup>({ status: "idle" });
   const [length, setLength] = useState<Length>("idle");
   const lastLink = useRef("");
+  const latest = useRef(0);
+  /** What the last lookup found: the next one replaces what it filled in (applyVideoLookup). */
+  const previous = useRef<FoundVideo | null>(null);
+  const current = useRef(story);
+  useEffect(() => {
+    current.current = story;
+  });
 
   const find = async (link: string) => {
     const text = link.trim();
     if (!text || text === lastLink.current) return;
     lastLink.current = text;
+    const ticket = ++latest.current;
+    const stale = () => ticket !== latest.current;
     setLookup({ status: "loading" });
     const res = await api.youtube(text);
+    if (stale()) return;
     if (!res.ok) {
       if (res.status === 401) handleFailure(res);
       setLookup({ status: "error", error: res.error });
@@ -437,16 +454,17 @@ function useYouTubeLookup(update: SectionProps["update"]) {
         picture = null;
       }
     }
-    setLookup({ status: "done", info, picture });
-    update((e) => ({
-      ...e,
-      youtubeId: info.id,
-      title: e.title.en.trim() ? e.title : { ...e.title, en: info.title },
-      // A new story takes the YouTube picture; an existing one keeps its picture unless asked.
-      thumbnail: picture && !e.thumbnail ? picture : e.thumbnail,
-    }));
+    if (stale() || !current.current) return;
+    const video: FoundVideo = { id: info.id, title: info.title, picture };
+    const before = previous.current;
+    previous.current = video;
+    const filled = applyVideoLookup(current.current, video, before);
+    setLookup({ status: "done", info, picture, filled: { title: filled.title, picture: filled.picture } });
+    // A different video also clears the old length, so it is read (or typed) again.
+    update((e) => applyVideoLookup(e, video, before).story);
     setLength("reading");
     const seconds = await readVideoLength(info.id);
+    if (stale()) return;
     if (seconds) {
       update((e) => (e.youtubeId === info.id ? { ...e, durationSec: seconds } : e));
       setLength("read");
@@ -455,11 +473,33 @@ function useYouTubeLookup(update: SectionProps["update"]) {
   return { lookup, length, find, setLength };
 }
 
+/** What a lookup did to the title and picture, in words. */
+function lookupMessage({ title, picture }: { title: Filled; picture: Filled }): string {
+  if (title === "filled" && picture === "filled") return "The title and picture are filled in.";
+  const parts = [
+    title === "filled" ? "The title is filled in." : title === "kept" ? "The title stays as it was." : "",
+    picture === "filled"
+      ? "The picture is filled in."
+      : picture === "kept"
+        ? "The picture stays as it was; “Use the YouTube picture” below swaps it."
+        : "It has no picture; upload one below.",
+  ];
+  return parts.filter(Boolean).join(" ");
+}
+
 function VideoCard({ story, errors, update, yt }: SectionProps & { yt: ReturnType<typeof useYouTubeLookup> }) {
   const [link, setLink] = useState(() => videoLink(story.youtubeId));
   const [lengthText, setLengthText] = useState(() => (story.durationSec > 0 ? formatClock(story.durationSec) : ""));
   const [lengthError, setLengthError] = useState<string | null>(null);
   const [editLength, setEditLength] = useState(false);
+  // Another video: the length shown or typed was the old video's.
+  const [lengthOf, setLengthOf] = useState(story.youtubeId);
+  if (lengthOf !== story.youtubeId) {
+    setLengthOf(story.youtubeId);
+    setLengthText(story.durationSec > 0 ? formatClock(story.durationSec) : "");
+    setLengthError(null);
+    setEditLength(false);
+  }
 
   const linkErrors = [
     ...(yt.lookup.status === "error" ? [yt.lookup.error] : []),
@@ -528,7 +568,7 @@ function VideoCard({ story, errors, update, yt }: SectionProps & { yt: ReturnTyp
             <div className="min-w-0">
               <p className="truncate font-semibold text-ink">{yt.lookup.info.title || "Video found"}</p>
               <p className="text-sm text-ink-2">
-                Found on YouTube. {yt.lookup.picture ? "The title and picture are filled in." : "It has no picture; upload one below."}
+                Found on YouTube. {lookupMessage(yt.lookup.filled)}
               </p>
             </div>
           </div>

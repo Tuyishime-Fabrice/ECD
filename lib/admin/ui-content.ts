@@ -361,6 +361,40 @@ export function moveInList<T>(list: readonly T[], index: number, direction: Dire
   return next;
 }
 
+/* ---------- YouTube ---------- */
+
+/** A video found from a pasted link; `picture` is its thumbnail, already resized and waiting to be saved. */
+export type FoundVideo = { id: string; title: string; picture: string | null };
+/** What happened to a field: filled in from the video, the person's own kept, or none to fill in. */
+export type Filled = "filled" | "kept" | "none";
+
+/**
+ * Puts a looked-up video into a story. The title and picture follow the video unless they
+ * are the person's own: a title they typed, a picture they uploaded, or what an existing
+ * story already had. What the previous lookup (`previous`) filled in is replaced. A
+ * different video's length is unknown until it is read or typed again.
+ */
+export function applyVideoLookup(
+  story: Episode,
+  video: FoundVideo,
+  previous: FoundVideo | null,
+): { story: Episode; title: Filled; picture: Filled } {
+  const title = story.title.en.trim();
+  const titleFromVideo = !title || (previous !== null && title === previous.title.trim());
+  const pictureFromVideo = !story.thumbnail || (Boolean(previous?.picture) && story.thumbnail === previous?.picture);
+  return {
+    story: {
+      ...story,
+      youtubeId: video.id,
+      durationSec: story.youtubeId === video.id ? story.durationSec : 0,
+      title: titleFromVideo ? { ...story.title, en: video.title } : story.title,
+      thumbnail: pictureFromVideo ? (video.picture ?? "") : story.thumbnail,
+    },
+    title: !titleFromVideo ? "kept" : video.title ? "filled" : "none",
+    picture: !pictureFromVideo ? "kept" : video.picture ? "filled" : "none",
+  };
+}
+
 /* ---------- Question changes ---------- */
 // Each takes the question as it is now and returns a changed copy. Editors pass them to
 // the update functions, so a change that lands late (a picture still being resized) is

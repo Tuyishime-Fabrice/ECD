@@ -6,6 +6,7 @@ import {
   addSeason,
   addOption,
   addStory,
+  applyVideoLookup,
   allIds,
   blankChallenge,
   blankQuestion,
@@ -256,6 +257,57 @@ describe("featured stories", () => {
     const out = prepareForSave(c, site(["s1e1"]));
     expect(out.site.featured).toEqual([]);
     expect(storiesOf(out.seasons.seasons[0]!).map((e) => e.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+});
+
+describe("applyVideoLookup", () => {
+  const videoA = { id: "AAAAAAAAAAA", title: "Video A", picture: "/images/uploads/video-a-picture-1.jpg" };
+  const videoB = { id: "BBBBBBBBBBB", title: "Video B", picture: "/images/uploads/video-b-picture-1.jpg" };
+  const blank = () => blankStory(content(), "s1");
+
+  it("fills in a new story's title and picture", () => {
+    const out = applyVideoLookup(blank(), videoA, null);
+    expect(out.story).toMatchObject({ youtubeId: videoA.id, title: { en: "Video A" }, thumbnail: videoA.picture, durationSec: 0 });
+    expect(out).toMatchObject({ title: "filled", picture: "filled" });
+  });
+  it("replaces what the last link filled in when another link is pasted", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const out = applyVideoLookup({ ...first, durationSec: 252 }, videoB, videoA);
+    expect(out.story).toMatchObject({ youtubeId: videoB.id, title: { en: "Video B" }, thumbnail: videoB.picture });
+    expect(out).toMatchObject({ title: "filled", picture: "filled" });
+    // A different video: its length must be read (or typed) again.
+    expect(out.story.durationSec).toBe(0);
+  });
+  it("keeps a title the person typed and a picture they uploaded", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const typed = { ...first, title: { en: "Keza Counts", rw: "" } };
+    expect(applyVideoLookup(typed, videoB, videoA)).toMatchObject({
+      story: { title: { en: "Keza Counts" }, thumbnail: videoB.picture },
+      title: "kept",
+      picture: "filled",
+    });
+    const uploaded = { ...first, thumbnail: "/images/uploads/my-own-1.jpg" };
+    expect(applyVideoLookup(uploaded, videoB, videoA)).toMatchObject({
+      story: { title: { en: "Video B" }, thumbnail: "/images/uploads/my-own-1.jpg" },
+      title: "filled",
+      picture: "kept",
+    });
+  });
+  it("keeps an existing story's own title and picture, but not the old video's length", () => {
+    const story = findStory(content(), "s1e2")!.value;
+    const out = applyVideoLookup(story, videoB, null);
+    expect(out.story).toMatchObject({ youtubeId: videoB.id, title: story.title, thumbnail: story.thumbnail, durationSec: 0 });
+    expect(out).toMatchObject({ title: "kept", picture: "kept" });
+  });
+  it("keeps the length when the same video is found again", () => {
+    const story = { ...applyVideoLookup(blank(), videoA, null).story, durationSec: 252 };
+    expect(applyVideoLookup(story, videoA, videoA).story.durationSec).toBe(252);
+  });
+  it("takes away the last video's picture when the new one has none", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const out = applyVideoLookup(first, { ...videoB, picture: null }, videoA);
+    expect(out.story.thumbnail).toBe("");
+    expect(out.picture).toBe("none");
   });
 });
 
