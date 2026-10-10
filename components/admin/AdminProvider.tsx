@@ -11,7 +11,7 @@ import type { Challenge, Content, Episode } from "@/content/schema";
 import type { Site } from "@/content/site";
 import { allIds, findChallenge, findSeason, findStory, picturesIn, prepareForSave, renumberStories } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located, type Target } from "@/lib/admin/ui-issues";
-import { liveState, type LiveState } from "@/lib/admin/ui-live";
+import { liveState, pollDelay, type LiveState } from "@/lib/admin/ui-live";
 import { draftAfterSave, notesAfterSave, type Note as SavedNote } from "@/lib/admin/ui-save";
 import { summarize } from "@/lib/admin/ui-summary";
 import { MAX_SAVE_UPLOAD_BYTES, MAX_UPLOADS_PER_SAVE } from "@/lib/admin/uploads";
@@ -37,7 +37,6 @@ export type NewFormKind = keyof NewForms;
 type ServerIssue = Located & { value: string };
 
 const PUBLISH_KEY = "izuba-admin:publish";
-const POLL_MS = 10_000;
 /** Below the server's 3 MB, to leave room for rounding. */
 const BATCH_BYTES = MAX_SAVE_UPLOAD_BYTES - 200_000;
 
@@ -179,6 +178,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Read on the client only; nothing that depends on it shows before the session check.
   const [publish, setPublish] = useState<Publish | null>(() => (typeof window === "undefined" ? null : readPublish()));
   const [deployed, setDeployed] = useState<string | null>(null);
+  /** The last read of /build-info.json failed (offline); `deployed` is the answer before that. */
+  const [buildInfoFailed, setBuildInfoFailed] = useState(false);
   const [historyShas, setHistoryShas] = useState<string[]>([]);
   const [newForms, setNewForms] = useState<NewForms>({});
   const [leaveGuard, setLeaveGuard] = useState<NewFormKind | null>(null);
@@ -456,13 +457,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   );
 
   // Is the latest save live? Checked when the dashboard opens, then every 10 seconds until it is.
+  // A read that fails (offline for a moment) keeps the last answer and tries again a bit later.
   const ready = phase === "ready";
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
-    void Promise.all([deployedSha(), api.history()]).then(([sha, history]) => {
+    void Promise.all([deployedSha(), api.history()]).then(([info, history]) => {
       if (cancelled) return;
-      setDeployed(sha);
+      if (info.ok) setDeployed(info.sha);
+      setBuildInfoFailed(!info.ok);
       if (history.ok) setHistoryShas(history.data.commits.map((c) => c.sha));
     });
     return () => {
@@ -480,16 +483,27 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     earlier: publish?.earlier,
     now,
   });
-  const waiting = ready && (live === "going" || live === "slow");
+  const waiting =
+    ready && (live === "going" || live === "slow" || (live === "unknown" && buildInfoFailed && publish !== null));
   useEffect(() => {
     if (!waiting) return;
-    const timer = setInterval(() => {
-      void deployedSha().then((sha) => {
-        setDeployed(sha);
-        setNow(Date.now());
-      });
-    }, POLL_MS);
-    return () => clearInterval(timer);
+    let cancelled = false;
+    let failures = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      const info = await deployedSha();
+      if (cancelled) return;
+      failures = info.ok ? 0 : failures + 1;
+      if (info.ok) setDeployed(info.sha);
+      setBuildInfoFailed(!info.ok);
+      setNow(Date.now());
+      timer = setTimeout(poll, pollDelay(failures));
+    };
+    timer = setTimeout(poll, pollDelay(0));
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [waiting]);
 
   const publishedSha = live === "live" ? publish?.commitSha : undefined;

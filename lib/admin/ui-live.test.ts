@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { liveState, SLOW_AFTER_MS } from "./ui-live";
+import { liveState, pollDelay, POLL_MS, SLOW_AFTER_MS } from "./ui-live";
 
 const sha = (n: number) => String(n).repeat(40).slice(0, 40);
 // History is newest first.
@@ -49,7 +49,20 @@ describe("liveState", () => {
     expect(liveState({ deployed: pictures, target: stories, history: [stories, pictures, before], earlier: [pictures] })).toBe("going");
     expect(liveState({ deployed: stories, target: stories, history: [stories, pictures, before], earlier: [pictures] })).toBe("live");
   });
+  it("doesn't count a build as newer when the build at save time wasn't known", () => {
+    const code = "c".repeat(40);
+    // Offline when saving: the next build read could be the same old one.
+    expect(liveState({ deployed: code, target: sha(3), history: [], deployedAtSave: null, savedAt: 0, now: 1 })).toBe("going");
+    expect(liveState({ deployed: sha(3), target: sha(3), history: [], deployedAtSave: null, savedAt: 0, now: 1 })).toBe("live");
+  });
   it("is live when there is nothing to wait for", () => {
     expect(liveState({ deployed: sha(1), target: null, history: [] })).toBe("live");
+  });
+});
+
+describe("pollDelay", () => {
+  it("polls every 10 seconds, and backs off gently while build info can't be read", () => {
+    expect(pollDelay(0)).toBe(POLL_MS);
+    expect([1, 2, 3, 10].map(pollDelay)).toEqual([20_000, 40_000, 60_000, 60_000]);
   });
 });

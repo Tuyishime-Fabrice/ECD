@@ -232,7 +232,10 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
 - **Live status** (`lib/admin/ui-live.ts`): after a save the header chip says "Going live…" and
   polls `/build-info.json` every 10 seconds until the build is that save or newer, then "Live ✓".
   A save split into batches waits for its **last** commit (the one with the stories): a build of
-  one of its picture-only commits still says "Going live…".
+  one of its picture-only commits still says "Going live…". A read that fails (offline for a
+  moment) changes nothing: the last answer stands and polling goes on, waiting longer after each
+  failure (20 s, 40 s, then every minute) until a read works. A save made while the build wasn't
+  known is only "Live" once the app is built from it or a newer save.
   After 10 minutes it says "Taking longer than usual". Without build info (`next dev`) it shows
   nothing.
 
