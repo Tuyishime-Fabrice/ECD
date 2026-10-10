@@ -217,8 +217,13 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
   and keeps the draft and any half-filled new story or challenge.
 - **Consistency before saving** (`prepareForSave` in `lib/admin/ui-content.ts`): story numbers
   count 1, 2, 3… in each collection, `site.featured` keeps only stories in Live collections, once
-  each, at most 6. New ids follow the sample: `s4`, `s1e9`, `s1c3`, `s1e9-p1`, `s1c3-q2`.
-  Moving a story swaps it with the next story; challenges keep their places.
+  each, at most 6. Moving a story swaps it with the next story; challenges keep their places.
+- **New ids are never reused.** Children's devices keep progress and stickers by story and
+  challenge id, so a new story or challenge must not get an id that existed before, including one
+  deleted in an earlier save (`content/seasons.json` no longer shows those). New ones get the next
+  number plus a short random suffix (`newStoryId` / `newChallengeId` in `lib/admin/ui-content.ts`):
+  stories `s1e9-k7fq`, challenges `s1c3-m2xd`, their questions `s1e9-k7fq-p1` and `s1c3-m2xd-q2`.
+  Collections keep plain `s4` ids, since nothing on a device is kept by collection.
 - **Pictures** are resized with a canvas (`lib/admin/ui-images.ts`): story pictures 1280×720 and
   posters 800×600, cut from the middle; answers and stickers fit in 512×512 and stay PNG when
   see-through. Names come from `uploadPath()`. The dashboard keeps showing the pictures it just

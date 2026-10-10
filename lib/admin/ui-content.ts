@@ -98,9 +98,12 @@ export function picturesIn(content: Content): Set<string> {
 
 /* ---------- New ids ---------- */
 
-/** The first `${prefix}${n}` (n = 1, 2, …) after the highest one in use, that isn't taken. */
+/**
+ * The first `${prefix}${n}` (n = 1, 2, …) after the highest one in use, that isn't taken.
+ * Ids with a suffix count too: "s1e9-k7fq" is number 9.
+ */
 function nextNumbered(prefix: string, taken: ReadonlySet<string>): string {
-  const pattern = new RegExp(`^${prefix.replace(/[-]/g, "\\-")}(\\d+)$`);
+  const pattern = new RegExp(`^${prefix.replace(/[-]/g, "\\-")}(\\d+)(?:-[a-z0-9]+)?$`);
   let highest = 0;
   for (const id of taken) {
     const match = pattern.exec(id);
@@ -111,23 +114,43 @@ function nextNumbered(prefix: string, taken: ReadonlySet<string>): string {
   return `${prefix}${n}`;
 }
 
+/** Letters and digits that can't be mixed up (no 0/o, 1/l/i). */
+const SUFFIX_CHARS = "23456789abcdefghjkmnpqrstuvwxyz";
+
+/** Four random characters, like "k7fq": 31⁴, about 920,000 kinds. */
+export function idSuffix(): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => SUFFIX_CHARS[b % SUFFIX_CHARS.length]).join("");
+}
+
 /** "s1" for the sample layout; collections with other ids get "-" before the letter ("numbers-e1"). */
 const itemPrefix = (seasonId: string, letter: "e" | "c") =>
   /^s\d+$/.test(seasonId) ? `${seasonId}${letter}` : `${seasonId}-${letter}`;
 
+/** The next number for the place, then a random suffix: an id no earlier save can have used. */
+function uniqueItemId(prefix: string, taken: ReadonlySet<string>, suffix: () => string): string {
+  const numbered = nextNumbered(prefix, taken);
+  const first = `${numbered}-${suffix()}`;
+  let id = first;
+  for (let n = 2; taken.has(id); n++) id = n < 20 ? `${numbered}-${suffix()}` : `${first}${n}`;
+  return id;
+}
+
 /**
- * Ids for new things: s4 (collection), s1e9 (story), s1c3 (challenge).
- * `reserved` holds ids to avoid besides the ones in `content` (for example ones
- * deleted since the last save, so a device's progress never points at a new story).
+ * Ids for new things: s4 (collection), s1e9-k7fq (story), s1c3-m2xd (challenge).
+ *
+ * Children's devices keep progress and stickers by story and challenge id, so a new one
+ * must never get an id that was used before, also not one deleted in an earlier save
+ * (the file no longer shows those). The random suffix makes sure of that; the number
+ * keeps the id readable. `reserved` holds more ids to avoid besides those in `content`.
  */
 export const newSeasonId = (content: Content, reserved: Iterable<string> = []) =>
   nextNumbered("s", new Set([...allIds(content), ...reserved]));
 
-export const newStoryId = (content: Content, seasonId: string, reserved: Iterable<string> = []) =>
-  nextNumbered(itemPrefix(seasonId, "e"), new Set([...allIds(content), ...reserved]));
+export const newStoryId = (content: Content, seasonId: string, reserved: Iterable<string> = [], suffix = idSuffix) =>
+  uniqueItemId(itemPrefix(seasonId, "e"), new Set([...allIds(content), ...reserved]), suffix);
 
-export const newChallengeId = (content: Content, seasonId: string, reserved: Iterable<string> = []) =>
-  nextNumbered(itemPrefix(seasonId, "c"), new Set([...allIds(content), ...reserved]));
+export const newChallengeId = (content: Content, seasonId: string, reserved: Iterable<string> = [], suffix = idSuffix) =>
+  uniqueItemId(itemPrefix(seasonId, "c"), new Set([...allIds(content), ...reserved]), suffix);
 
 /** Question ids hang off their story or challenge: s1e9-p1, s1c3-q2. */
 export const newQuestionId = (ownerId: string, kind: "p" | "q", taken: ReadonlySet<string>) =>
