@@ -7,13 +7,14 @@
 import clsx from "clsx";
 import { ChevronDown, CircleAlert, Gift, Info, ListChecks, Plus, Trash2, Type } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import type { Challenge } from "@/content/schema";
 import {
   addChallenge,
   blankChallenge,
   deleteItem,
   findChallenge,
+  hasInput,
   newChallengeId,
   sortedSeasons,
   storiesBefore,
@@ -43,8 +44,16 @@ import {
   Select,
 } from "./ui";
 
-export function ChallengeEditor({ id, collection }: { id?: string; collection?: string }) {
-  const { draft, edit, reservedIds, toast, pictureSrc } = useDraft();
+type Props = { id?: string; collection?: string };
+
+export function ChallengeEditor(props: Props) {
+  // "Start over" on a new challenge begins again with a fresh screen.
+  const [round, setRound] = useState(0);
+  return <ChallengeScreen key={round} {...props} onStartOver={() => setRound((r) => r + 1)} />;
+}
+
+function ChallengeScreen({ id, collection, onStartOver }: Props & { onStartOver: () => void }) {
+  const { draft, edit, reservedIds, toast, pictureSrc, newForms, updateNewForm, guardLeaving } = useDraft();
   const router = useRouter();
   useFocusFromHash();
 
@@ -56,8 +65,24 @@ export function ChallengeEditor({ id, collection }: { id?: string; collection?: 
     seasons.find((s) => s.status === "published")?.id ??
     seasons[0]?.id ??
     "";
-  const [newSeasonId, setNewSeasonId] = useState(firstSeason);
-  const [local, setLocal] = useState<Challenge>(() => blankChallenge(draft.seasons, firstSeason, reservedIds));
+  // Kept by the dashboard, like a new story (see StoryEditor).
+  const kept = isNew ? newForms.challenge : undefined;
+  const [blank] = useState<Challenge>(() => blankChallenge(draft.seasons, firstSeason, reservedIds));
+  const [restored] = useState(() => Boolean(kept));
+  const [pickedSeasonId, setPickedSeasonId] = useState(kept?.seasonId ?? firstSeason);
+  const newSeasonId = kept?.seasonId ?? pickedSeasonId;
+  const local = kept?.value ?? blank;
+  const setLocal = (change: (c: Challenge) => Challenge) =>
+    updateNewForm("challenge", (form) => {
+      const value = change(form?.value ?? blank);
+      return hasInput(value, blank) ? { value, seasonId: form?.seasonId ?? newSeasonId } : undefined;
+    });
+  const setNewSeasonId = (next: string) => {
+    setPickedSeasonId(next);
+    updateNewForm("challenge", (form) => form && { ...form, seasonId: next });
+  };
+  const filledIn = Boolean(kept);
+  useEffect(() => (filledIn ? guardLeaving("challenge") : undefined), [filledIn, guardLeaving]);
   const [attempt, setAttempt] = useState<{ id: string } | null>(null);
   const [open, setOpen] = useState<Record<number, boolean>>({});
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -108,12 +133,13 @@ export function ChallengeEditor({ id, collection }: { id?: string; collection?: 
     const problems = locate(candidate, checkDraft(candidate, draft.site)).filter(
       (i) => i.target.kind === "challenge" && i.target.id === finalId,
     );
-    setLocal(ready);
     if (problems.length) {
+      setLocal(() => ready);
       setAttempt({ id: finalId });
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+    updateNewForm("challenge", () => undefined);
     edit((s) => ({ ...s, seasons: addChallenge(s.seasons, newSeasonId, ready) }), {
       key: `add:${finalId}`,
       text: `Added challenge ${quoteTitle(ready.title.en)}`,
@@ -139,6 +165,27 @@ export function ChallengeEditor({ id, collection }: { id?: string; collection?: 
         }
       />
 
+      {restored && filledIn && (
+        <Alert
+          tone="info"
+          className="mb-6"
+          title="Picking up where you left off"
+          actions={
+            <Button
+              size="sm"
+              variant="ghost"
+              onClick={() => {
+                updateNewForm("challenge", () => undefined);
+                onStartOver();
+              }}
+            >
+              Start over
+            </Button>
+          }
+        >
+          This challenge isn&apos;t added yet. Finish it and press Add challenge.
+        </Alert>
+      )}
       <ProblemSummary byField={byField} />
 
       <div className="space-y-6">

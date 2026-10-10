@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Episode } from "@/content/schema";
 import {
   addStory,
@@ -31,6 +31,7 @@ import {
   blankStory,
   deleteItem,
   findStory,
+  hasInput,
   moveStoryToSeason,
   newStoryId,
   sortedSeasons,
@@ -75,9 +76,17 @@ type Lookup =
 
 type Length = "idle" | "reading" | "read" | "failed";
 
-export function StoryEditor({ id, collection }: { id?: string; collection?: string }) {
+type Props = { id?: string; collection?: string };
+
+export function StoryEditor(props: Props) {
+  // "Start over" on a new story begins again with a fresh screen.
+  const [round, setRound] = useState(0);
+  return <StoryScreen key={round} {...props} onStartOver={() => setRound((r) => r + 1)} />;
+}
+
+function StoryScreen({ id, collection, onStartOver }: Props & { onStartOver: () => void }) {
   const admin = useDraft();
-  const { draft, edit, reservedIds, toast } = admin;
+  const { draft, edit, reservedIds, toast, newForms, updateNewForm, guardLeaving } = admin;
   const router = useRouter();
   useFocusFromHash();
 
@@ -90,8 +99,26 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
     seasons.find((s) => s.status === "published")?.id ??
     seasons[0]?.id ??
     "";
-  const [newSeasonId, setNewSeasonId] = useState(firstSeason);
-  const [local, setLocal] = useState<Episode>(() => blankStory(draft.seasons, firstSeason, reservedIds));
+  // A new story is kept by the dashboard, not this screen, so it survives being signed out
+  // or leaving with the browser's back button; it comes back here (docs/ADMIN.md).
+  const kept = isNew ? newForms.story : undefined;
+  const [blank] = useState<Episode>(() => blankStory(draft.seasons, firstSeason, reservedIds));
+  const [restored] = useState(() => Boolean(kept));
+  const [pickedSeasonId, setPickedSeasonId] = useState(kept?.seasonId ?? firstSeason);
+  const newSeasonId = kept?.seasonId ?? pickedSeasonId;
+  const local = kept?.value ?? blank;
+  const setLocal = (change: (e: Episode) => Episode) =>
+    updateNewForm("story", (form) => {
+      const value = change(form?.value ?? blank);
+      return hasInput(value, blank) ? { value, seasonId: form?.seasonId ?? newSeasonId } : undefined;
+    });
+  const setNewSeasonId = (next: string) => {
+    setPickedSeasonId(next);
+    updateNewForm("story", (form) => form && { ...form, seasonId: next });
+  };
+  const filledIn = Boolean(kept);
+  // Links and the menu ask before leaving a story that has something filled in.
+  useEffect(() => (filledIn ? guardLeaving("story") : undefined), [filledIn, guardLeaving]);
   const [attempt, setAttempt] = useState<{ id: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -163,10 +190,11 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
     );
     if (problems.length) {
       setAttempt({ id: finalId });
-      setLocal(ready);
+      setLocal(() => ready);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+    updateNewForm("story", () => undefined);
     edit((s) => ({ ...s, seasons: addStory(s.seasons, newSeasonId, ready) }), {
       key: `add:${finalId}`,
       text: `Added story ${quoteTitle(ready.title.en)}`,
@@ -209,6 +237,26 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="min-w-0 space-y-6">
+          {restored && filledIn && (
+            <Alert
+              tone="info"
+              title="Picking up where you left off"
+              actions={
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    updateNewForm("story", () => undefined);
+                    onStartOver();
+                  }}
+                >
+                  Start over
+                </Button>
+              }
+            >
+              This story isn&apos;t added yet. Finish it and press Add story.
+            </Alert>
+          )}
           <ProblemSummary byField={byField} />
           <VideoCard story={story} update={update} errors={errors} yt={yt} />
 

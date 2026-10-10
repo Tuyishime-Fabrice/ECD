@@ -17,6 +17,7 @@ import {
   deleteSeason,
   findChallenge,
   findStory,
+  hasInput,
   liveStories,
   moveInList,
   moveSeason,
@@ -122,6 +123,27 @@ describe("blank items", () => {
       ["s3", 3],
       ["s4", 4],
     ]);
+  });
+});
+
+describe("hasInput", () => {
+  it("is false for a new story or challenge left as it started, whatever its ids", () => {
+    const c = content();
+    const blank = blankStory(c, "s1");
+    expect(hasInput(blank, blank)).toBe(false);
+    expect(hasInput({ ...blank, id: "s1e10" }, blank)).toBe(false);
+    const ch = blankChallenge(c, "s1");
+    const renamed = { ...ch, id: "s2c1", questions: ch.questions.map((q, i) => ({ ...q, id: `s2c1-q${i + 1}` })) };
+    expect(hasInput(renamed, ch)).toBe(false);
+  });
+  it("is true once anything is filled in", () => {
+    const c = content();
+    const blank = blankStory(c, "s1");
+    expect(hasInput({ ...blank, youtubeId: "dQw4w9WgXcQ" }, blank)).toBe(true);
+    expect(hasInput({ ...blank, title: { en: "", rw: "Ihene" } }, blank)).toBe(true);
+    const ch = blankChallenge(c, "s1");
+    const labelled = { ...ch, questions: ch.questions.map((q, i) => (i === 4 ? { ...q, options: [q.options[0]!, { id: "b", image: "", label: "two" }] } : q)) };
+    expect(hasInput(labelled, ch)).toBe(true);
   });
 });
 

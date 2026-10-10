@@ -7,7 +7,7 @@
  * sends everything in one save (docs/ADMIN.md).
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { Content } from "@/content/schema";
+import type { Challenge, Content, Episode } from "@/content/schema";
 import type { Site } from "@/content/site";
 import { allIds, findChallenge, findSeason, findStory, picturesIn, prepareForSave, renumberStories } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located, type Target } from "@/lib/admin/ui-issues";
@@ -23,6 +23,10 @@ export type Phase = "checking" | "setup" | "signed-out" | "loading" | "ready" | 
 export type Toast = { id: number; tone: "success" | "info" | "error"; title: string; body?: string };
 type Publish = { commitSha: string; savedAt: number; deployedAtSave: string | null };
 type Note = { key: string; text: string };
+/** A new story or challenge that isn't added yet, with its collection. Kept only while something is filled in. */
+export type NewForm<T> = { value: T; seasonId: string };
+export type NewForms = { story?: NewForm<Episode>; challenge?: NewForm<Challenge> };
+export type NewFormKind = keyof NewForms;
 type ServerIssue = Located & { value: string };
 
 const PUBLISH_KEY = "izuba-admin:publish";
@@ -93,6 +97,17 @@ type AdminContext = {
   loadError: string;
   /** True when the session ran out while there were unsaved changes. */
   signedOutWithChanges: boolean;
+  /**
+   * New stories and challenges being filled in. They live here, not in the editor, so
+   * being signed out (or going back with the browser) doesn't lose them.
+   */
+  newForms: NewForms;
+  updateNewForm: <K extends NewFormKind>(kind: K, change: (form: NewForms[K]) => NewForms[K]) => void;
+  /** Unsaved changes, or a new story or challenge that isn't added yet. */
+  unsavedWork: boolean;
+  /** Set while a screen has input that leaving would lose ("story"): links then ask first. */
+  leaveGuard: NewFormKind | null;
+  guardLeaving: (kind: NewFormKind) => () => void;
   base: Snapshot | null;
   draft: Snapshot | null;
   dirty: boolean;
@@ -158,6 +173,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [publish, setPublish] = useState<Publish | null>(() => (typeof window === "undefined" ? null : readPublish()));
   const [deployed, setDeployed] = useState<string | null>(null);
   const [historyShas, setHistoryShas] = useState<string[]>([]);
+  const [newForms, setNewForms] = useState<NewForms>({});
+  const [leaveGuard, setLeaveGuard] = useState<NewFormKind | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const toastId = useRef(0);
   /** Numbers the change notes, so a save clears only the ones written before it started. */
@@ -171,6 +188,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
 
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(base), [draft, base]);
   const hasDraft = draft !== null;
+  const unsavedWork = dirty || Boolean(newForms.story || newForms.challenge);
 
   const toast = useCallback((t: Omit<Toast, "id">) => {
     const id = ++toastId.current;
@@ -246,6 +264,19 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       const seq = ++noteSeq.current;
       setNotes((n) => new Map(n).set(note.key, { text: note.text, seq }));
     }
+  }, []);
+
+  const updateNewForm = useCallback(
+    <K extends NewFormKind>(kind: K, change: (form: NewForms[K]) => NewForms[K]) =>
+      setNewForms((all) => {
+        const next = change(all[kind]);
+        return next === all[kind] ? all : { ...all, [kind]: next };
+      }),
+    [],
+  );
+  const guardLeaving = useCallback((kind: NewFormKind) => {
+    setLeaveGuard(kind);
+    return () => setLeaveGuard((g) => (g === kind ? null : g));
   }, []);
 
   const addPicture = useCallback((path: string, picture: Omit<Picture, "pending">) => {
@@ -389,6 +420,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     await api.logout();
     setBase(null);
     setDraft(null);
+    setNewForms({});
     setNotes(new Map());
     setPictures({});
     setServerIssues([]);
@@ -452,11 +484,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }, [publishedSha]);
 
   useEffect(() => {
-    if (!dirty) return;
+    if (!unsavedWork) return;
     const warn = (e: BeforeUnloadEvent) => e.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
+  }, [unsavedWork]);
 
   const reservedIds = useMemo(() => (base ? allIds(base.seasons) : new Set<string>()), [base]);
 
@@ -464,7 +496,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     phase,
     session,
     loadError,
-    signedOutWithChanges: phase === "signed-out" && dirty,
+    signedOutWithChanges: phase === "signed-out" && unsavedWork,
+    newForms,
+    updateNewForm,
+    unsavedWork,
+    leaveGuard,
+    guardLeaving,
     base,
     draft,
     dirty,

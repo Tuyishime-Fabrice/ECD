@@ -189,6 +189,15 @@ export function blankChallenge(content: Content, seasonId: string, reserved: Ite
   };
 }
 
+/**
+ * Whether a new story or challenge has anything filled in, compared with the blank one
+ * it started as. Ids don't count: they are given again when it is added.
+ */
+export function hasInput<T>(item: T, blank: T): boolean {
+  const withoutIds = (value: T) => JSON.stringify(value, (key, v: unknown) => (key === "id" ? undefined : v));
+  return withoutIds(item) !== withoutIds(blank);
+}
+
 const COLORS: SeasonColor[] = ["sky", "coral", "leaf", "grape"];
 
 /** A new "Coming soon" collection at the end, in the next color along. */

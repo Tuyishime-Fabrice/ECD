@@ -195,6 +195,13 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
   updates a draft; a bar at the bottom says there are unsaved changes, with **Discard** and
   **Save**. Leaving the page with unsaved changes asks first. A new story or challenge stays on its
   own screen until **Add story** / **Add challenge**, so a half-filled form never reaches the draft.
+- **A half-filled new story or challenge is never lost without asking.** Once something is filled
+  in, every link (the menu, back links, **Cancel**, a **Fix** button) asks "Leave without adding
+  this story?", and closing or reloading the page asks too. The dashboard keeps the form, not the
+  screen (`newForms` in `AdminProvider`), so being signed out (a 401) or going back with the
+  browser doesn't lose it: after signing in, or on **Add a story** / **Add a challenge** again, it
+  comes back ("Picking up where you left off", with **Start over**), and the other pages say it
+  isn't added yet, with **Finish it** and **Throw it away**. It lasts until the page is reloaded.
 - **One save** sends the draft and the new pictures it uses. If the new pictures don't fit in one
   save (40 pictures, 3 MB), the extra ones go first in saves of their own. The summary in History
   is written from what was changed ("Added story “…” and changed the order of stories").
@@ -207,7 +214,7 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
   at once. A 422 from the server is shown the same way: next to the field when `issues[].path`
   points at one, and in the "Fix these before saving" list with a **Fix** link that opens the
   field. A 409 shows "Someone else saved changes" with **Reload**; a 401 shows the sign-in screen
-  and keeps the draft.
+  and keeps the draft and any half-filled new story or challenge.
 - **Consistency before saving** (`prepareForSave` in `lib/admin/ui-content.ts`): story numbers
   count 1, 2, 3… in each collection, `site.featured` keeps only stories in Live collections, once
   each, at most 6. New ids follow the sample: `s4`, `s1e9`, `s1c3`, `s1e9-p1`, `s1c3-q2`.
