@@ -12,6 +12,7 @@ import type { Site } from "@/content/site";
 import { allIds, findChallenge, findSeason, findStory, picturesIn, prepareForSave, renumberStories } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located, type Target } from "@/lib/admin/ui-issues";
 import { liveState, type LiveState } from "@/lib/admin/ui-live";
+import { draftAfterSave, notesAfterSave, type Note as SavedNote } from "@/lib/admin/ui-save";
 import { summarize } from "@/lib/admin/ui-summary";
 import { MAX_SAVE_UPLOAD_BYTES, MAX_UPLOADS_PER_SAVE } from "@/lib/admin/uploads";
 import { api, deployedSha, type ApiFailure, type SessionInfo } from "./api";
@@ -146,7 +147,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [base, setBase] = useState<Snapshot | null>(null);
   const [draft, setDraft] = useState<Snapshot | null>(null);
   const [baseSha, setBaseSha] = useState("");
-  const [notes, setNotes] = useState<Map<string, string>>(() => new Map());
+  const [notes, setNotes] = useState<Map<string, SavedNote>>(() => new Map());
   const [pictures, setPictures] = useState<Record<string, Picture>>({});
   const [serverIssues, setServerIssues] = useState<ServerIssue[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
@@ -159,6 +160,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [historyShas, setHistoryShas] = useState<string[]>([]);
   const [now, setNow] = useState(() => Date.now());
   const toastId = useRef(0);
+  /** Numbers the change notes, so a save clears only the ones written before it started. */
+  const noteSeq = useRef(0);
+  const savingNow = useRef(false);
+  /** The draft as it is now, for a save that finishes after more edits were made. */
+  const latestDraft = useRef(draft);
+  useEffect(() => {
+    latestDraft.current = draft;
+  }, [draft]);
 
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(base), [draft, base]);
   const hasDraft = draft !== null;
@@ -233,7 +242,10 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       const next = change(d);
       return next === d ? d : { seasons: renumberStories(next.seasons), site: next.site };
     });
-    if (note) setNotes((n) => new Map(n).set(note.key, note.text));
+    if (note) {
+      const seq = ++noteSeq.current;
+      setNotes((n) => new Map(n).set(note.key, { text: note.text, seq }));
+    }
   }, []);
 
   const addPicture = useCallback((path: string, picture: Omit<Picture, "pending">) => {
@@ -268,7 +280,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   );
 
   const save = useCallback(async () => {
-    if (!draft || !base || !prepared || saving) return;
+    if (!draft || !base || !prepared || saving || savingNow.current) return;
     if (localIssues.length) {
       setProblemsOpen(true);
       return;
@@ -278,8 +290,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       .filter(([path, p]) => p.pending && used.has(path))
       .map(([path, p]) => ({ path, base64: p.dataUrl, bytes: p.bytes }));
     const groups = batches(uploads);
-    const summary = summarize([...notes.values()]);
+    const summary = summarize([...notes.values()].map((n) => n.text));
+    // Editing goes on during the save; what changes after this point stays unsaved, on top of it.
+    const sent = draft;
+    const sentNotes = noteSeq.current;
     let sha = baseSha;
+    savingNow.current = true;
     setServerIssues([]);
     try {
       for (const [i, group] of groups.entries()) {
@@ -316,19 +332,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           return next;
         });
         if (last) {
-          setBase(prepared);
-          setDraft(prepared);
+          const changedMeanwhile = JSON.stringify(latestDraft.current) !== JSON.stringify(sent);
+          // Signing out during the save clears everything; leave it cleared.
+          setBase((b) => (b ? prepared : b));
+          setDraft((d) => (d ? draftAfterSave(d, sent, prepared) : d));
           setBaseSha(sha);
-          setNotes(new Map());
+          setNotes((n) => notesAfterSave(n, sentNotes));
+          const meanwhile = changedMeanwhile
+            ? "Changes you made while it was saving aren't saved yet. Press Save again to save them."
+            : undefined;
           if (res.data.unchanged && groups.length === 1) {
-            toast({ tone: "info", title: "Nothing new to save.", body: "Everything here is already saved." });
+            toast({ tone: "info", title: "Nothing new to save.", body: meanwhile ?? "Everything here is already saved." });
           } else {
             startPublish(sha);
-            toast({ tone: "success", title: "Saved. Live in about 2 minutes." });
+            toast({ tone: "success", title: "Saved. Live in about 2 minutes.", body: meanwhile });
           }
         }
       }
     } finally {
+      savingNow.current = false;
       setSaving(null);
     }
   }, [draft, base, prepared, saving, localIssues, pictures, notes, baseSha, toast, handleFailure, startPublish]);

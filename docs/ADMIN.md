@@ -198,6 +198,10 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
 - **One save** sends the draft and the new pictures it uses. If the new pictures don't fit in one
   save (40 pictures, 3 MB), the extra ones go first in saves of their own. The summary in History
   is written from what was changed ("Added story “…” and changed the order of stories").
+- **Editing goes on during a save.** The save sends the draft as it was when Save was pressed
+  (`lib/admin/ui-save.ts`). Anything changed while it runs, by typing or by a picture or YouTube
+  lookup that finishes late, stays as unsaved changes on top of it, and the "Saved" message says
+  so. Nothing is overwritten by the copy that was sent.
 - **Before sending**, the same checks as the server run in the browser (`checkDraft` in
   `lib/admin/ui-issues.ts`, everything but pictures), so most problems show next to their field
   at once. A 422 from the server is shown the same way: next to the field when `issues[].path`
