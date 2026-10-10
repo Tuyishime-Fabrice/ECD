@@ -23,7 +23,7 @@ function Slot({ slot, earned }: { slot: StickerSlot; earned: boolean }) {
           bounce.trigger();
         }}
         aria-label={earned ? title : `${title}: ${t("stickerLocked")}`}
-        className="tap flex w-full flex-col items-center gap-2 rounded-card bg-paper p-4 shadow-e1 shadow-rim"
+        className="tap flex w-full flex-col items-center gap-2 rounded-card bg-paper p-4 shadow-e1 inset-shadow-rim"
       >
         <span className={clsx("block aspect-square w-full max-w-44", bounce.className)} {...bounce.props}>
           {/* Not earned yet: a gift-colored "?" slot, never a grey hole. */}
@@ -46,7 +46,7 @@ export function StickerGrid({ slots }: { slots: StickerSlot[] }) {
   return (
     <section className="mx-auto max-w-3xl px-4 pb-10">
       <h1 className="flex items-center gap-3 font-display text-[34px] font-extrabold text-ink">
-        <span className="grid size-14 place-items-center rounded-full bg-sun-soft shadow-e1 shadow-rim">
+        <span className="grid size-14 place-items-center rounded-full bg-sun-soft shadow-e1 inset-shadow-rim">
           <Star className="size-8 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
         </span>
         {t("myStickers")}
@@ -55,7 +55,7 @@ export function StickerGrid({ slots }: { slots: StickerSlot[] }) {
         </span>
       </h1>
       {/* The sticker album: one page with a slot per challenge. */}
-      <ul className="mt-6 grid grid-cols-2 gap-4 rounded-hero bg-paper-2 p-4 shadow-e2 shadow-rim sm:grid-cols-3 sm:p-6">
+      <ul className="mt-6 grid grid-cols-2 gap-4 rounded-hero bg-paper-2 p-4 shadow-e2 inset-shadow-rim sm:grid-cols-3 sm:p-6">
         {slots.map((slot) => (
           <Slot key={slot.challengeId} slot={slot} earned={earned.includes(slot.challengeId)} />
         ))}

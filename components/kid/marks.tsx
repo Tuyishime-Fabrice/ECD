@@ -37,11 +37,12 @@ export function PlayDisc({ className }: { className?: string }) {
   );
 }
 
-/** Gold progress strip: how much of a story was watched. */
+/** Gold progress strip. A started story always shows a sliver; 0 shows an empty track. */
 export function ProgressStrip({ percent, className }: { percent: number; className?: string }) {
+  const width = percent <= 0 ? 0 : Math.max(6, Math.min(100, percent));
   return (
     <span aria-hidden className={clsx("block h-2 overflow-hidden rounded-full bg-line", className)}>
-      <span className="block h-full rounded-full bg-sun" style={{ width: `${Math.max(6, Math.min(100, percent))}%` }} />
+      <span className="block h-full rounded-full bg-sun" style={{ width: `${width}%` }} />
     </span>
   );
 }

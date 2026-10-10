@@ -53,7 +53,7 @@ export function TopBar() {
             href="/stickers"
             aria-label={t("myStickers")}
             onClick={playPop}
-            className="tap relative grid size-16 place-items-center rounded-full bg-sun-soft shadow-e1 shadow-rim"
+            className="tap relative grid size-16 place-items-center rounded-full bg-sun-soft shadow-e1 inset-shadow-rim"
           >
             <Star className="size-8 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
             {stickers > 0 && (
@@ -68,7 +68,7 @@ export function TopBar() {
           <Link
             href="/parents"
             aria-label={t("parents")}
-            className="tap grid size-16 place-items-center rounded-full bg-paper shadow-e1 shadow-rim"
+            className="tap grid size-16 place-items-center rounded-full bg-paper shadow-e1 inset-shadow-rim"
           >
             <Lock className="size-6 text-ink-2" strokeWidth={2.5} aria-hidden />
           </Link>

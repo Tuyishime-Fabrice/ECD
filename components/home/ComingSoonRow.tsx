@@ -44,7 +44,7 @@ function SleepingCollection({ season }: { season: SeasonCard }) {
       }}
       {...wiggle.props}
       className={clsx(
-        "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 shadow-rim md:w-64",
+        "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 inset-shadow-rim md:w-64",
         wiggle.className,
       )}
     >

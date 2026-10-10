@@ -79,7 +79,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
         {/* Izuba asks the question in a speech bubble; the blue button says it again. */}
         <div className="flex w-full items-center gap-2">
           <Mascot pose="happy" className="w-16 shrink-0 short:hidden tight:w-12" />
-          <div className="relative flex min-w-0 flex-1 items-center gap-3 rounded-tile bg-paper p-2.5 pr-4 shadow-e2 shadow-rim short:flex-col short:p-3 short:text-center">
+          <div className="relative flex min-w-0 flex-1 items-center gap-3 rounded-tile bg-paper p-2.5 pr-4 shadow-e2 inset-shadow-rim short:flex-col short:p-3 short:text-center">
             <span
               aria-hidden
               className="absolute -left-2 top-1/2 size-5 -translate-y-1/2 rotate-45 rounded-[4px] bg-paper short:hidden"

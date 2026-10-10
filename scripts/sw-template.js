@@ -14,13 +14,29 @@ const RUNTIME = `runtime-${VERSION}`;
 const OFFLINE_URL = "/offline";
 const NETWORK_TIMEOUT_MS = 4000;
 
+/** The cache key for a precached file: its URL plus its content revision, if it has one. */
+const keyFor = ([url, rev]) => (rev ? `${url}${url.includes("?") ? "&" : "?"}__v=${rev}` : url);
+
 self.addEventListener("install", (event) => {
   event.waitUntil(
     (async () => {
       const cache = await caches.open(SHELL);
-      // All or nothing: if the connection drops halfway, this update fails and the
-      // previous, complete version stays in charge until the browser tries again.
-      await cache.addAll(PRECACHE.map((url) => new Request(url, { cache: "reload" })));
+      // Files that didn't change since the last version are copied from the old cache,
+      // so phones download only what is new. All or nothing: if anything fails to
+      // download, this update fails and the previous, complete version stays in charge.
+      const queue = PRECACHE.slice();
+      const worker = async () => {
+        for (let entry = queue.shift(); entry; entry = queue.shift()) {
+          const key = keyFor(entry);
+          let response = await caches.match(key);
+          if (!response) {
+            response = await fetch(new Request(entry[0], { cache: "reload" }));
+            if (!response.ok) throw new Error(`precache ${entry[0]}: ${response.status}`);
+          }
+          await cache.put(key, response);
+        }
+      };
+      await Promise.all(Array.from({ length: 6 }, worker));
       await self.skipWaiting();
     })(),
   );
@@ -60,7 +76,7 @@ async function networkFirst(request, fallbackUrl) {
     const cached = await fromCache(request);
     if (cached) return cached;
     if (fallbackUrl) {
-      const fallback = await caches.match(fallbackUrl);
+      const fallback = await caches.match(fallbackUrl, { ignoreSearch: true });
       if (fallback) return fallback;
     }
     return Response.error();

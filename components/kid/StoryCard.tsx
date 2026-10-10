@@ -14,7 +14,7 @@ export const itemHref = (item: { type: "episode" | "challenge"; id: string }) =>
   item.type === "episode" ? `/watch/${item.id}` : `/challenge/${item.id}`;
 
 const card =
-  "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 shadow-rim md:w-64";
+  "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 inset-shadow-rim md:w-64";
 /** The story to watch next: a sun ring and a soft halo. */
 const upNextRing = "ring-4 ring-sun outline-8 outline-sun/25";
 
@@ -127,6 +127,7 @@ export function ChallengeCard({
           {t("challengeN", { n: challenge.number })}
         </span>
         {status.locked && <span className="sr-only">, {t("locked")}</span>}
+        {status.done && <span className="sr-only">, {t("starsN", { n: status.stars })}</span>}
       </span>
     </>
   );

@@ -14,7 +14,7 @@ export function HomeActivityCard({ text }: { text: LocalizedText }) {
   const t = useT();
   const pick = usePick();
   return (
-    <div className="flex gap-4 rounded-card bg-paper p-4 text-left shadow-e2 shadow-rim sm:p-5">
+    <div className="flex gap-4 rounded-card bg-paper p-4 text-left shadow-e2 inset-shadow-rim sm:p-5">
       <span className="grid size-14 shrink-0 place-items-center rounded-full bg-leaf-soft">
         <House className="size-8 text-leaf-ink" strokeWidth={2.5} aria-hidden />
       </span>

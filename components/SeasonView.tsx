@@ -38,6 +38,12 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
 
   const stories = season.items.filter((i) => i.type === "episode");
   const watched = stories.filter((s) => learning.episodes[s.id]?.watched).length;
+  // Everything done: the whole road is walked, in gold.
+  const allDone =
+    hydrated &&
+    !currentId &&
+    season.items.every((i) => (i.type === "episode" ? learning.episodes[i.id]?.watched : !!learning.challenges[i.id]));
+  const walked = layout.walked || (allDone ? layout.road : "");
 
   // Open the map where the child is.
   useEffect(() => {
@@ -48,7 +54,8 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
   }, [hydrated, currentId]);
 
   return (
-    <div className="relative">
+    // overflow-x-clip: nothing on the map may make the page scroll sideways.
+    <div className="relative overflow-x-clip">
       {/* The world behind the map, from under the top bar to the bottom of the page. */}
       <div aria-hidden className="absolute inset-x-0 -top-24 bottom-0 -z-10 overflow-hidden">
         <Sky className="absolute inset-0" />
@@ -62,7 +69,7 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
       </div>
 
       <header className="relative mx-auto max-w-md px-4 pt-2">
-        <div className="rounded-card bg-paper px-5 py-4 shadow-e2 shadow-rim">
+        <div className="rounded-card bg-paper px-5 py-4 shadow-e2 inset-shadow-rim">
           <h1 className="font-display text-[28px] font-extrabold leading-tight text-ink">{pick(season.title)}</h1>
           <p className="mt-1 text-sm font-bold text-ink-2">{t("storiesProgress", { n: watched, m: stories.length })}</p>
           <ProgressStrip percent={stories.length ? (watched / stories.length) * 100 : 0} className="mt-2 h-2.5" />
@@ -77,7 +84,7 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
           preserveAspectRatio="none"
         >
           <Road d={layout.road} edge="stroke-road-edge" fill="stroke-road" dots="stroke-road-dots" />
-          {layout.walked && <Road d={layout.walked} edge="stroke-sun-lip" fill="stroke-sun" dots="stroke-sun-soft" />}
+          {walked && <Road d={walked} edge="stroke-sun-lip" fill="stroke-sun" dots="stroke-sun-soft" />}
         </svg>
 
         <ol>
@@ -143,7 +150,14 @@ function StoryStone({ story, node }: { story: EpisodeCard; node: PathNode }) {
             <Play className="ml-1 size-10 fill-on-accent text-on-accent" strokeWidth={2.5} aria-hidden />
           </span>
         </Link>
-        <span className="absolute top-[calc(100%+14px)] max-w-[220px] truncate rounded-full bg-paper px-4 py-1.5 font-display text-base font-extrabold text-ink shadow-e1">
+        {/* Stones near an edge get their title pill pulled toward the middle, so it stays on screen. */}
+        <span
+          className={clsx(
+            "absolute top-[calc(100%+14px)] max-w-[min(220px,calc(100vw-2rem))] truncate rounded-full bg-paper px-4 py-1.5 font-display text-base font-extrabold text-ink shadow-e1",
+            node.x > 0.6 && "right-0",
+            node.x < 0.4 && "left-0",
+          )}
+        >
           {title}
         </span>
       </div>

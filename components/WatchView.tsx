@@ -200,9 +200,10 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
         <div
           aria-hidden={!showVideo}
           className={clsx(
-            "mx-auto w-full max-w-[calc((100dvh-290px)*16/9+16px)] rounded-[26px] bg-paper p-2 shadow-e2 shadow-rim",
+            "mx-auto max-w-[calc((100dvh-290px)*16/9+16px)] rounded-[26px] bg-paper p-2 shadow-e2 inset-inset-shadow-rim",
             "short:max-w-[calc((100dvh-100px)*16/9)] short:rounded-none short:bg-transparent short:p-0 short:shadow-none",
-            showVideo ? "relative" : "pointer-events-none invisible absolute inset-x-3 top-0",
+            // Hidden, the insets set the width (with w-full too, it would stick out and scroll sideways).
+            showVideo ? "relative w-full" : "pointer-events-none invisible absolute inset-x-3 top-0",
           )}
         >
           <div className="relative aspect-video overflow-hidden rounded-[18px] bg-black short:rounded-none">

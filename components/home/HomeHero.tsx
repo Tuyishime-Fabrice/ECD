@@ -25,12 +25,14 @@ export function HomeHero({ featured, seasons }: { featured: FeaturedStory[]; sea
   const learning = useLearningState();
   const next = hydrated && hasStarted(learning) ? nextRecommended(seasons, learning) : null;
 
+  // The "keep watching" slide is known only after hydration. It takes the first place and the
+  // number of slides stays the same, so nothing on the page moves when it appears.
   const slides: Slide[] = [
     ...(next ? [{ kind: "continue" as const, item: next, season: seasons.find((s) => s.slug === next.seasonSlug) }] : []),
     ...featured
       .filter((f) => f.card.id !== next?.id)
       .map((f) => ({ kind: "featured" as const, item: f.card as ItemCard, season: f.season })),
-  ];
+  ].slice(0, Math.max(featured.length, 1));
 
   const track = useRef<HTMLUListElement>(null);
   const [active, setActive] = useState(0);
@@ -47,7 +49,11 @@ export function HomeHero({ featured, seasons }: { featured: FeaturedStory[]; sea
     const el = track.current;
     const target = el?.children[index] as HTMLElement | undefined;
     if (!el || !target) return;
-    el.scrollTo({ left: target.offsetLeft - el.offsetLeft - parseFloat(getComputedStyle(el).paddingLeft), behavior: "smooth" });
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    el.scrollTo({
+      left: target.offsetLeft - el.offsetLeft - parseFloat(getComputedStyle(el).paddingLeft),
+      behavior: reduced ? "auto" : "smooth",
+    });
   };
 
   // A "keep watching" slide appears after hydration: start again from the first slide.
@@ -66,7 +72,8 @@ export function HomeHero({ featured, seasons }: { featured: FeaturedStory[]; sea
         className="scrollbar-touch-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-2 pt-1 md:scroll-px-8 md:px-8"
       >
         {slides.map((slide, i) => (
-          <HeroSlide key={`${slide.kind}-${slide.item.id}`} slide={slide} index={i} count={slides.length} eager={i === 0} />
+          // Keyed by position: when "keep watching" arrives, the slides update in place.
+          <HeroSlide key={i} slide={slide} index={i} count={slides.length} eager={i === 0} />
         ))}
       </ul>
 
@@ -74,7 +81,7 @@ export function HomeHero({ featured, seasons }: { featured: FeaturedStory[]; sea
         <div className="mt-2 flex items-center justify-center gap-1">
           {slides.map((s, i) => (
             <button
-              key={s.item.id}
+              key={i}
               type="button"
               onClick={() => go(i)}
               aria-label={t("goToSlide", { n: i + 1 })}
@@ -156,8 +163,8 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
         href={href}
         prefetch={false}
         onClick={playPop}
-        aria-label={`${t("watch")}: ${title}`}
-        className="tap group relative flex h-full flex-col overflow-hidden rounded-hero bg-paper shadow-e2 shadow-rim md:block md:aspect-[21/9] md:bg-transparent"
+        aria-label={`${isStory ? t("watch") : t("letsPlay")}: ${title}`}
+        className="tap group relative flex h-full flex-col overflow-hidden rounded-hero bg-paper shadow-e2 inset-shadow-rim md:block md:aspect-[21/9] md:bg-transparent"
       >
         {/* Picture: on phones a 16:9 panel above the words; on wide screens it fills the slide. */}
         <span className="relative block aspect-video overflow-hidden md:absolute md:inset-0 md:aspect-auto">
@@ -191,12 +198,17 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
               {label}
             </span>
           )}
-          <span className="line-clamp-2 font-display text-[26px] font-extrabold leading-[1.05] text-ink md:text-[46px] md:text-white">
+          {/* Every slide keeps room for two lines and a progress bar, so all have the same height. */}
+          <span className="line-clamp-2 min-h-[2.1em] font-display text-[26px] font-extrabold leading-[1.05] text-ink md:min-h-0 md:text-[46px] md:text-white">
             {title}
           </span>
-          {slide.kind === "continue" && isStory && percent > 0 && (
-            <ProgressStrip percent={percent} className="mt-1 max-w-64 md:max-w-80 md:bg-white/30" />
-          )}
+          <ProgressStrip
+            percent={percent}
+            className={clsx(
+              "mt-1 max-w-64 md:max-w-80 md:bg-white/30",
+              !(slide.kind === "continue" && isStory && percent > 0) && "invisible",
+            )}
+          />
         </span>
 
         <span

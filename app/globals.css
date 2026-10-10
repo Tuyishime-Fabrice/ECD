@@ -229,7 +229,7 @@
 
   --shadow-e1: var(--e1);
   --shadow-e2: var(--e2);
-  --shadow-rim: var(--rim);
+  --inset-shadow-rim: var(--rim);
 }
 
 @layer base {

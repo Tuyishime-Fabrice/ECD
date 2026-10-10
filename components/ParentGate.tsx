@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { Lock } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useT } from "@/lib/store";
 
 const HOLD_MS = 3000;
@@ -88,7 +89,7 @@ export function ParentGate({
         }}
         onBlur={stop}
         onContextMenu={(e) => e.preventDefault()}
-        className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-paper shadow-e2 shadow-rim [-webkit-touch-callout:none]"
+        className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-paper shadow-e2 inset-shadow-rim [-webkit-touch-callout:none]"
       >
         <svg viewBox="0 0 120 120" className="absolute inset-0 size-full -rotate-90" aria-hidden>
           <circle cx="60" cy="60" r={R} fill="none" className="stroke-line" strokeWidth="10" />
@@ -149,7 +150,8 @@ export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onCl
     };
   }, [onClose]);
 
-  return (
+  // Rendered into <body>: a moving (animated) parent would otherwise trap the overlay under the top bar.
+  return createPortal(
     <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="presentation" onClick={onClose}>
       <div
         ref={ref}
@@ -161,6 +163,7 @@ export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onCl
       >
         <ParentGate onPass={onPass} onCancel={onClose} titleId={titleId} />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
