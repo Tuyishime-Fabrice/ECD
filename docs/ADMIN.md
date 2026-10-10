@@ -24,7 +24,7 @@ files. It runs on Vercel, next to the kid app.
 
 | Variable | Required | What |
 | --- | --- | --- |
-| `ADMIN_PASSWORD` | yes | The password for `/admin`. Use 12+ characters. |
+| `ADMIN_PASSWORD` | yes | The password for `/admin`. At least 12 characters; a long passphrase (four or more random words) is much safer. |
 | `GITHUB_TOKEN` | yes | A GitHub fine-grained token for this repo only, with **Contents: Read and write**. |
 | `GITHUB_REPO` | no | `owner/name`. Default `Tuyishime-Fabrice/ECD`. |
 | `GITHUB_BRANCH` | no | Default `main`. |
@@ -40,6 +40,18 @@ which one, instead of an error.
   - Value: an HMAC-SHA256-signed `{exp}`.
   - Flags: `SameSite=Strict`, `Secure` in production, 7 days.
   - The password is compared in constant time. A wrong password waits 800ms before answering.
+  - **Guessing is limited** (`lib/admin/login-limit.ts`): after 10 wrong passwords from one
+    address in 15 minutes, sign-in from that address answers 429 ("Too many wrong passwords. For
+    safety, signing in is paused for 15 minutes…", with `Retry-After`) until the oldest of them is
+    15 minutes old, even with the right password. A right password clears that address's count.
+    All addresses together get at most 100 wrong passwords per 15 minutes. The address is the
+    first `x-forwarded-for` entry (set by Vercel), else `x-real-ip`. Checking and counting happen
+    together, so a burst of parallel guesses can't slip past.
+  - That limit lives in memory, so it is **per server instance**: Vercel can run several at once,
+    and a restart forgets. It slows guessing down a lot but is no lockout, so use a **long**
+    password: a passphrase of four or more random words, or 16+ random characters. The 100-a-
+    quarter-hour cap also means someone guessing from many addresses can pause sign-in for
+    everyone on that instance for up to 15 minutes.
   - The signing key, unless `ADMIN_SESSION_SECRET` is set, is
     `scrypt(ADMIN_PASSWORD, "izuba-admin-session\n" + GITHUB_REPO)` (N = 2¹⁵, r = 8, p = 1;
     `deriveSessionSecret` in `lib/admin/env.ts`), worked out once per server process (about a
@@ -63,7 +75,7 @@ which one, instead of an error.
 
 | Route | Does |
 | --- | --- |
-| `POST /api/admin/login` `{password}` | Sets the cookie. 401 if wrong. |
+| `POST /api/admin/login` `{password}` | Sets the cookie. 401 if wrong; 429 after too many wrong passwords. |
 | `POST /api/admin/logout` | Clears the cookie. |
 | `GET /api/admin/session` | `{ loggedIn, setup: { password: bool, github: bool } }` |
 | `GET /api/admin/content` | Latest `seasons.json` and `site.json` from GitHub, plus `baseSha`, the head commit they were read at. |
@@ -87,8 +99,8 @@ Node imports, so the dashboard can use it too.
   `{ errors: string[] }`.
 - **Status codes:** 400 malformed request · 401 not signed in, or wrong password · 403 not
   same-origin · 409 someone else saved · 413 body too big · 415 not JSON · 422 refused, with
-  reasons · 502 GitHub or YouTube trouble · 503 not set up yet, or GitHub rate limit. On 401, show
-  the login screen. On 409, reload the content.
+  reasons · 429 too many wrong passwords (sign-in paused) · 502 GitHub or YouTube trouble · 503 not
+  set up yet, or GitHub rate limit. On 401, show the login screen. On 409, reload the content.
 - **Setup:** `ADMIN_PASSWORD` under 12 characters, or an `ADMIN_SESSION_SECRET` under 32,
   counts as not set up. `GET /session` returns `setup.problems`: plain sentences naming each
   missing or broken variable, for the setup screen.
