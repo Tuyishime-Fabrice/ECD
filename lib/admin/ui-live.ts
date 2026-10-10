@@ -8,6 +8,12 @@ export type LiveState = "live" | "going" | "slow" | "unknown";
 
 /** After this long without going live, say it's taking longer than usual. */
 export const SLOW_AFTER_MS = 10 * 60_000;
+/** How often /build-info.json is read while a save is going live. */
+export const POLL_MS = 10_000;
+const MAX_POLL_MS = 60_000;
+
+/** The wait before the next read: 10 seconds, doubling after each read that failed (offline), up to a minute. */
+export const pollDelay = (failures: number) => Math.min(POLL_MS * 2 ** Math.max(0, failures), MAX_POLL_MS);
 
 export type LiveInput = {
   /** The commit the running app was built from; null when /build-info.json is missing (`next dev`). */
@@ -16,26 +22,42 @@ export type LiveInput = {
   target: string | null;
   /** Shas from History, newest first. */
   history: readonly string[];
-  /** What /build-info.json said when the save was made, if it was made here. */
+  /** What /build-info.json said when the save was made, if it was made here; null if that wasn't known. */
   deployedAtSave?: string | null;
   /** When the save was made (ms), if it was made here. */
   savedAt?: number;
+  /**
+   * Commits the save made before `target`, its last one: pictures that didn't fit in one
+   * save go first. An app built from one of them doesn't have the save's stories yet.
+   */
+  earlier?: readonly string[];
   now?: number;
 };
 
-export function liveState({ deployed, target, history, deployedAtSave, savedAt, now = Date.now() }: LiveInput): LiveState {
+export function liveState({
+  deployed,
+  target,
+  history,
+  deployedAtSave,
+  savedAt,
+  earlier = [],
+  now = Date.now(),
+}: LiveInput): LiveState {
   if (!deployed || deployed === "dev") return "unknown";
   if (!target || deployed === target) return "live";
   const deployedAt = history.indexOf(deployed);
   const targetAt = history.indexOf(target);
   let live: boolean;
-  if (deployedAt !== -1) {
+  if (earlier.includes(deployed)) {
+    live = false;
+  } else if (deployedAt !== -1) {
     // Both in History, which is newest first: a smaller index is a newer save.
     live = targetAt !== -1 && deployedAt < targetAt;
   } else if (savedAt !== undefined) {
     // The app was built from a commit that isn't a save (a code change). If that build
     // finished after this save was made, it was started after it too and includes it.
-    live = deployedAtSave !== undefined && deployed !== deployedAtSave;
+    // Without knowing the build at save time, it could be that same old build.
+    live = deployedAtSave != null && deployed !== deployedAtSave;
   } else {
     // Nothing saved from here: a code change newer than the last save is the usual reason.
     live = true;

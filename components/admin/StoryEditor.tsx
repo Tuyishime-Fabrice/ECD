@@ -23,18 +23,22 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { Episode } from "@/content/schema";
 import {
   addStory,
+  applyVideoLookup,
   blankQuestion,
   blankStory,
   deleteItem,
   findStory,
+  hasInput,
   moveStoryToSeason,
   newStoryId,
   sortedSeasons,
   updateStory,
+  type Filled,
+  type FoundVideo,
 } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located } from "@/lib/admin/ui-issues";
 import { quoteTitle } from "@/lib/admin/ui-summary";
@@ -71,13 +75,21 @@ type Lookup =
   | { status: "idle" }
   | { status: "loading" }
   | { status: "error"; error: string }
-  | { status: "done"; info: VideoInfo; picture: string | null };
+  | { status: "done"; info: VideoInfo; picture: string | null; filled: { title: Filled; picture: Filled } };
 
 type Length = "idle" | "reading" | "read" | "failed";
 
-export function StoryEditor({ id, collection }: { id?: string; collection?: string }) {
+type Props = { id?: string; collection?: string };
+
+export function StoryEditor(props: Props) {
+  // "Start over" on a new story begins again with a fresh screen.
+  const [round, setRound] = useState(0);
+  return <StoryScreen key={round} {...props} onStartOver={() => setRound((r) => r + 1)} />;
+}
+
+function StoryScreen({ id, collection, onStartOver }: Props & { onStartOver: () => void }) {
   const admin = useDraft();
-  const { draft, edit, reservedIds, toast } = admin;
+  const { draft, edit, reservedIds, toast, newForms, updateNewForm, guardLeaving } = admin;
   const router = useRouter();
   useFocusFromHash();
 
@@ -90,8 +102,26 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
     seasons.find((s) => s.status === "published")?.id ??
     seasons[0]?.id ??
     "";
-  const [newSeasonId, setNewSeasonId] = useState(firstSeason);
-  const [local, setLocal] = useState<Episode>(() => blankStory(draft.seasons, firstSeason, reservedIds));
+  // A new story is kept by the dashboard, not this screen, so it survives being signed out
+  // or leaving with the browser's back button; it comes back here (docs/ADMIN.md).
+  const kept = isNew ? newForms.story : undefined;
+  const [blank] = useState<Episode>(() => blankStory(draft.seasons, firstSeason, reservedIds));
+  const [restored] = useState(() => Boolean(kept));
+  const [pickedSeasonId, setPickedSeasonId] = useState(kept?.seasonId ?? firstSeason);
+  const newSeasonId = kept?.seasonId ?? pickedSeasonId;
+  const local = kept?.value ?? blank;
+  const setLocal = (change: (e: Episode) => Episode) =>
+    updateNewForm("story", (form) => {
+      const value = change(form?.value ?? blank);
+      return hasInput(value, blank) ? { value, seasonId: form?.seasonId ?? newSeasonId } : undefined;
+    });
+  const setNewSeasonId = (next: string) => {
+    setPickedSeasonId(next);
+    updateNewForm("story", (form) => form && { ...form, seasonId: next });
+  };
+  const filledIn = Boolean(kept);
+  // Links and the menu ask before leaving a story that has something filled in.
+  useEffect(() => (filledIn ? guardLeaving("story") : undefined), [filledIn, guardLeaving]);
   const [attempt, setAttempt] = useState<{ id: string } | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
@@ -127,7 +157,7 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
         text: `Changed story ${quoteTitle(title)}`,
       });
   };
-  const yt = useYouTubeLookup(update);
+  const yt = useYouTubeLookup(story, update);
 
   if (!story) {
     return (
@@ -163,10 +193,11 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
     );
     if (problems.length) {
       setAttempt({ id: finalId });
-      setLocal(ready);
+      setLocal(() => ready);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
+    updateNewForm("story", () => undefined);
     edit((s) => ({ ...s, seasons: addStory(s.seasons, newSeasonId, ready) }), {
       key: `add:${finalId}`,
       text: `Added story ${quoteTitle(ready.title.en)}`,
@@ -209,6 +240,26 @@ export function StoryEditor({ id, collection }: { id?: string; collection?: stri
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_17rem]">
         <div className="min-w-0 space-y-6">
+          {restored && filledIn && (
+            <Alert
+              tone="info"
+              title="Picking up where you left off"
+              actions={
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => {
+                    updateNewForm("story", () => undefined);
+                    onStartOver();
+                  }}
+                >
+                  Start over
+                </Button>
+              }
+            >
+              This story isn&apos;t added yet. Finish it and press Add story.
+            </Alert>
+          )}
           <ProblemSummary byField={byField} />
           <VideoCard story={story} update={update} errors={errors} yt={yt} />
 
@@ -359,19 +410,33 @@ type SectionProps = {
   errors: (field: string) => readonly string[] | undefined;
 };
 
-/** Keeps the YouTube result (title, picture) for this screen; the picture is already resized and waiting to be saved. */
-function useYouTubeLookup(update: SectionProps["update"]) {
+/**
+ * Keeps the YouTube result (title, picture) for this screen; the picture is already resized
+ * and waiting to be saved. Links can be pasted one after another faster than YouTube answers,
+ * so only the latest lookup may change the story; answers to older ones are ignored.
+ */
+function useYouTubeLookup(story: Episode | undefined, update: SectionProps["update"]) {
   const { addPicture, handleFailure } = useDraft();
   const [lookup, setLookup] = useState<Lookup>({ status: "idle" });
   const [length, setLength] = useState<Length>("idle");
   const lastLink = useRef("");
+  const latest = useRef(0);
+  /** What the last lookup found: the next one replaces what it filled in (applyVideoLookup). */
+  const previous = useRef<FoundVideo | null>(null);
+  const current = useRef(story);
+  useEffect(() => {
+    current.current = story;
+  });
 
   const find = async (link: string) => {
     const text = link.trim();
     if (!text || text === lastLink.current) return;
     lastLink.current = text;
+    const ticket = ++latest.current;
+    const stale = () => ticket !== latest.current;
     setLookup({ status: "loading" });
     const res = await api.youtube(text);
+    if (stale()) return;
     if (!res.ok) {
       if (res.status === 401) handleFailure(res);
       setLookup({ status: "error", error: res.error });
@@ -389,16 +454,17 @@ function useYouTubeLookup(update: SectionProps["update"]) {
         picture = null;
       }
     }
-    setLookup({ status: "done", info, picture });
-    update((e) => ({
-      ...e,
-      youtubeId: info.id,
-      title: e.title.en.trim() ? e.title : { ...e.title, en: info.title },
-      // A new story takes the YouTube picture; an existing one keeps its picture unless asked.
-      thumbnail: picture && !e.thumbnail ? picture : e.thumbnail,
-    }));
+    if (stale() || !current.current) return;
+    const video: FoundVideo = { id: info.id, title: info.title, picture };
+    const before = previous.current;
+    previous.current = video;
+    const filled = applyVideoLookup(current.current, video, before);
+    setLookup({ status: "done", info, picture, filled: { title: filled.title, picture: filled.picture } });
+    // A different video also clears the old length, so it is read (or typed) again.
+    update((e) => applyVideoLookup(e, video, before).story);
     setLength("reading");
     const seconds = await readVideoLength(info.id);
+    if (stale()) return;
     if (seconds) {
       update((e) => (e.youtubeId === info.id ? { ...e, durationSec: seconds } : e));
       setLength("read");
@@ -407,11 +473,33 @@ function useYouTubeLookup(update: SectionProps["update"]) {
   return { lookup, length, find, setLength };
 }
 
+/** What a lookup did to the title and picture, in words. */
+function lookupMessage({ title, picture }: { title: Filled; picture: Filled }): string {
+  if (title === "filled" && picture === "filled") return "The title and picture are filled in.";
+  const parts = [
+    title === "filled" ? "The title is filled in." : title === "kept" ? "The title stays as it was." : "",
+    picture === "filled"
+      ? "The picture is filled in."
+      : picture === "kept"
+        ? "The picture stays as it was; “Use the YouTube picture” below swaps it."
+        : "It has no picture; upload one below.",
+  ];
+  return parts.filter(Boolean).join(" ");
+}
+
 function VideoCard({ story, errors, update, yt }: SectionProps & { yt: ReturnType<typeof useYouTubeLookup> }) {
   const [link, setLink] = useState(() => videoLink(story.youtubeId));
   const [lengthText, setLengthText] = useState(() => (story.durationSec > 0 ? formatClock(story.durationSec) : ""));
   const [lengthError, setLengthError] = useState<string | null>(null);
   const [editLength, setEditLength] = useState(false);
+  // Another video: the length shown or typed was the old video's.
+  const [lengthOf, setLengthOf] = useState(story.youtubeId);
+  if (lengthOf !== story.youtubeId) {
+    setLengthOf(story.youtubeId);
+    setLengthText(story.durationSec > 0 ? formatClock(story.durationSec) : "");
+    setLengthError(null);
+    setEditLength(false);
+  }
 
   const linkErrors = [
     ...(yt.lookup.status === "error" ? [yt.lookup.error] : []),
@@ -480,7 +568,7 @@ function VideoCard({ story, errors, update, yt }: SectionProps & { yt: ReturnTyp
             <div className="min-w-0">
               <p className="truncate font-semibold text-ink">{yt.lookup.info.title || "Video found"}</p>
               <p className="text-sm text-ink-2">
-                Found on YouTube. {yt.lookup.picture ? "The title and picture are filled in." : "It has no picture; upload one below."}
+                Found on YouTube. {lookupMessage(yt.lookup.filled)}
               </p>
             </div>
           </div>
@@ -644,10 +732,10 @@ function QuestionCard({ story, update, errors, skills }: SectionProps & { skills
                     skills={skills}
                     errors={errors}
                     nameHint={`${story.title.en || story.id} question`}
-                    onChange={(question) =>
+                    onChange={(change) =>
                       update((e) => ({
                         ...e,
-                        pausePoints: (e.pausePoints ?? []).map((p, k) => (k === i ? { ...p, question } : p)),
+                        pausePoints: (e.pausePoints ?? []).map((p, k) => (k === i ? { ...p, question: change(p.question) } : p)),
                       }))
                     }
                   >

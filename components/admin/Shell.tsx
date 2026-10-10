@@ -27,9 +27,9 @@ import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { brand } from "@/lib/brand";
 import { targetHref } from "@/lib/admin/ui-issues";
-import { useAdmin } from "./AdminProvider";
+import { useAdmin, type NewFormKind } from "./AdminProvider";
 import { focusField } from "./editing";
-import { Button, ConfirmDialog, Dialog, ICON, IconButton } from "./ui";
+import { Alert, Button, ButtonLink, ConfirmDialog, Dialog, ICON, IconButton } from "./ui";
 
 const NAV = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard },
@@ -43,6 +43,21 @@ const NAV = [
 
 const isActive = (pathname: string, href: string) =>
   href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
+
+/** Where each kind of new item is filled in. */
+const NEW_FORM: Record<NewFormKind, { href: string; noun: string }> = {
+  story: { href: "/admin/stories/new", noun: "story" },
+  challenge: { href: "/admin/challenges/new", noun: "challenge" },
+};
+
+/** A link to another page of this site, as a path, or null for a new tab, a download or a link within this page. */
+function leavingTo(link: HTMLAnchorElement): string | null {
+  if ((link.target && link.target !== "_self") || link.hasAttribute("download")) return null;
+  const url = new URL(link.href, window.location.href);
+  if (url.origin !== window.location.origin) return null; // Leaving the site: the browser asks (beforeunload).
+  if (url.pathname === window.location.pathname && url.search === window.location.search) return null;
+  return `${url.pathname}${url.search}${url.hash}`;
+}
 
 export function BrandMark({ className }: { className?: string }) {
   return (
@@ -263,9 +278,8 @@ function Toasts() {
   );
 }
 
-function ProblemsDialog() {
+function ProblemsDialog({ go }: { go: (href: string) => void }) {
   const { problemsOpen, setProblemsOpen, issues } = useAdmin();
-  const router = useRouter();
   return (
     <Dialog
       open={problemsOpen}
@@ -291,9 +305,7 @@ function ProblemsDialog() {
                   size="sm"
                   onClick={() => {
                     setProblemsOpen(false);
-                    router.push(href);
-                    const hash = href.split("#")[1];
-                    if (hash) focusField(hash);
+                    go(href);
                   }}
                 >
                   Fix
@@ -344,13 +356,89 @@ function ConflictDialog() {
   );
 }
 
-export function Shell({ children }: { children: React.ReactNode }) {
-  const { signOut, dirty, phase } = useAdmin();
+/** New stories and challenges that were started but aren't added yet, shown on the other pages. */
+function KeptForms() {
+  const { newForms, updateNewForm } = useAdmin();
   const pathname = usePathname();
+  const [throwAway, setThrowAway] = useState<NewFormKind | null>(null);
+  const kept = (Object.keys(NEW_FORM) as NewFormKind[]).filter((k) => newForms[k] && pathname !== NEW_FORM[k].href);
+  return (
+    <>
+      {kept.map((kind) => (
+        <Alert
+          key={kind}
+          tone="info"
+          className="mb-6"
+          title={`Your new ${NEW_FORM[kind].noun} isn't added yet`}
+          actions={
+            <>
+              <ButtonLink href={NEW_FORM[kind].href} size="sm" variant="primary">
+                Finish it
+              </ButtonLink>
+              <Button size="sm" variant="ghost" onClick={() => setThrowAway(kind)}>
+                Throw it away
+              </Button>
+            </>
+          }
+        >
+          What you filled in is kept here until you finish it.
+        </Alert>
+      ))}
+      <ConfirmDialog
+        open={throwAway !== null}
+        onCancel={() => setThrowAway(null)}
+        onConfirm={() => {
+          if (throwAway) updateNewForm(throwAway, () => undefined);
+          setThrowAway(null);
+        }}
+        title={`Throw away the new ${throwAway ? NEW_FORM[throwAway].noun : "item"}?`}
+        confirmLabel="Throw it away"
+      >
+        What you filled in will be lost.
+      </ConfirmDialog>
+    </>
+  );
+}
+
+export function Shell({ children }: { children: React.ReactNode }) {
+  const { signOut, unsavedWork, phase, leaveGuard, updateNewForm } = useAdmin();
+  const pathname = usePathname();
+  const router = useRouter();
   const [menuOpen, setMenuOpen] = useState(false);
   const [confirmSignOut, setConfirmSignOut] = useState(false);
+  /** A page the person asked to open while a new story or challenge has input. */
+  const [leaveTo, setLeaveTo] = useState<string | null>(null);
   const drawer = useRef<HTMLDialogElement>(null);
   const current = NAV.find((n) => isActive(pathname, n.href));
+
+  const open = (href: string) => {
+    router.push(href);
+    const hash = href.split("#")[1];
+    if (hash) focusField(hash);
+  };
+  /** Opens a page, asking first if that would lose a half-filled new story or challenge. */
+  const go = (href: string) => {
+    const url = new URL(href, window.location.href);
+    const samePage = url.pathname === window.location.pathname && url.search === window.location.search;
+    if (leaveGuard && !samePage) setLeaveTo(href);
+    else open(href);
+  };
+
+  // Every link (menu, back links, Cancel, the status chip) asks first while a new item has input.
+  useEffect(() => {
+    if (!leaveGuard) return;
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      const link = e.target instanceof Element ? e.target.closest<HTMLAnchorElement>("a[href]") : null;
+      const href = link && leavingTo(link);
+      if (!href) return;
+      // Next.js links don't navigate a click whose default was prevented.
+      e.preventDefault();
+      setLeaveTo(href);
+    };
+    document.addEventListener("click", onClick, true);
+    return () => document.removeEventListener("click", onClick, true);
+  }, [leaveGuard]);
 
   useEffect(() => {
     const d = drawer.current;
@@ -359,7 +447,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
     if (!menuOpen && d.open) d.close();
   }, [menuOpen]);
 
-  const requestSignOut = () => (dirty ? setConfirmSignOut(true) : void signOut());
+  const requestSignOut = () => (unsavedWork ? setConfirmSignOut(true) : void signOut());
 
   return (
     <div className="min-h-dvh lg:pl-64">
@@ -449,13 +537,16 @@ export function Shell({ children }: { children: React.ReactNode }) {
             <span className="font-semibold">Loading the stories…</span>
           </div>
         ) : (
-          children
+          <>
+            <KeptForms />
+            {children}
+          </>
         )}
       </main>
 
       <SaveBar />
       <Toasts />
-      <ProblemsDialog />
+      <ProblemsDialog go={go} />
       <ConflictDialog />
       <ConfirmDialog
         open={confirmSignOut}
@@ -468,6 +559,20 @@ export function Shell({ children }: { children: React.ReactNode }) {
         confirmLabel="Sign out"
       >
         You have changes that aren&apos;t saved. If you sign out now, they will be lost.
+      </ConfirmDialog>
+      <ConfirmDialog
+        open={leaveTo !== null}
+        onCancel={() => setLeaveTo(null)}
+        onConfirm={() => {
+          const href = leaveTo;
+          if (leaveGuard) updateNewForm(leaveGuard, () => undefined);
+          setLeaveTo(null);
+          if (href) open(href);
+        }}
+        title={`Leave without adding this ${leaveGuard ? NEW_FORM[leaveGuard].noun : "item"}?`}
+        confirmLabel="Leave"
+      >
+        What you filled in isn&apos;t added yet. If you leave this page, it will be lost.
       </ConfirmDialog>
     </div>
   );

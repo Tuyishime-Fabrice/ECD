@@ -59,7 +59,8 @@ The dashboard saves your changes into this GitHub repository, so it needs two ke
 2. **Give both keys to Vercel.** In Vercel, open the project, then **Settings → Environment
    Variables**, and add:
    - `GITHUB_TOKEN`: the token you just copied.
-   - `ADMIN_PASSWORD`: a password for the dashboard, 12 characters or more. Share it only with
+   - `ADMIN_PASSWORD`: a password for the dashboard, 12 characters or more. Longer is much
+     safer: four or more random words that mean nothing together. Share it only with
      the people who manage stories.
    - Save.
 3. **Redeploy.** Go to **Deployments**, open the newest one, choose **⋯ → Redeploy**, and

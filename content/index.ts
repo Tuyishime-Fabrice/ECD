@@ -21,6 +21,13 @@ import { validateContent } from "./validate";
 
 type EpisodeCardOf = { card: Extract<ItemCard, { type: "episode" }>; season: SeasonCard };
 
+/**
+ * A skill's name for parents; its id when it isn't listed. Own keys only: `skills["constructor"]`
+ * is the Object function, which can't be passed to the parents' page and fails the build.
+ */
+export const skillLabel = (skills: Content["skills"], id: string): SkillInfo["label"] =>
+  Object.hasOwn(skills, id) ? skills[id]! : { rw: id, en: id };
+
 type Loaded = {
   seasons: SeasonCard[];
   episodes: Map<string, EpisodeView>;
@@ -105,7 +112,7 @@ function build(content: Content, missingAudio: Set<string>): Loaded {
       };
     });
 
-  const skills = skillIds.map((id) => ({ id, label: content.skills[id] ?? { rw: id, en: id } }));
+  const skills = skillIds.map((id) => ({ id, label: skillLabel(content.skills, id) }));
   return { seasons, episodes, challenges, skills };
 }
 

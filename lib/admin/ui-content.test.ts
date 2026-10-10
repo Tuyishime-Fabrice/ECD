@@ -4,16 +4,21 @@ import sample from "@/content/seasons.json";
 import {
   addChallenge,
   addSeason,
+  addOption,
   addStory,
+  applyVideoLookup,
   allIds,
   blankChallenge,
+  blankQuestion,
   blankSeason,
   blankStory,
+  changeOption,
   cleanFeatured,
   deleteItem,
   deleteSeason,
   findChallenge,
   findStory,
+  hasInput,
   liveStories,
   moveInList,
   moveSeason,
@@ -27,7 +32,9 @@ import {
   nextOptionId,
   picturesIn,
   prepareForSave,
+  removeOption,
   renumberStories,
+  setPromptImage,
   sortedSeasons,
   storiesBefore,
   storiesOf,
@@ -52,24 +59,40 @@ const story = (id: string): Episode => ({
 });
 
 describe("new ids", () => {
-  it("follows the sN / sNeM / sNcM pattern, after the highest in use", () => {
+  const fixed = () => "k7fq";
+  it("follows the sN / sNeM-xxxx / sNcM-xxxx pattern, after the highest in use", () => {
     const c = content();
     expect(newSeasonId(c)).toBe("s4");
-    expect(newStoryId(c, "s1")).toBe("s1e9");
-    expect(newStoryId(c, "s2")).toBe("s2e1");
-    expect(newChallengeId(c, "s1")).toBe("s1c3");
+    expect(newStoryId(c, "s1", [], fixed)).toBe("s1e9-k7fq");
+    expect(newStoryId(c, "s2", [], fixed)).toBe("s2e1-k7fq");
+    expect(newChallengeId(c, "s1", [], fixed)).toBe("s1c3-k7fq");
+    expect(newStoryId(c, "s1")).toMatch(/^s1e9-[2-9a-z]{4}$/);
+    expect(newChallengeId(c, "s1")).toMatch(/^s1c3-[2-9a-z]{4}$/);
   });
-  it("skips reserved ids, such as ones deleted since the last save", () => {
-    const c = deleteItem(content(), "s1e8");
-    expect(newStoryId(c, "s1")).toBe("s1e8");
-    expect(newStoryId(c, "s1", ["s1e8"])).toBe("s1e9");
-    expect(newSeasonId(c, ["s4", "s7"])).toBe("s8");
+  it("never gives a story or challenge an id that was used before, even one deleted in an earlier save", () => {
+    // Children's devices keep progress and stickers by id, so a new item must not inherit them.
+    const saved = deleteItem(deleteItem(content(), "s1e8"), "s1c2");
+    const story = newStoryId(saved, "s1");
+    const challenge = newChallengeId(saved, "s1");
+    expect(story).toMatch(/^s1e8-[2-9a-z]{4}$/);
+    expect(challenge).toMatch(/^s1c2-[2-9a-z]{4}$/);
+    expect(["s1e8", "s1c2"]).not.toContain(story);
+    expect(["s1e8", "s1c2"]).not.toContain(challenge);
+    // The suffix is random (31⁴ ≈ 920,000 kinds), so ids made for the same place differ.
+    expect(new Set(Array.from({ length: 20 }, () => newStoryId(saved, "s1"))).size).toBeGreaterThanOrEqual(19);
+  });
+  it("numbers after suffixed ids too, and skips taken and reserved ids", () => {
+    const c = addStory(content(), "s1", story("s1e9-k7fq"));
+    expect(newStoryId(c, "s1", [], fixed)).toBe("s1e10-k7fq");
+    expect(newStoryId(c, "s1", ["s1e10-k7fq"], fixed)).toBe("s1e11-k7fq");
+    expect(newStoryId(content(), "s1", ["s1e9", "s1e12-abcd"], fixed)).toBe("s1e13-k7fq");
+    expect(newSeasonId(content(), ["s4", "s7"])).toBe("s8");
   });
   it("uses a dash for collections with other ids, and stays unique across the file", () => {
     const c = content();
     c.seasons[1]!.id = "animals";
-    expect(newStoryId(c, "animals")).toBe("animals-e1");
-    expect(newChallengeId(c, "animals")).toBe("animals-c1");
+    expect(newStoryId(c, "animals", [], fixed)).toBe("animals-e1-k7fq");
+    expect(newChallengeId(c, "animals", [], fixed)).toBe("animals-c1-k7fq");
     const taken = allIds(c);
     expect(taken.has("s1c1-q5")).toBe(true);
     expect(newQuestionId("s1c1", "q", taken)).toBe("s1c1-q6");
@@ -90,12 +113,12 @@ describe("new ids", () => {
 describe("blank items", () => {
   it("gives a new story the next id and number", () => {
     const s = blankStory(content(), "s1");
-    expect(s).toMatchObject({ id: "s1e9", number: 9, youtubeId: "", durationSec: 0, skills: [] });
+    expect(s).toMatchObject({ id: expect.stringMatching(/^s1e9-[2-9a-z]{4}$/), number: 9, youtubeId: "", durationSec: 0, skills: [] });
   });
   it("gives a new challenge exactly 5 questions with their own ids", () => {
     const ch = blankChallenge(content(), "s1");
-    expect(ch.id).toBe("s1c3");
-    expect(ch.questions.map((q) => q.id)).toEqual(["s1c3-q1", "s1c3-q2", "s1c3-q3", "s1c3-q4", "s1c3-q5"]);
+    expect(ch.id).toMatch(/^s1c3-[2-9a-z]{4}$/);
+    expect(ch.questions.map((q) => q.id)).toEqual([1, 2, 3, 4, 5].map((n) => `${ch.id}-q${n}`));
     expect(ch.questions[0]!.options).toHaveLength(2);
     expect(ch.questions[0]!.skill).toBe("count-1-5");
   });
@@ -117,6 +140,27 @@ describe("blank items", () => {
       ["s3", 3],
       ["s4", 4],
     ]);
+  });
+});
+
+describe("hasInput", () => {
+  it("is false for a new story or challenge left as it started, whatever its ids", () => {
+    const c = content();
+    const blank = blankStory(c, "s1");
+    expect(hasInput(blank, blank)).toBe(false);
+    expect(hasInput({ ...blank, id: "s1e10" }, blank)).toBe(false);
+    const ch = blankChallenge(c, "s1");
+    const renamed = { ...ch, id: "s2c1", questions: ch.questions.map((q, i) => ({ ...q, id: `s2c1-q${i + 1}` })) };
+    expect(hasInput(renamed, ch)).toBe(false);
+  });
+  it("is true once anything is filled in", () => {
+    const c = content();
+    const blank = blankStory(c, "s1");
+    expect(hasInput({ ...blank, youtubeId: "dQw4w9WgXcQ" }, blank)).toBe(true);
+    expect(hasInput({ ...blank, title: { en: "", rw: "Ihene" } }, blank)).toBe(true);
+    const ch = blankChallenge(c, "s1");
+    const labelled = { ...ch, questions: ch.questions.map((q, i) => (i === 4 ? { ...q, options: [q.options[0]!, { id: "b", image: "", label: "two" }] } : q)) };
+    expect(hasInput(labelled, ch)).toBe(true);
   });
 });
 
@@ -162,11 +206,12 @@ describe("reorder and renumber", () => {
     expect(storiesOf(renumberStories(c).seasons[0]!).map((e) => e.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
   });
   it("adds stories and challenges at the end of a collection", () => {
-    let c = addStory(content(), "s1", story("s1e9"));
-    c = addChallenge(c, "s1", blankChallenge(c, "s1"));
-    expect(order(c).slice(-3)).toEqual(["s1c2", "s1e9#9", "s1c3"]);
+    let c = addStory(content(), "s1", story("s1e9-k7fq"));
+    const challenge = blankChallenge(c, "s1");
+    c = addChallenge(c, "s1", challenge);
+    expect(order(c).slice(-3)).toEqual(["s1c2", "s1e9-k7fq#9", challenge.id]);
     expect(storiesBefore(c.seasons[0]!, "s1c1")).toBe(4);
-    expect(storiesBefore(c.seasons[0]!, "s1c3")).toBe(9);
+    expect(storiesBefore(c.seasons[0]!, challenge.id)).toBe(9);
   });
   it("moves a story to another collection", () => {
     const c = moveStoryToSeason(content(), "s1e3", "s2");
@@ -212,6 +257,100 @@ describe("featured stories", () => {
     const out = prepareForSave(c, site(["s1e1"]));
     expect(out.site.featured).toEqual([]);
     expect(storiesOf(out.seasons.seasons[0]!).map((e) => e.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+});
+
+describe("applyVideoLookup", () => {
+  const videoA = { id: "AAAAAAAAAAA", title: "Video A", picture: "/images/uploads/video-a-picture-1.jpg" };
+  const videoB = { id: "BBBBBBBBBBB", title: "Video B", picture: "/images/uploads/video-b-picture-1.jpg" };
+  const blank = () => blankStory(content(), "s1");
+
+  it("fills in a new story's title and picture", () => {
+    const out = applyVideoLookup(blank(), videoA, null);
+    expect(out.story).toMatchObject({ youtubeId: videoA.id, title: { en: "Video A" }, thumbnail: videoA.picture, durationSec: 0 });
+    expect(out).toMatchObject({ title: "filled", picture: "filled" });
+  });
+  it("replaces what the last link filled in when another link is pasted", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const out = applyVideoLookup({ ...first, durationSec: 252 }, videoB, videoA);
+    expect(out.story).toMatchObject({ youtubeId: videoB.id, title: { en: "Video B" }, thumbnail: videoB.picture });
+    expect(out).toMatchObject({ title: "filled", picture: "filled" });
+    // A different video: its length must be read (or typed) again.
+    expect(out.story.durationSec).toBe(0);
+  });
+  it("keeps a title the person typed and a picture they uploaded", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const typed = { ...first, title: { en: "Keza Counts", rw: "" } };
+    expect(applyVideoLookup(typed, videoB, videoA)).toMatchObject({
+      story: { title: { en: "Keza Counts" }, thumbnail: videoB.picture },
+      title: "kept",
+      picture: "filled",
+    });
+    const uploaded = { ...first, thumbnail: "/images/uploads/my-own-1.jpg" };
+    expect(applyVideoLookup(uploaded, videoB, videoA)).toMatchObject({
+      story: { title: { en: "Video B" }, thumbnail: "/images/uploads/my-own-1.jpg" },
+      title: "filled",
+      picture: "kept",
+    });
+  });
+  it("keeps an existing story's own title and picture, but not the old video's length", () => {
+    const story = findStory(content(), "s1e2")!.value;
+    const out = applyVideoLookup(story, videoB, null);
+    expect(out.story).toMatchObject({ youtubeId: videoB.id, title: story.title, thumbnail: story.thumbnail, durationSec: 0 });
+    expect(out).toMatchObject({ title: "kept", picture: "kept" });
+  });
+  it("keeps the length when the same video is found again", () => {
+    const story = { ...applyVideoLookup(blank(), videoA, null).story, durationSec: 252 };
+    expect(applyVideoLookup(story, videoA, videoA).story.durationSec).toBe(252);
+  });
+  it("takes away the last video's picture when the new one has none", () => {
+    const first = applyVideoLookup(blank(), videoA, null).story;
+    const out = applyVideoLookup(first, { ...videoB, picture: null }, videoA);
+    expect(out.story.thumbnail).toBe("");
+    expect(out.picture).toBe("none");
+  });
+});
+
+describe("question changes", () => {
+  // A picture finishes resizing after other changes were made to the question.
+  const latest = () => ({
+    ...blankQuestion("s1c3-q1", "count-1-5"),
+    promptText: { en: "Which has 2?", rw: "" },
+    correctOptionId: "b",
+    options: [
+      { id: "a", image: "/images/uploads/a-1.png" },
+      { id: "b", image: "", label: "two" },
+    ],
+  });
+  it("puts a picture on its answer in the latest question, keeping everything else", () => {
+    const pickedForB = (q: ReturnType<typeof latest>) => changeOption(q, "b", { image: "/images/uploads/b-1.png" });
+    expect(pickedForB(latest())).toEqual({
+      ...latest(),
+      options: [
+        { id: "a", image: "/images/uploads/a-1.png" },
+        { id: "b", image: "/images/uploads/b-1.png", label: "two" },
+      ],
+    });
+  });
+  it("finds the answer by id, so removing another answer meanwhile doesn't misplace it", () => {
+    const q = removeOption(latest(), "a");
+    expect(q.correctOptionId).toBe("b");
+    expect(changeOption(q, "b", { image: "/images/uploads/b-1.png" }).options).toEqual([
+      { id: "b", image: "/images/uploads/b-1.png", label: "two" },
+    ]);
+    expect(changeOption(q, "a", { image: "/images/uploads/x-1.png" })).toEqual(q);
+  });
+  it("drops a cleared label", () => {
+    expect(changeOption(latest(), "b", { label: undefined }).options[1]).toEqual({ id: "b", image: "" });
+  });
+  it("moves the right answer when the right one is removed", () => {
+    expect(removeOption(latest(), "b").correctOptionId).toBe("a");
+  });
+  it("adds answers with the next letter, and sets or clears the question's picture", () => {
+    expect(addOption(latest()).options.map((o) => o.id)).toEqual(["a", "b", "c"]);
+    const withPicture = setPromptImage(latest(), "/images/uploads/p-1.png");
+    expect(withPicture.promptImage).toBe("/images/uploads/p-1.png");
+    expect("promptImage" in setPromptImage(withPicture, undefined)).toBe(false);
   });
 });
 

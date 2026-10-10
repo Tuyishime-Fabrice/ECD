@@ -7,11 +7,12 @@
  * sends everything in one save (docs/ADMIN.md).
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
-import type { Content } from "@/content/schema";
+import type { Challenge, Content, Episode } from "@/content/schema";
 import type { Site } from "@/content/site";
 import { allIds, findChallenge, findSeason, findStory, picturesIn, prepareForSave, renumberStories } from "@/lib/admin/ui-content";
 import { checkDraft, locate, type Located, type Target } from "@/lib/admin/ui-issues";
-import { liveState, type LiveState } from "@/lib/admin/ui-live";
+import { liveState, pollDelay, type LiveState } from "@/lib/admin/ui-live";
+import { draftAfterSave, notesAfterSave, type Note as SavedNote } from "@/lib/admin/ui-save";
 import { summarize } from "@/lib/admin/ui-summary";
 import { MAX_SAVE_UPLOAD_BYTES, MAX_UPLOADS_PER_SAVE } from "@/lib/admin/uploads";
 import { api, deployedSha, type ApiFailure, type SessionInfo } from "./api";
@@ -20,12 +21,22 @@ export type Snapshot = { seasons: Content; site: Site };
 export type Picture = { dataUrl: string; bytes: number; pending: boolean };
 export type Phase = "checking" | "setup" | "signed-out" | "loading" | "ready" | "error";
 export type Toast = { id: number; tone: "success" | "info" | "error"; title: string; body?: string };
-type Publish = { commitSha: string; savedAt: number; deployedAtSave: string | null };
+type Publish = {
+  /** The save's last commit, the one with its stories. */
+  commitSha: string;
+  savedAt: number;
+  deployedAtSave: string | null;
+  /** Commits the same save made first, with pictures only (oldest first). */
+  earlier?: string[];
+};
 type Note = { key: string; text: string };
+/** A new story or challenge that isn't added yet, with its collection. Kept only while something is filled in. */
+export type NewForm<T> = { value: T; seasonId: string };
+export type NewForms = { story?: NewForm<Episode>; challenge?: NewForm<Challenge> };
+export type NewFormKind = keyof NewForms;
 type ServerIssue = Located & { value: string };
 
 const PUBLISH_KEY = "izuba-admin:publish";
-const POLL_MS = 10_000;
 /** Below the server's 3 MB, to leave room for rounding. */
 const BATCH_BYTES = MAX_SAVE_UPLOAD_BYTES - 200_000;
 
@@ -92,6 +103,17 @@ type AdminContext = {
   loadError: string;
   /** True when the session ran out while there were unsaved changes. */
   signedOutWithChanges: boolean;
+  /**
+   * New stories and challenges being filled in. They live here, not in the editor, so
+   * being signed out (or going back with the browser) doesn't lose them.
+   */
+  newForms: NewForms;
+  updateNewForm: <K extends NewFormKind>(kind: K, change: (form: NewForms[K]) => NewForms[K]) => void;
+  /** Unsaved changes, or a new story or challenge that isn't added yet. */
+  unsavedWork: boolean;
+  /** Set while a screen has input that leaving would lose ("story"): links then ask first. */
+  leaveGuard: NewFormKind | null;
+  guardLeaving: (kind: NewFormKind) => () => void;
   base: Snapshot | null;
   draft: Snapshot | null;
   dirty: boolean;
@@ -146,7 +168,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const [base, setBase] = useState<Snapshot | null>(null);
   const [draft, setDraft] = useState<Snapshot | null>(null);
   const [baseSha, setBaseSha] = useState("");
-  const [notes, setNotes] = useState<Map<string, string>>(() => new Map());
+  const [notes, setNotes] = useState<Map<string, SavedNote>>(() => new Map());
   const [pictures, setPictures] = useState<Record<string, Picture>>({});
   const [serverIssues, setServerIssues] = useState<ServerIssue[]>([]);
   const [saving, setSaving] = useState<string | null>(null);
@@ -156,12 +178,25 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   // Read on the client only; nothing that depends on it shows before the session check.
   const [publish, setPublish] = useState<Publish | null>(() => (typeof window === "undefined" ? null : readPublish()));
   const [deployed, setDeployed] = useState<string | null>(null);
+  /** The last read of /build-info.json failed (offline); `deployed` is the answer before that. */
+  const [buildInfoFailed, setBuildInfoFailed] = useState(false);
   const [historyShas, setHistoryShas] = useState<string[]>([]);
+  const [newForms, setNewForms] = useState<NewForms>({});
+  const [leaveGuard, setLeaveGuard] = useState<NewFormKind | null>(null);
   const [now, setNow] = useState(() => Date.now());
   const toastId = useRef(0);
+  /** Numbers the change notes, so a save clears only the ones written before it started. */
+  const noteSeq = useRef(0);
+  const savingNow = useRef(false);
+  /** The draft as it is now, for a save that finishes after more edits were made. */
+  const latestDraft = useRef(draft);
+  useEffect(() => {
+    latestDraft.current = draft;
+  }, [draft]);
 
   const dirty = useMemo(() => JSON.stringify(draft) !== JSON.stringify(base), [draft, base]);
   const hasDraft = draft !== null;
+  const unsavedWork = dirty || Boolean(newForms.story || newForms.challenge);
 
   const toast = useCallback((t: Omit<Toast, "id">) => {
     const id = ++toastId.current;
@@ -233,7 +268,23 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       const next = change(d);
       return next === d ? d : { seasons: renumberStories(next.seasons), site: next.site };
     });
-    if (note) setNotes((n) => new Map(n).set(note.key, note.text));
+    if (note) {
+      const seq = ++noteSeq.current;
+      setNotes((n) => new Map(n).set(note.key, { text: note.text, seq }));
+    }
+  }, []);
+
+  const updateNewForm = useCallback(
+    <K extends NewFormKind>(kind: K, change: (form: NewForms[K]) => NewForms[K]) =>
+      setNewForms((all) => {
+        const next = change(all[kind]);
+        return next === all[kind] ? all : { ...all, [kind]: next };
+      }),
+    [],
+  );
+  const guardLeaving = useCallback((kind: NewFormKind) => {
+    setLeaveGuard(kind);
+    return () => setLeaveGuard((g) => (g === kind ? null : g));
   }, []);
 
   const addPicture = useCallback((path: string, picture: Omit<Picture, "pending">) => {
@@ -256,19 +307,22 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     return [...localIssues, ...stillTrue];
   }, [draft, localIssues, serverIssues]);
 
+  /** Starts waiting for `commitSha`, a save's last commit; `earlier` are its picture-only commits, oldest first. */
   const startPublish = useCallback(
-    (commitSha: string) => {
-      const value = { commitSha, savedAt: Date.now(), deployedAtSave: deployed };
+    (commitSha: string, earlier: string[] = []) => {
+      const value: Publish = { commitSha, savedAt: Date.now(), deployedAtSave: deployed, earlier };
       setPublish(value);
       writePublish(value);
-      setHistoryShas((list) => (list.includes(commitSha) ? list : [commitSha, ...list]));
+      // Newest first, like History.
+      const made = [commitSha, ...[...earlier].reverse()];
+      setHistoryShas((list) => [...made, ...list.filter((sha) => !made.includes(sha))]);
       setNow(Date.now());
     },
     [deployed],
   );
 
   const save = useCallback(async () => {
-    if (!draft || !base || !prepared || saving) return;
+    if (!draft || !base || !prepared || saving || savingNow.current) return;
     if (localIssues.length) {
       setProblemsOpen(true);
       return;
@@ -278,8 +332,14 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
       .filter(([path, p]) => p.pending && used.has(path))
       .map(([path, p]) => ({ path, base64: p.dataUrl, bytes: p.bytes }));
     const groups = batches(uploads);
-    const summary = summarize([...notes.values()]);
+    const summary = summarize([...notes.values()].map((n) => n.text));
+    // Editing goes on during the save; what changes after this point stays unsaved, on top of it.
+    const sent = draft;
+    const sentNotes = noteSeq.current;
     let sha = baseSha;
+    /** Every commit this save makes: the app has its stories only once it is built from the last one. */
+    const commits: string[] = [];
+    savingNow.current = true;
     setServerIssues([]);
     try {
       for (const [i, group] of groups.entries()) {
@@ -310,25 +370,32 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         sha = res.data.commitSha;
+        if (!commits.includes(sha)) commits.push(sha);
         setPictures((all) => {
           const next = { ...all };
           for (const { path } of group) if (next[path]) next[path] = { ...next[path]!, pending: false };
           return next;
         });
         if (last) {
-          setBase(prepared);
-          setDraft(prepared);
+          const changedMeanwhile = JSON.stringify(latestDraft.current) !== JSON.stringify(sent);
+          // Signing out during the save clears everything; leave it cleared.
+          setBase((b) => (b ? prepared : b));
+          setDraft((d) => (d ? draftAfterSave(d, sent, prepared) : d));
           setBaseSha(sha);
-          setNotes(new Map());
+          setNotes((n) => notesAfterSave(n, sentNotes));
+          const meanwhile = changedMeanwhile
+            ? "Changes you made while it was saving aren't saved yet. Press Save again to save them."
+            : undefined;
           if (res.data.unchanged && groups.length === 1) {
-            toast({ tone: "info", title: "Nothing new to save.", body: "Everything here is already saved." });
+            toast({ tone: "info", title: "Nothing new to save.", body: meanwhile ?? "Everything here is already saved." });
           } else {
-            startPublish(sha);
-            toast({ tone: "success", title: "Saved. Live in about 2 minutes." });
+            startPublish(sha, commits.filter((c) => c !== sha));
+            toast({ tone: "success", title: "Saved. Live in about 2 minutes.", body: meanwhile });
           }
         }
       }
     } finally {
+      savingNow.current = false;
       setSaving(null);
     }
   }, [draft, base, prepared, saving, localIssues, pictures, notes, baseSha, toast, handleFailure, startPublish]);
@@ -367,6 +434,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     await api.logout();
     setBase(null);
     setDraft(null);
+    setNewForms({});
     setNotes(new Map());
     setPictures({});
     setServerIssues([]);
@@ -389,13 +457,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   );
 
   // Is the latest save live? Checked when the dashboard opens, then every 10 seconds until it is.
+  // A read that fails (offline for a moment) keeps the last answer and tries again a bit later.
   const ready = phase === "ready";
   useEffect(() => {
     if (!ready) return;
     let cancelled = false;
-    void Promise.all([deployedSha(), api.history()]).then(([sha, history]) => {
+    void Promise.all([deployedSha(), api.history()]).then(([info, history]) => {
       if (cancelled) return;
-      setDeployed(sha);
+      if (info.ok) setDeployed(info.sha);
+      setBuildInfoFailed(!info.ok);
       if (history.ok) setHistoryShas(history.data.commits.map((c) => c.sha));
     });
     return () => {
@@ -410,18 +480,30 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     history: historyShas,
     deployedAtSave: publish?.deployedAtSave,
     savedAt: publish?.savedAt,
+    earlier: publish?.earlier,
     now,
   });
-  const waiting = ready && (live === "going" || live === "slow");
+  const waiting =
+    ready && (live === "going" || live === "slow" || (live === "unknown" && buildInfoFailed && publish !== null));
   useEffect(() => {
     if (!waiting) return;
-    const timer = setInterval(() => {
-      void deployedSha().then((sha) => {
-        setDeployed(sha);
-        setNow(Date.now());
-      });
-    }, POLL_MS);
-    return () => clearInterval(timer);
+    let cancelled = false;
+    let failures = 0;
+    let timer: ReturnType<typeof setTimeout>;
+    const poll = async () => {
+      const info = await deployedSha();
+      if (cancelled) return;
+      failures = info.ok ? 0 : failures + 1;
+      if (info.ok) setDeployed(info.sha);
+      setBuildInfoFailed(!info.ok);
+      setNow(Date.now());
+      timer = setTimeout(poll, pollDelay(failures));
+    };
+    timer = setTimeout(poll, pollDelay(0));
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [waiting]);
 
   const publishedSha = live === "live" ? publish?.commitSha : undefined;
@@ -430,11 +512,11 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   }, [publishedSha]);
 
   useEffect(() => {
-    if (!dirty) return;
+    if (!unsavedWork) return;
     const warn = (e: BeforeUnloadEvent) => e.preventDefault();
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
-  }, [dirty]);
+  }, [unsavedWork]);
 
   const reservedIds = useMemo(() => (base ? allIds(base.seasons) : new Set<string>()), [base]);
 
@@ -442,7 +524,12 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     phase,
     session,
     loadError,
-    signedOutWithChanges: phase === "signed-out" && dirty,
+    signedOutWithChanges: phase === "signed-out" && unsavedWork,
+    newForms,
+    updateNewForm,
+    unsavedWork,
+    leaveGuard,
+    guardLeaving,
     base,
     draft,
     dirty,

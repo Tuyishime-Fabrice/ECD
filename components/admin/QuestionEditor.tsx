@@ -4,11 +4,15 @@
  * One picture question: the question in both languages, 2–4 picture answers,
  * which one is right, and the skill it practices. Used for the question during a
  * story and for the 5 questions of a challenge.
+ *
+ * Changes go up as functions of the question (`onChange(q => …)`), so a picture that
+ * finishes resizing after other changes is added to the latest question, not to the
+ * copy that was on screen when it was picked.
  */
 import clsx from "clsx";
 import { ImagePlus, LoaderCircle, Mic, Plus, Trash2 } from "lucide-react";
 import type { LocalizedText, Question } from "@/content/schema";
-import { nextOptionId } from "@/lib/admin/ui-content";
+import { addOption, changeOption, removeOption, setPromptImage } from "@/lib/admin/ui-content";
 import { fieldId } from "@/lib/admin/ui-issues";
 import { useAdmin } from "./AdminProvider";
 import { PictureField, usePictureUpload } from "./editing";
@@ -16,6 +20,9 @@ import { Bilingual, Button, Field, FieldErrors, ICON, PictureView, Select, TextI
 
 const MAX_ANSWERS = 4;
 const MIN_ANSWERS = 2;
+
+type Option = Question["options"][number];
+export type QuestionChange = (q: Question) => Question;
 
 export function QuestionEditor({
   value,
@@ -27,7 +34,7 @@ export function QuestionEditor({
   children,
 }: {
   value: Question;
-  onChange: (q: Question) => void;
+  onChange: (change: QuestionChange) => void;
   /** Where this question is, for problems and field ids: "pausePoints.0.question", "questions.2". */
   field: string;
   skills: Record<string, LocalizedText>;
@@ -37,17 +44,8 @@ export function QuestionEditor({
   children?: React.ReactNode;
 }) {
   const f = (name: string) => `${field}.${name}`;
-  const set = (patch: Partial<Question>) => onChange({ ...value, ...patch });
+  const set = (patch: Partial<Question>) => onChange((q) => ({ ...q, ...patch }));
   const options = value.options;
-
-  const setOption = (index: number, patch: Partial<Question["options"][number]>) =>
-    set({ options: options.map((o, i) => (i === index ? { ...o, ...patch } : o)) });
-
-  const removeOption = (index: number) => {
-    const removed = options[index]!;
-    const rest = options.filter((_, i) => i !== index);
-    set({ options: rest, correctOptionId: removed.id === value.correctOptionId ? rest[0]!.id : value.correctOptionId });
-  };
 
   const hasRecording = Boolean(value.promptAudio && Object.values(value.promptAudio).some(Boolean));
 
@@ -79,11 +77,7 @@ export function QuestionEditor({
         kind="answer"
         nameHint={`${nameHint} picture`}
         value={value.promptImage}
-        onChange={(promptImage) => {
-          const next = { ...value, promptImage };
-          if (!promptImage) delete next.promptImage;
-          onChange(next);
-        }}
+        onChange={(promptImage) => onChange((q) => setPromptImage(q, promptImage))}
         errors={errors(f("promptImage"))}
       />
 
@@ -104,8 +98,13 @@ export function QuestionEditor({
               groupName={`${fieldId(field)}-right`}
               correct={option.id === value.correctOptionId}
               onCorrect={() => set({ correctOptionId: option.id })}
-              onChange={(patch) => setOption(i, patch)}
-              onRemove={options.length > MIN_ANSWERS ? () => removeOption(i) : undefined}
+              // By id, not position: answers can be removed while a picture is still resizing.
+              onChange={(patch) => onChange((q) => changeOption(q, option.id, patch))}
+              onRemove={
+                options.length > MIN_ANSWERS
+                  ? () => onChange((q) => (q.options.length > MIN_ANSWERS ? removeOption(q, option.id) : q))
+                  : undefined
+              }
               errors={errors}
               nameHint={nameHint}
               rightFieldId={i === 0 ? fieldId(f("correctOptionId")) : undefined}
@@ -116,7 +115,7 @@ export function QuestionEditor({
           <Button
             className="mt-3"
             icon={<Plus className="size-[18px]" {...ICON} />}
-            onClick={() => set({ options: [...options, { id: nextOptionId(value), image: "" }] })}
+            onClick={() => onChange((q) => (q.options.length < MAX_ANSWERS ? addOption(q) : q))}
           >
             Add an answer
           </Button>
@@ -159,12 +158,12 @@ function AnswerCard({
   rightFieldId,
 }: {
   index: number;
-  option: Question["options"][number];
+  option: Option;
   field: string;
   groupName: string;
   correct: boolean;
   onCorrect: () => void;
-  onChange: (patch: Partial<Question["options"][number]>) => void;
+  onChange: (patch: Partial<Option>) => void;
   onRemove?: () => void;
   errors: (field: string) => readonly string[] | undefined;
   nameHint: string;
@@ -172,7 +171,7 @@ function AnswerCard({
 }) {
   const { pictureSrc } = useAdmin();
   const letter = String.fromCharCode(65 + index);
-  const upload = usePictureUpload("answer", `${nameHint} answer ${letter}`, (image) => onChange({ image: image ?? "" }));
+  const upload = usePictureUpload("answer", `${nameHint} answer ${letter}`, (image) => onChange({ image }));
   const imageId = fieldId(`${field}.image`);
   const problems = [...(upload.error ? [upload.error] : []), ...(errors(`${field}.image`) ?? [])];
   return (
@@ -232,11 +231,7 @@ function AnswerCard({
               value={option.label ?? ""}
               placeholder="3 mangoes"
               className="mt-1"
-              onChange={(e) => {
-                const label = e.target.value;
-                if (label) onChange({ label });
-                else onChange({ label: undefined });
-              }}
+              onChange={(e) => onChange({ label: e.target.value || undefined })}
             />
           </div>
           <label

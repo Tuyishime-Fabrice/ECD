@@ -178,7 +178,8 @@ export const contentSchema = z
       }
     };
     const knownSkill = (skill: string, path: (string | number)[]) => {
-      if (!(skill in c.skills)) {
+      // Own keys only: `"constructor" in c.skills` is true for every object.
+      if (!Object.hasOwn(c.skills, skill)) {
         ctx.addIssue({
           code: "custom",
           path,

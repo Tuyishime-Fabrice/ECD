@@ -62,14 +62,19 @@ export const api = {
   undo: (sha: string, baseSha: string) => call<{ commitSha: string }>("undo", { sha, baseSha }),
 };
 
-/** The commit the running app was built from; null when unknown (no build info, or offline). */
-export async function deployedSha(): Promise<string | null> {
+/**
+ * The commit the running app was built from: `sha` is null when there is no build info
+ * (`next dev`). `ok: false` when it couldn't be read this time (offline, a server hiccup),
+ * which says nothing about the build, so the last answer still stands.
+ */
+export async function deployedSha(): Promise<{ ok: true; sha: string | null } | { ok: false }> {
   try {
     const res = await fetch("/build-info.json", { cache: "no-store" });
-    if (!res.ok) return null;
-    const body = (await res.json()) as { sha?: unknown };
-    return typeof body.sha === "string" ? body.sha : null;
+    if (res.status === 404) return { ok: true, sha: null };
+    if (!res.ok) return { ok: false };
+    const body = (await res.json().catch(() => null)) as { sha?: unknown } | null;
+    return { ok: true, sha: typeof body?.sha === "string" ? body.sha : null };
   } catch {
-    return null;
+    return { ok: false };
   }
 }

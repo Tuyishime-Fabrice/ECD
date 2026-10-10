@@ -11,6 +11,8 @@ import { GET as session } from "@/app/api/admin/session/route";
 import { POST as undo } from "@/app/api/admin/undo/route";
 import { GET as youtube } from "@/app/api/admin/youtube/route";
 import { createFakeGitHub, seedFromWorkingTree, type FakeGitHub } from "../../scripts/dev/fake-github.mjs";
+import { readAdminEnv } from "./env";
+import { loginLimiter } from "./login-limit";
 import { createSessionToken } from "./session";
 
 const PASSWORD = "correct horse battery";
@@ -19,14 +21,15 @@ const seed = seedFromWorkingTree();
 let fake: FakeGitHub;
 
 beforeEach(() => {
+  loginLimiter.reset();
   fake = createFakeGitHub({ files: seed });
   vi.stubGlobal("fetch", (input: RequestInfo | URL, init?: RequestInit) => fake.handle(new Request(input, init)));
   vi.stubEnv("ADMIN_PASSWORD", PASSWORD);
   vi.stubEnv("ADMIN_SESSION_SECRET", "");
   vi.stubEnv("GITHUB_TOKEN", "test-token");
-  vi.stubEnv("GITHUB_API_URL", "http://fake.test");
-  vi.stubEnv("YOUTUBE_OEMBED_URL", "http://fake.test/oembed");
-  vi.stubEnv("YOUTUBE_THUMBNAIL_URL", "http://fake.test/vi");
+  vi.stubEnv("GITHUB_API_URL", "http://127.0.0.1:4010");
+  vi.stubEnv("YOUTUBE_OEMBED_URL", "http://127.0.0.1:4010/oembed");
+  vi.stubEnv("YOUTUBE_THUMBNAIL_URL", "http://127.0.0.1:4010/vi");
 });
 
 afterEach(() => {
@@ -94,8 +97,10 @@ describe("admin API", () => {
   });
 
   it("refuses everything but login and session without a valid cookie", async () => {
-    const expired = `izuba_admin=${createSessionToken(`izuba-admin-session\n${PASSWORD}`, Date.now() - 8 * 86400_000)}`;
-    for (const cookie of [undefined, "izuba_admin=forged.value", expired]) {
+    const expired = `izuba_admin=${createSessionToken(readAdminEnv().sessionSecret!, Date.now() - 8 * 86400_000)}`;
+    // Signed with a fast hash of the password (the old default key): no longer accepted.
+    const fastHash = `izuba_admin=${createSessionToken(`izuba-admin-session\n${PASSWORD}`)}`;
+    for (const cookie of [undefined, "izuba_admin=forged.value", expired, fastHash]) {
       const replies = await Promise.all([
         content(request("GET", "/api/admin/content", { cookie })),
         history(request("GET", "/api/admin/history", { cookie })),
@@ -140,6 +145,32 @@ describe("admin API", () => {
     expect(res.status).toBe(401);
     expect(res.headers.get("set-cookie")).toBeNull();
     expect(await res.json()).toEqual({ error: "That password isn't right. Try again." });
+  });
+
+  it("pauses sign-in for an address after 10 wrong passwords, even sent all at once", async () => {
+    vi.useFakeTimers();
+    const from = (ip: string, password: string) =>
+      login(
+        new Request(`${ORIGIN}/api/admin/login`, {
+          method: "POST",
+          headers: { host: "localhost:4173", origin: ORIGIN, "content-type": "application/json", "x-forwarded-for": `${ip}, 10.0.0.1` },
+          body: JSON.stringify({ password }),
+        }),
+      );
+    const burst = Array.from({ length: 12 }, () => from("203.0.113.5", "nope"));
+    await vi.advanceTimersByTimeAsync(800);
+    const statuses = (await Promise.all(burst)).map((r) => r.status).sort();
+    expect(statuses).toEqual([...Array(10).fill(401), 429, 429]);
+    // Paused even with the right password; the reply says for how long.
+    const paused = await from("203.0.113.5", PASSWORD);
+    expect(paused.status).toBe(429);
+    expect(paused.headers.get("retry-after")).toBe("900");
+    expect(paused.headers.get("set-cookie")).toBeNull();
+    expect((await paused.json()).error).toBe(
+      "Too many wrong passwords. For safety, signing in is paused for 15 minutes. Try again after that.",
+    );
+    // Someone else can still sign in.
+    expect((await from("198.51.100.7", PASSWORD)).status).toBe(200);
   });
 
   it("sets a strict, HttpOnly cookie and reports the session", async () => {

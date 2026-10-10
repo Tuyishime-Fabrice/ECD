@@ -3,6 +3,7 @@
  * Never throws: missing or broken values become plain-language `problems`, so
  * /admin can show a setup screen that names the variable instead of an error.
  */
+import { scryptSync } from "node:crypto";
 
 export const DEFAULT_REPO = "Tuyishime-Fabrice/ECD";
 export const DEFAULT_BRANCH = "main";
@@ -28,10 +29,39 @@ const WHERE = "Add it in Vercel → Project → Settings → Environment Variabl
 const REPO = /^([A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)\/([A-Za-z0-9._-]+)$/;
 const BRANCH = /^(?!-)(?!.*\.\.)(?!.*\/\/)[A-Za-z0-9._/-]+(?<![/.])$/;
 
-function httpUrl(value: string): string | null {
+/** scrypt's cost: about a tenth of a second and 32 MB, for the server once and for every guess at a stolen cookie. */
+const SCRYPT = { N: 2 ** 15, r: 8, p: 1, maxmem: 64 * 1024 * 1024 } as const;
+const derivedSecrets = new Map<string, string>();
+
+/**
+ * The default key for signing the login cookie, made from the password with scrypt (slow,
+ * salted by repository) and kept for the life of the server process. With a fast hash of
+ * the password, anyone holding one copied cookie could test password guesses offline at
+ * millions a second. Still made from the password, so changing it signs everyone out.
+ */
+export function deriveSessionSecret(password: string, salt: string): string {
+  const cacheKey = `${salt}\n${password}`;
+  let secret = derivedSecrets.get(cacheKey);
+  if (!secret) {
+    secret = scryptSync(password, `izuba-admin-session\n${salt}`, 32, SCRYPT).toString("base64url");
+    if (derivedSecrets.size >= 4) derivedSecrets.clear();
+    derivedSecrets.set(cacheKey, secret);
+  }
+  return secret;
+}
+
+/** This machine: the local stand-ins for GitHub and YouTube (scripts/dev/fake-github.mjs). */
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+/**
+ * A web address without its trailing slash, or null. https: only, since the GitHub token
+ * goes with every request; plain http: only to this machine, for the local stand-ins.
+ */
+function webUrl(value: string): string | null {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.href.replace(/\/+$/, "") : null;
+    const safe = url.protocol === "https:" || (url.protocol === "http:" && LOCAL_HOSTS.has(url.hostname));
+    return safe ? url.href.replace(/\/+$/, "") : null;
   } catch {
     return null;
   }
@@ -60,7 +90,7 @@ export function readAdminEnv(env: Record<string, string | undefined> = process.e
     );
   } else if (password) {
     // Derived from the password by default, so changing the password signs everyone out.
-    sessionSecret = rawSecret ?? `izuba-admin-session\n${password}`;
+    sessionSecret = rawSecret ?? deriveSessionSecret(password, setting("GITHUB_REPO", DEFAULT_REPO));
   }
 
   const token = value("GITHUB_TOKEN")?.trim();
@@ -72,13 +102,13 @@ export function readAdminEnv(env: Record<string, string | undefined> = process.e
   const branch = setting("GITHUB_BRANCH", DEFAULT_BRANCH);
   if (!BRANCH.test(branch)) problems.push(`GITHUB_BRANCH "${branch}" is not a valid branch name.`);
 
-  const apiUrl = httpUrl(setting("GITHUB_API_URL", DEFAULT_API_URL));
+  const apiUrl = webUrl(setting("GITHUB_API_URL", DEFAULT_API_URL));
   if (!apiUrl) problems.push("GITHUB_API_URL must be a web address starting with https://.");
 
-  const oembedUrl = httpUrl(setting("YOUTUBE_OEMBED_URL", DEFAULT_OEMBED_URL));
-  const thumbnailUrl = httpUrl(setting("YOUTUBE_THUMBNAIL_URL", DEFAULT_THUMBNAIL_URL));
-  if (!oembedUrl) problems.push("YOUTUBE_OEMBED_URL must be a web address. Remove it to use YouTube.");
-  if (!thumbnailUrl) problems.push("YOUTUBE_THUMBNAIL_URL must be a web address. Remove it to use YouTube.");
+  const oembedUrl = webUrl(setting("YOUTUBE_OEMBED_URL", DEFAULT_OEMBED_URL));
+  const thumbnailUrl = webUrl(setting("YOUTUBE_THUMBNAIL_URL", DEFAULT_THUMBNAIL_URL));
+  if (!oembedUrl) problems.push("YOUTUBE_OEMBED_URL must be a web address starting with https://. Remove it to use YouTube.");
+  if (!thumbnailUrl) problems.push("YOUTUBE_THUMBNAIL_URL must be a web address starting with https://. Remove it to use YouTube.");
 
   const github =
     token && repoMatch && BRANCH.test(branch) && apiUrl

@@ -98,9 +98,12 @@ export function picturesIn(content: Content): Set<string> {
 
 /* ---------- New ids ---------- */
 
-/** The first `${prefix}${n}` (n = 1, 2, …) after the highest one in use, that isn't taken. */
+/**
+ * The first `${prefix}${n}` (n = 1, 2, …) after the highest one in use, that isn't taken.
+ * Ids with a suffix count too: "s1e9-k7fq" is number 9.
+ */
 function nextNumbered(prefix: string, taken: ReadonlySet<string>): string {
-  const pattern = new RegExp(`^${prefix.replace(/[-]/g, "\\-")}(\\d+)$`);
+  const pattern = new RegExp(`^${prefix.replace(/[-]/g, "\\-")}(\\d+)(?:-[a-z0-9]+)?$`);
   let highest = 0;
   for (const id of taken) {
     const match = pattern.exec(id);
@@ -111,23 +114,43 @@ function nextNumbered(prefix: string, taken: ReadonlySet<string>): string {
   return `${prefix}${n}`;
 }
 
+/** Letters and digits that can't be mixed up (no 0/o, 1/l/i). */
+const SUFFIX_CHARS = "23456789abcdefghjkmnpqrstuvwxyz";
+
+/** Four random characters, like "k7fq": 31⁴, about 920,000 kinds. */
+export function idSuffix(): string {
+  return Array.from(crypto.getRandomValues(new Uint8Array(4)), (b) => SUFFIX_CHARS[b % SUFFIX_CHARS.length]).join("");
+}
+
 /** "s1" for the sample layout; collections with other ids get "-" before the letter ("numbers-e1"). */
 const itemPrefix = (seasonId: string, letter: "e" | "c") =>
   /^s\d+$/.test(seasonId) ? `${seasonId}${letter}` : `${seasonId}-${letter}`;
 
+/** The next number for the place, then a random suffix: an id no earlier save can have used. */
+function uniqueItemId(prefix: string, taken: ReadonlySet<string>, suffix: () => string): string {
+  const numbered = nextNumbered(prefix, taken);
+  const first = `${numbered}-${suffix()}`;
+  let id = first;
+  for (let n = 2; taken.has(id); n++) id = n < 20 ? `${numbered}-${suffix()}` : `${first}${n}`;
+  return id;
+}
+
 /**
- * Ids for new things: s4 (collection), s1e9 (story), s1c3 (challenge).
- * `reserved` holds ids to avoid besides the ones in `content` (for example ones
- * deleted since the last save, so a device's progress never points at a new story).
+ * Ids for new things: s4 (collection), s1e9-k7fq (story), s1c3-m2xd (challenge).
+ *
+ * Children's devices keep progress and stickers by story and challenge id, so a new one
+ * must never get an id that was used before, also not one deleted in an earlier save
+ * (the file no longer shows those). The random suffix makes sure of that; the number
+ * keeps the id readable. `reserved` holds more ids to avoid besides those in `content`.
  */
 export const newSeasonId = (content: Content, reserved: Iterable<string> = []) =>
   nextNumbered("s", new Set([...allIds(content), ...reserved]));
 
-export const newStoryId = (content: Content, seasonId: string, reserved: Iterable<string> = []) =>
-  nextNumbered(itemPrefix(seasonId, "e"), new Set([...allIds(content), ...reserved]));
+export const newStoryId = (content: Content, seasonId: string, reserved: Iterable<string> = [], suffix = idSuffix) =>
+  uniqueItemId(itemPrefix(seasonId, "e"), new Set([...allIds(content), ...reserved]), suffix);
 
-export const newChallengeId = (content: Content, seasonId: string, reserved: Iterable<string> = []) =>
-  nextNumbered(itemPrefix(seasonId, "c"), new Set([...allIds(content), ...reserved]));
+export const newChallengeId = (content: Content, seasonId: string, reserved: Iterable<string> = [], suffix = idSuffix) =>
+  uniqueItemId(itemPrefix(seasonId, "c"), new Set([...allIds(content), ...reserved]), suffix);
 
 /** Question ids hang off their story or challenge: s1e9-p1, s1c3-q2. */
 export const newQuestionId = (ownerId: string, kind: "p" | "q", taken: ReadonlySet<string>) =>
@@ -187,6 +210,15 @@ export function blankChallenge(content: Content, seasonId: string, reserved: Ite
     sticker: "",
     questions: Array.from({ length: CHALLENGE_QUESTIONS }, (_, i) => blankQuestion(`${id}-q${i + 1}`, skill)),
   };
+}
+
+/**
+ * Whether a new story or challenge has anything filled in, compared with the blank one
+ * it started as. Ids don't count: they are given again when it is added.
+ */
+export function hasInput<T>(item: T, blank: T): boolean {
+  const withoutIds = (value: T) => JSON.stringify(value, (key, v: unknown) => (key === "id" ? undefined : v));
+  return withoutIds(item) !== withoutIds(blank);
 }
 
 const COLORS: SeasonColor[] = ["sky", "coral", "leaf", "grape"];
@@ -326,6 +358,79 @@ export function moveInList<T>(list: readonly T[], index: number, direction: Dire
   if (index < 0 || index >= list.length || to < 0 || to >= list.length) return [...list];
   const next = [...list];
   [next[index], next[to]] = [next[to]!, next[index]!];
+  return next;
+}
+
+/* ---------- YouTube ---------- */
+
+/** A video found from a pasted link; `picture` is its thumbnail, already resized and waiting to be saved. */
+export type FoundVideo = { id: string; title: string; picture: string | null };
+/** What happened to a field: filled in from the video, the person's own kept, or none to fill in. */
+export type Filled = "filled" | "kept" | "none";
+
+/**
+ * Puts a looked-up video into a story. The title and picture follow the video unless they
+ * are the person's own: a title they typed, a picture they uploaded, or what an existing
+ * story already had. What the previous lookup (`previous`) filled in is replaced. A
+ * different video's length is unknown until it is read or typed again.
+ */
+export function applyVideoLookup(
+  story: Episode,
+  video: FoundVideo,
+  previous: FoundVideo | null,
+): { story: Episode; title: Filled; picture: Filled } {
+  const title = story.title.en.trim();
+  const titleFromVideo = !title || (previous !== null && title === previous.title.trim());
+  const pictureFromVideo = !story.thumbnail || (Boolean(previous?.picture) && story.thumbnail === previous?.picture);
+  return {
+    story: {
+      ...story,
+      youtubeId: video.id,
+      durationSec: story.youtubeId === video.id ? story.durationSec : 0,
+      title: titleFromVideo ? { ...story.title, en: video.title } : story.title,
+      thumbnail: pictureFromVideo ? (video.picture ?? "") : story.thumbnail,
+    },
+    title: !titleFromVideo ? "kept" : video.title ? "filled" : "none",
+    picture: !pictureFromVideo ? "kept" : video.picture ? "filled" : "none",
+  };
+}
+
+/* ---------- Question changes ---------- */
+// Each takes the question as it is now and returns a changed copy. Editors pass them to
+// the update functions, so a change that lands late (a picture still being resized) is
+// made to the latest question and never puts back an older copy of it.
+
+type Option = Question["options"][number];
+
+/** Changes the answer with this id; a value set to undefined is removed (a cleared label). */
+export function changeOption(question: Question, optionId: string, patch: Partial<Option>): Question {
+  return {
+    ...question,
+    options: question.options.map((o) => {
+      if (o.id !== optionId) return o;
+      const next: Option = { ...o, ...patch };
+      for (const key of Object.keys(patch) as (keyof Option)[]) if (next[key] === undefined) delete next[key];
+      return next;
+    }),
+  };
+}
+
+/** Removes an answer; if it was the right one, the first answer left becomes right. */
+export function removeOption(question: Question, optionId: string): Question {
+  const options = question.options.filter((o) => o.id !== optionId);
+  const correctOptionId =
+    question.correctOptionId === optionId ? (options[0]?.id ?? question.correctOptionId) : question.correctOptionId;
+  return { ...question, options, correctOptionId };
+}
+
+export const addOption = (question: Question): Question => ({
+  ...question,
+  options: [...question.options, { id: nextOptionId(question), image: "" }],
+});
+
+export function setPromptImage(question: Question, promptImage: string | undefined): Question {
+  const next = { ...question, promptImage };
+  if (!promptImage) delete next.promptImage;
   return next;
 }
 

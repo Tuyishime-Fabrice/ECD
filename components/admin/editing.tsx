@@ -109,12 +109,18 @@ export function ProblemSummary({ byField }: { byField: Map<string, string[]> }) 
 /**
  * Picks a file, resizes it and adds it to the save; `onPicked` gets the new picture's path.
  * `name` describes the picture ("Keza's One Mango picture") and becomes its file name.
+ * Resizing can take a few seconds, and editing goes on meanwhile, so `onPicked` must make
+ * its change to the latest content (a functional update), and the latest `onPicked` is used.
  */
 export function usePictureUpload(kind: PictureKind, name: string, onPicked: (path: string) => void) {
   const { addPicture } = useAdmin();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const input = useRef<HTMLInputElement>(null);
+  const latestOnPicked = useRef(onPicked);
+  useEffect(() => {
+    latestOnPicked.current = onPicked;
+  });
 
   const accept = async (file: Blob) => {
     setBusy(true);
@@ -123,7 +129,7 @@ export function usePictureUpload(kind: PictureKind, name: string, onPicked: (pat
       const picture = await preparePicture(file, kind);
       const path = uploadPath(name, picture.type);
       addPicture(path, { dataUrl: picture.dataUrl, bytes: picture.bytes });
-      onPicked(path);
+      latestOnPicked.current(path);
     } catch (err) {
       setError(err instanceof PictureError ? err.message : "This picture couldn't be used. Try another one.");
     } finally {

@@ -1,3 +1,4 @@
+import { scryptSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { readAdminEnv } from "./env";
 
@@ -18,9 +19,23 @@ describe("readAdminEnv", () => {
     expect(env.production).toBe(false);
   });
 
-  it("derives the session secret from the password unless one is given", () => {
-    expect(readAdminEnv(ready).sessionSecret).toContain(ready.ADMIN_PASSWORD);
-    expect(readAdminEnv({ ...ready, ADMIN_PASSWORD: "another long password" }).sessionSecret).not.toBe(readAdminEnv(ready).sessionSecret);
+  it("derives the session secret from the password with scrypt, unless one is given", () => {
+    const derived = readAdminEnv(ready).sessionSecret!;
+    // Slow and salted: a copied cookie is no fast way to test password guesses.
+    expect(derived).toBe(
+      scryptSync(ready.ADMIN_PASSWORD, "izuba-admin-session\nTuyishime-Fabrice/ECD", 32, {
+        N: 2 ** 15,
+        r: 8,
+        p: 1,
+        maxmem: 64 * 1024 * 1024,
+      }).toString("base64url"),
+    );
+    expect(derived).not.toContain(ready.ADMIN_PASSWORD);
+    expect(readAdminEnv(ready).sessionSecret).toBe(derived);
+    // Changing the password signs everyone out.
+    expect(readAdminEnv({ ...ready, ADMIN_PASSWORD: "another long password" }).sessionSecret).not.toBe(derived);
+    // Salted per deployment (by repository).
+    expect(readAdminEnv({ ...ready, GITHUB_REPO: "someone/else" }).sessionSecret).not.toBe(derived);
     const secret = "s".repeat(32);
     expect(readAdminEnv({ ...ready, ADMIN_SESSION_SECRET: secret }).sessionSecret).toBe(secret);
   });
@@ -50,6 +65,32 @@ describe("readAdminEnv", () => {
       'GITHUB_BRANCH "-x" is not a valid branch name.',
       "GITHUB_API_URL must be a web address starting with https://.",
     ]);
+  });
+
+  it("needs https:, except for a stand-in on this machine", () => {
+    // Plain http would send the GitHub token in clear text.
+    const remote = readAdminEnv({
+      ...ready,
+      GITHUB_API_URL: "http://api.github.com",
+      YOUTUBE_OEMBED_URL: "http://www.youtube.com/oembed",
+      YOUTUBE_THUMBNAIL_URL: "http://example.com/vi",
+    });
+    expect(remote.github).toBeNull();
+    expect(remote.youtube).toEqual({ oembedUrl: "https://www.youtube.com/oembed", thumbnailUrl: "https://i.ytimg.com/vi" });
+    expect(remote.setup.problems).toEqual([
+      "GITHUB_API_URL must be a web address starting with https://.",
+      "YOUTUBE_OEMBED_URL must be a web address starting with https://. Remove it to use YouTube.",
+      "YOUTUBE_THUMBNAIL_URL must be a web address starting with https://. Remove it to use YouTube.",
+    ]);
+    for (const local of ["http://localhost:4010", "http://127.0.0.1:4010", "http://[::1]:4010"]) {
+      const env = readAdminEnv({ ...ready, GITHUB_API_URL: local, YOUTUBE_OEMBED_URL: `${local}/oembed`, YOUTUBE_THUMBNAIL_URL: `${local}/vi` });
+      expect(env.setup.problems, local).toEqual([]);
+      expect(env.github?.apiUrl).toBe(local);
+      expect(env.youtube).toEqual({ oembedUrl: `${local}/oembed`, thumbnailUrl: `${local}/vi` });
+    }
+    // Not fooled by a host that only starts like one.
+    expect(readAdminEnv({ ...ready, GITHUB_API_URL: "http://localhost.evil.example" }).github).toBeNull();
+    expect(readAdminEnv({ ...ready, GITHUB_API_URL: "https://ghe.example.com/api/v3" }).github?.apiUrl).toBe("https://ghe.example.com/api/v3");
   });
 
   it("treats blank values as missing", () => {

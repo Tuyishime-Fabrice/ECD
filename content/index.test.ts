@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { DEMO_YOUTUBE_ID } from "@/lib/brand";
-import { getChallenge, getEpisode, getSeasons, getSkills, getStickerSlots } from "./index";
+import { getChallenge, getEpisode, getSeasons, getSkills, getStickerSlots, skillLabel } from "./index";
 
 describe("content loader", () => {
   it("orders season 1 as 4 episodes, challenge, 4 episodes, challenge", () => {
@@ -38,5 +38,12 @@ describe("content loader", () => {
       "count-1-5", "match-1-5", "numerals-1-5", "count-6-10", "match-6-10", "numerals-6-10",
     ]);
     expect(getStickerSlots().map((s) => s.challengeId)).toEqual(["s1c1", "s1c2"]);
+  });
+
+  it("labels skills only from the listed ones, never from what every object has", () => {
+    const listed = { "count-1-5": { en: "Counting 1–5", rw: "Kubara 1–5" } };
+    expect(skillLabel(listed, "count-1-5")).toEqual(listed["count-1-5"]);
+    // The Object function here can't be sent to the parents' page, and failed the build.
+    expect(skillLabel(listed, "constructor")).toEqual({ en: "constructor", rw: "constructor" });
   });
 });
