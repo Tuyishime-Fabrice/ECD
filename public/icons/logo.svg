@@ -1,18 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Sun logo">
-  <g stroke="#263238" stroke-width="3" stroke-linejoin="round" fill="#FFD23F">
-    <g stroke-linecap="round">
-      <rect x="29" y="2" width="6" height="11" rx="3"/>
-      <rect x="29" y="51" width="6" height="11" rx="3"/>
-      <rect x="2" y="29" width="11" height="6" rx="3"/>
-      <rect x="51" y="29" width="11" height="6" rx="3"/>
-      <rect x="29" y="2" width="6" height="11" rx="3" transform="rotate(45 32 32)"/>
-      <rect x="29" y="2" width="6" height="11" rx="3" transform="rotate(135 32 32)"/>
-      <rect x="29" y="2" width="6" height="11" rx="3" transform="rotate(225 32 32)"/>
-      <rect x="29" y="2" width="6" height="11" rx="3" transform="rotate(315 32 32)"/>
-    </g>
-    <circle cx="32" cy="32" r="17"/>
-  </g>
-  <circle cx="26" cy="30" r="2.6" fill="#263238"/>
-  <circle cx="38" cy="30" r="2.6" fill="#263238"/>
-  <path d="M25 37 q7 7 14 0" fill="none" stroke="#263238" stroke-width="3" stroke-linecap="round"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120" role="img" aria-label="Izuba"><defs><radialGradient id="mf" cx="0.38" cy="0.32" r="0.8"><stop offset="0" stop-color="#FFEB97"/><stop offset="0.55" stop-color="#FFCB3D"/><stop offset="1" stop-color="#FFA81E"/></radialGradient><linearGradient id="mr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFC93F"/><stop offset="1" stop-color="#FF9F1A"/></linearGradient></defs><g stroke="#5A3112" stroke-width="3" stroke-linejoin="round" fill="url(#mr)"><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(45 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(90 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(135 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(180 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(225 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(270 60 60)"/><path d="M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z" transform="rotate(315 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(22.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(67.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(112.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(157.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(202.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(247.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(292.5 60 60)"/><path d="M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z" transform="rotate(337.5 60 60)"/></g><circle cx="60" cy="60" r="38" fill="url(#mf)" stroke="#5A3112" stroke-width="3"/><path d="M36 50A27 27 0 0 1 51 33.5" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".6"/><g><ellipse cx="39" cy="70" rx="7.5" ry="4.8" fill="#FF7F5C" opacity="0.45"/><ellipse cx="81" cy="70" rx="7.5" ry="4.8" fill="#FF7F5C" opacity="0.45"/><ellipse cx="47.5" cy="59" rx="4.6" ry="6" fill="#3A1F0E"/><circle cx="49.2" cy="56.4" r="1.8" fill="#fff"/><ellipse cx="72.5" cy="59" rx="4.6" ry="6" fill="#3A1F0E"/><circle cx="74.2" cy="56.4" r="1.8" fill="#fff"/><path d="M49.5 70.5C52 80 68 80 70.5 70.5C63 73 57 73 49.5 70.5Z" fill="#7C2D12" stroke="#5A3112" stroke-width="2.6" stroke-linejoin="round"/><path d="M54.5 75.6C57.5 74 62.5 74 65.5 75.6C63 78.4 57 78.4 54.5 75.6Z" fill="#FF8467"/></g></svg>

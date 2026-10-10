@@ -16,7 +16,7 @@ export function QuestionHomeLink({ className }: { className?: string }) {
       href="/"
       onClick={playPop}
       aria-label={t("home")}
-      className={`tactile hidden size-16 shrink-0 place-items-center rounded-full bg-white text-ink-900 short:grid tight:grid ${className ?? ""}`}
+      className={`press press-paper hidden size-16 shrink-0 place-items-center rounded-full bg-paper text-ink short:grid tight:grid ${className ?? ""}`}
     >
       <House className="size-8" strokeWidth={2.5} aria-hidden />
     </Link>

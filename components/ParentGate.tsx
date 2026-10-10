@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { Lock } from "lucide-react";
 import { useEffect, useId, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useT } from "@/lib/store";
 
 const HOLD_MS = 3000;
@@ -63,10 +64,10 @@ export function ParentGate({
 
   return (
     <div className={clsx("flex flex-col items-center gap-5 text-center", className)}>
-      <h2 id={titleId} className="font-display text-2xl font-bold text-ink-900">
+      <h2 id={titleId} className="font-display text-2xl font-bold text-ink">
         {t("gateTitle")}
       </h2>
-      <p className="max-w-xs text-lg text-ink-900">{t("gateInstruction")}</p>
+      <p className="max-w-xs text-lg text-ink">{t("gateInstruction")}</p>
       <button
         type="button"
         aria-label={t("gateInstruction")}
@@ -88,29 +89,29 @@ export function ParentGate({
         }}
         onBlur={stop}
         onContextMenu={(e) => e.preventDefault()}
-        className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-grape-100 [-webkit-touch-callout:none]"
+        className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-paper shadow-e2 inset-shadow-rim [-webkit-touch-callout:none]"
       >
         <svg viewBox="0 0 120 120" className="absolute inset-0 size-full -rotate-90" aria-hidden>
-          <circle cx="60" cy="60" r={R} fill="none" className="stroke-white" strokeWidth="10" />
+          <circle cx="60" cy="60" r={R} fill="none" className="stroke-line" strokeWidth="10" />
           <circle
             cx="60"
             cy="60"
             r={R}
             fill="none"
-            className="stroke-grape-700"
+            className="stroke-listen"
             strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={CIRCUMFERENCE * (1 - progress)}
           />
         </svg>
-        <Lock className="relative size-10 text-grape-700" strokeWidth={2.5} aria-hidden />
+        <Lock className="relative size-10 text-listen-ink" strokeWidth={2.5} aria-hidden />
       </button>
-      <p className="text-base text-ink-600" aria-live="polite">
+      <p className="text-base text-ink-2" aria-live="polite">
         {progress > 0 ? `${Math.ceil((1 - progress) * (HOLD_MS / 1000))}…` : t("gateHint")}
       </p>
       {onCancel && (
-        <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-6 text-base font-semibold text-ink-600 underline">
+        <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-6 text-base font-semibold text-ink-2 underline">
           {t("cancel")}
         </button>
       )}
@@ -149,18 +150,20 @@ export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onCl
     };
   }, [onClose]);
 
-  return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-ink-900/60 p-4" role="presentation" onClick={onClose}>
+  // Rendered into <body>: a moving (animated) parent would otherwise trap the overlay under the top bar.
+  return createPortal(
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/60 p-4" role="presentation" onClick={onClose}>
       <div
         ref={ref}
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm rounded-card bg-white p-6 shadow-soft"
+        className="w-full max-w-sm rounded-card bg-paper p-6 shadow-e2"
         onClick={(e) => e.stopPropagation()}
       >
         <ParentGate onPass={onPass} onCancel={onClose} titleId={titleId} />
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

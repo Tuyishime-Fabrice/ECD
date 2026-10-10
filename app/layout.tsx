@@ -12,13 +12,18 @@ export const metadata: Metadata = {
   title: { default: brand.name, template: `%s · ${brand.name}` },
   description: brand.tagline.en,
   applicationName: brand.name,
-  icons: { icon: brand.logo },
+  icons: { icon: brand.logo, apple: "/icons/apple-touch-icon.png" },
   // No external links, no tracking: keep crawlers from following anything.
   referrer: "strict-origin-when-cross-origin",
 };
 
 export const viewport: Viewport = {
-  themeColor: brand.themeColor,
+  // Browser bar matches the sky: morning in light mode, night in dark mode.
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#9fd6f0" },
+    { media: "(prefers-color-scheme: dark)", color: "#0b1533" },
+  ],
+  colorScheme: "light dark",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",

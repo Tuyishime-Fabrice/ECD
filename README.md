@@ -1,230 +1,144 @@
-# Izuba — early learning for children aged 3–6
+# Izuba: educational story videos for children aged 3–6
 
 > **Izuba** ("sun") is a placeholder name. Change it in one place: `lib/brand.ts`.
 
-A calm, ordered learning path for young children in Rwanda. Short animated
-episodes play in a set order, and after every 4 episodes the child plays a
-5-question picture **challenge**. Parents get a progress page and a daily
-screen-time limit.
+Children in Rwanda learn from short animated **stories**, each with a lesson, played in
+a set order and grouped into **collections**. After every 4 stories the child plays a
+5-question picture **challenge** and wins a sticker. Each story ends with an activity
+to do together at home. Parents get a progress page and a daily screen-time limit. The
+team manages everything from an **admin dashboard**, with no coding.
 
-- No accounts, no backend, no tracking. Progress is saved **only on the device**.
-- Works on cheap Android phones, installs as an app, and opens offline. Videos still need the internet.
-- Kinyarwanda first (English fallback).
+- **Privacy:** no accounts for families, no ads, no tracking. A child's progress is saved
+  **only on their device**.
+- **Built for real conditions:** works on cheap Android phones, installs as an app and
+  opens offline. Stories still need the internet.
+- **Storybook World design:** an illustrated Rwandan landscape. By day it's a sunrise; at
+  night it's a moonlit sky. The app follows the phone's light/dark setting.
+- **Languages:** Kinyarwanda first, with English as the fallback.
 
 ---
 
-## For the content team (no coding needed)
+## Managing stories: the admin dashboard
 
-All learning content lives in **one file: `content/seasons.json`**. You can edit
-it directly on GitHub: open the file, check that the branch menu above the file
-says **main**, click the ✏️ pencil, make your change, then "Commit changes". The
-site rebuilds by itself in a minute or two. (Changes on any other branch only
-make a preview, never the live app.)
+Open **`/admin`** on the live site (for example `https://ecd-nine.vercel.app/admin`) and
+sign in with the admin password.
 
-If something is wrong, **the build stops and lists every problem in plain words**,
-for example:
+| Page | What you do there |
+| --- | --- |
+| **Overview** | Counts, publishing status, and a big **Add a story** button. |
+| **Stories** | See every story in order. Add, edit, move up or down, or delete. |
+| **Challenges** | The picture quiz after every 4 stories: 5 questions, picture answers, the sticker. |
+| **Collections** | Story collections: name, color, poster, and *Live* or *Coming soon*. |
+| **Settings** | The stories in the big slider on Home, and the parents' WhatsApp number. |
+| **History** | Every save, with **Undo**. |
+| **Help** | How it all works, in plain words. |
 
-```
-✖ Found 2 problem(s) in content/seasons.json:
+**Adding a story:**
+1. Paste the YouTube link. The title, picture and length fill in by themselves.
+2. Check the English and Kinyarwanda titles.
+3. Write the "Do it at home" activity.
+4. Tick the skills it teaches.
+5. Optionally, add a question that pauses the story halfway.
+6. Press **Save**.
 
-  1. Season 1 "numbers" › item 3 (episode "s1e3") › youtubeId: this is a full link; use only the video ID "dQw4w9WgXcQ"
-  2. Season 1 "numbers" › item 5 (challenge "s1c1") › question 2 "s1c1-q2" › correctOptionId: "x" is not one of this question's options (a, b, c)
-```
+Changes are **live in about 2 minutes**; the status at the top says *Going live…*, then
+*Live ✓*. The dashboard checks every save first, so a mistake can't break the app. If
+something needs fixing, it shows the problem next to the field.
 
-On Vercel you'll see this list in the deploy log (project → **Deployments** → the
-failed one → **Build Logs**), and the live site keeps the last good version until
-you fix it.
+### One-time setup (the owner, about 5 minutes)
 
-Every piece of text has two languages: `{ "rw": "…", "en": "…" }`. English is
-required (it's the fallback). Kinyarwanda can be left `""` until it's ready.
+The dashboard saves your changes into this GitHub repository, so it needs two keys:
 
-> ⚠️ The Kinyarwanda text in this first version is a draft (**NEEDS NATIVE REVIEW**).
+1. **Make a GitHub key.** Signed in as **Tuyishime-Fabrice**, open
+   [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new).
+   - **Token name:** `Izuba admin`.
+   - **Expiration:** 1 year. Put a reminder in your calendar to make a new one.
+   - **Repository access:** *Only select repositories* → **ECD**.
+   - **Permissions → Repository permissions → Contents:** *Read and write*.
+   - Click **Generate token** and copy it. GitHub shows it only once.
+2. **Give both keys to Vercel.** In Vercel, open the project, then **Settings → Environment
+   Variables**, and add:
+   - `GITHUB_TOKEN`: the token you just copied.
+   - `ADMIN_PASSWORD`: a password for the dashboard, 12 characters or more. Longer is much
+     safer: four or more random words that mean nothing together. Share it only with
+     the people who manage stories.
+   - Save.
+3. **Redeploy.** Go to **Deployments**, open the newest one, choose **⋯ → Redeploy**, and
+   wait about 2 minutes.
+4. Open `/admin` and sign in.
 
-### How to add an episode
-
-1. Upload the episode to YouTube (it can be *Unlisted*; **embedding must be allowed**).
-2. Copy its **video ID**, the 11 characters after `v=` in the link.
-   For `https://www.youtube.com/watch?v=dQw4w9WgXcQ` the ID is `dQw4w9WgXcQ`.
-3. In `content/seasons.json`, find the season's `"items"` list and add a block
-   **where it belongs in the order**:
-
-```json
-{
-  "type": "episode",
-  "episode": {
-    "id": "s1e9",
-    "number": 9,
-    "title": { "rw": "Umubare 11: Cumi na rimwe", "en": "Number 11: Eleven" },
-    "youtubeId": "dQw4w9WgXcQ",
-    "durationSec": 240,
-    "skills": ["count-6-10"],
-    "homeActivity": {
-      "rw": "…",
-      "en": "Count 11 spoons together."
-    }
-  }
-},
-```
-
-- `id` must be unique in the whole file (we use `s<season>e<episode>`).
-- `durationSec` is the length in seconds (4 minutes = 240).
-- `thumbnail` is optional. Without it, YouTube's own thumbnail is used (it needs the
-  internet). To use your own picture, which also shows offline, put it in
-  `public/images/thumbs/` and add `"thumbnail": "/images/thumbs/s1e9.svg"`.
-- `skills` must be names listed in `"skills"` at the top of the file.
-- Watch the commas: every block in a list is separated by a comma, except the last.
-
-**Optional: a question in the middle of the video.** Add `pausePoints`. At
-`atSec` seconds the video pauses, the question replaces the player, and after the
-right answer the video continues:
-
-```json
-"pausePoints": [
-  { "atSec": 20, "question": { …same shape as a challenge question… } }
-]
-```
-
-### How to add a challenge
-
-A challenge is placed **after the episodes it checks** (we use one after every 4
-episodes). It unlocks once those episodes are watched. It needs **exactly 5
-questions**, each with **2 to 4** picture options:
-
-```json
-{
-  "type": "challenge",
-  "challenge": {
-    "id": "s1c3",
-    "title": { "rw": "Umukino wa 3", "en": "Challenge 3" },
-    "sticker": "/images/stickers/s1c3.svg",
-    "questions": [
-      {
-        "id": "s1c3-q1",
-        "promptText": { "rw": "Kanda ku ishusho iriho imyembe itatu", "en": "Tap the picture with 3 mangoes" },
-        "promptAudio": { "rw": "/audio/s1c3-q1.rw.mp3" },
-        "promptImage": "/images/counting/banana-4.svg",
-        "options": [
-          { "id": "a", "image": "/images/counting/mango-2.svg", "label": "2 mangoes" },
-          { "id": "b", "image": "/images/counting/mango-3.svg", "label": "3 mangoes" }
-        ],
-        "correctOptionId": "b",
-        "skill": "count-1-5"
-      }
-    ]
-  }
-}
-```
-
-- `promptText` is shown small for parents; children hear `promptAudio`.
-- `promptImage` (optional) is shown above the options.
-- `label` is read by screen readers (short, e.g. "3 mangoes").
-- `skill` decides what parents see under **Skills** ("Counting 1–5: Mastered").
-  To add a new skill, add it to `"skills"` at the top with a plain-language name.
-- Ready-made pictures: `public/images/counting/<mango|banana|orange|avocado>-<1…10>.svg`
-  and `public/images/numbers/<1…10>.svg`.
-
-### How to replace the demo video and audio
-
-**Demo video.** Every episode with `"youtubeId": "DEMO"` plays the video set in
-`lib/brand.ts`:
-
-```ts
-export const DEMO_YOUTUBE_ID = "M7lc1UVf-VE"; // placeholder: YouTube's own sample video
-```
-
-Put a real video ID in each episode's `youtubeId` (best), or change this one line.
-
-**Question audio.** Record each question (MP3 works everywhere), name the file as
-listed, and put it in `public/audio/`. The build prints the exact list of missing
-recordings:
-
-```
-⚠ 11 audio file(s) are not recorded yet. … Missing files:
-   - public/audio/s1c1-q1.rw.mp3
-   …
-```
-
-Until a file exists, demo mode reads the **English** text aloud with the phone's
-built-in voice (Parent area → Demo mode → *Placeholder voice*). Keep files short
-and small (mono, 64 kbps is plenty).
-
-**App voice lines** ("Try again!", "Great job!") are set in
-`lib/speech.ts` (`VOICE_LINES`). Add a recording to `public/audio/ui/` and fill in
-its path, e.g. `tryAgain: { audio: { rw: "/audio/ui/try-again.rw.mp3" }, … }`.
-
-### How to change the brand name and colors
-
-- **Name, tagline, logo, WhatsApp contact, demo video:** `lib/brand.ts`.
-  The Contact card in the parent area stays hidden until you fill in `contactLink`.
-  The page title, header, installed-app name and parent area all follow.
-  (Leave `storagePrefix` alone after launch; changing it starts every family over.)
-- **Logo:** replace `public/icons/logo.svg`, then regenerate the app icons:
-  `npm i --no-save playwright && node scripts/make-icons.mjs`.
-- **Colors:** the `@theme` block at the top of `app/globals.css`
-  (`--color-sky-500: #29a9e0;` and so on). Keep the same names. `npm test` checks
-  that text stays readable (WCAG AA contrast) for every color pair the app uses.
-- **Never use red on children's screens.**
+If something is missing, `/admin` shows a setup page that says exactly what to add. When
+the GitHub key expires, make a new one the same way and replace `GITHUB_TOKEN`. Changing
+`ADMIN_PASSWORD` signs everyone out. Details and security notes are in
+[docs/ADMIN.md](docs/ADMIN.md).
 
 ---
 
 ## Put it online (Vercel, once, about 5 minutes)
 
 1. Go to [vercel.com/signup](https://vercel.com/signup) and choose **Continue with GitHub**.
-   Use the GitHub account that **owns** the repository (**Tuyishime-Fabrice**). Vercel only
+   Use the GitHub account that **owns** the repository (**Tuyishime-Fabrice**); Vercel only
    lets the owner connect a personal repository.
 2. Open [vercel.com/new](https://vercel.com/new), find **ECD** and click **Import**.
-   If it isn't listed, click the GitHub link under the list (**Configure GitHub App**, or
-   **Adjust GitHub App Permissions** on some screens). Choose **Only select repositories**,
-   pick **ECD**, click **Save**, then come back to vercel.com/new.
-3. **Don't change any setting** (Vercel detects Next.js; `vercel.json` does the rest). Click **Deploy**.
+   - If it isn't listed, click the GitHub link under the list (**Configure GitHub App**, or
+     **Adjust GitHub App Permissions** on some screens).
+   - Choose **Only select repositories**, pick **ECD**, click **Save**, then come back to
+     vercel.com/new.
+3. **Don't change any setting.** Vercel detects Next.js, and `vercel.json` does the rest.
+   Click **Deploy**.
 4. About two minutes later you get a link like `ecd-….vercel.app`. That's the live app.
-   To change the address, open the project's **Settings → Domains** (a free `…vercel.app`
-   name, or your own domain).
-5. Check that Vercel publishes the **`main`** branch: in the project, open **Settings →
-   Environments → Production** and look under **Branch Tracking**. It must say `main`.
-   If it doesn't, type `main` and click **Save**. Also make `main` the default branch on
-   GitHub (repository **Settings → General → Default branch**), so edits made on GitHub land there.
+   To change the address, use **Settings → Domains**.
+5. **Check the branch.** Under **Settings → Environments → Production → Branch Tracking**, it
+   must say `main`. Also make `main` the default branch on GitHub (**Settings → General →
+   Default branch**).
 6. **Leave Vercel Analytics and Speed Insights off.** The app promises families no tracking.
+7. Do the [admin setup](#one-time-setup-the-owner-about-5-minutes).
 
-From then on, every change on `main` goes live by itself within about two minutes. Other
-branches get their own preview link. If a change breaks the content file, the deploy
-stops and the live app keeps the last good version. Phones that installed the app get
-the new version the next time they open it with internet.
+From then on, every change on `main` goes live by itself, whether it's a save in the
+dashboard or a code change. A change that would break the app stops before it goes live,
+and the app keeps the last good version. Phones that installed the app get the new version
+the next time they open it with internet.
 
-> Vercel's free **Hobby** plan is for personal, non-commercial use only. Vercel counts a
-> project as commercial if anyone involved earns money from it: charging families, showing
-> ads, or paying someone (staff or a consultant) to build or run it. Asking for donations is
+> **Plan:** Vercel's free **Hobby** plan is for personal, non-commercial use only. Vercel
+> counts a project as commercial if anyone involved earns money from it: charging families,
+> showing ads, or paying staff or a consultant to build or run it. Asking for donations is
 > fine. Commercial use needs the **Pro** plan; if you're unsure, ask Vercel Support.
 >
-> Keep the GitHub repository **public**. If it becomes private, the free plan only publishes
-> changes made from the repository owner's own GitHub account.
+> **Keep the GitHub repository public.** If it becomes private, the free plan only
+> publishes changes made from the owner's own GitHub account.
 
 ## Before real families use it
 
-The live app works today with placeholder content. Swap these in when they're ready.
-Each change goes live by itself.
+The app works today with sample content. Swap these in from the dashboard as they're ready:
 
-- [ ] **Real videos:** replace `"DEMO"` with each episode's YouTube ID in `content/seasons.json`.
-  Until then every episode plays YouTube's sample video. Embedding must be allowed on each video.
-- [ ] **WhatsApp:** fill in `contactLink` and `contactLabel` in `lib/brand.ts`. The Contact card then appears.
-- [ ] **Name, logo and mascot:** `lib/brand.ts`, `public/icons/logo.svg`, `components/Mascot.tsx`.
-- [ ] **Kinyarwanda review** by a native speaker (`content/seasons.json`, `lib/i18n.ts`).
-- [ ] **Question recordings:** the build log lists the missing files.
+- [ ] **Real stories.** Every sample story plays YouTube's own sample video. In **Stories**,
+      open each one and paste its real YouTube link. Embedding must be allowed on YouTube.
+- [ ] **WhatsApp:** **Settings → WhatsApp number**. The parents' Contact card then appears.
+- [ ] **Name and logo:** `lib/brand.ts` and the art scripts (see "For developers").
+- [ ] **Kinyarwanda review** by a native speaker: the titles and activities in the dashboard,
+      and the app's own words in `lib/messages/*.ts`.
+- [ ] **Question recordings:** the build log lists the missing files (see below).
 - [ ] Run the checklist below on the live link, on one Android phone and one iPhone.
 
 ## Demo checklist (2 minutes, on a real phone)
 
-This build was tested in a headless browser against a stand-in for YouTube's
-player, because YouTube is unreachable from the build machine. Please check
-these on a real phone once:
+The app was tested in a headless browser with a stand-in for YouTube's player, because
+YouTube can't be reached from the build machine. Please check these on a real phone once:
 
-1. Home → tap **Episode 1**. The video starts (or the big Play button pulses; tap it).
-2. At **0:20** the video pauses and a question replaces it. Tap the single mango → cheer → the video continues.
-3. Drag YouTube's progress bar near the end. You get **Well done!**, the home activity, and **Next**. Nothing plays by itself.
-4. Back on Home: Episode 1 has a ✓ and **Continue** points to Episode 2. Reopen an episode halfway through and it resumes where it stopped.
-5. Parent area (🔒 top right, hold the circle 3 s) → Demo mode → **1-minute daily limit**. Play an episode: it finishes, then **Time to play!** appears.
-6. Hold-to-unlock **+10 minutes** on that screen; Home comes back.
-7. Chrome menu → **Install app**. Turn on airplane mode and open it: everything except videos works.
+1. **Play:** on Home, tap the big orange **Play** on the first story. It plays, or the big
+   Play button below the video pulses; tap it.
+2. **Mid-story question:** at **0:20** the story pauses and Izuba asks a question. Tap the
+   plate with one mango. You hear a cheer, then the story continues.
+3. **End screen:** drag YouTube's progress bar near the end. You get **Well done!**, the
+   "Do it at home" card and **Next story**. Nothing plays by itself.
+4. **Progress:** back on Home, the story card has a ✓ and the slider starts with
+   **Keep watching**. **Path** opens the winding road with Izuba on the next story.
+5. **Time limit:** open the parent area (🔒 at the top, hold the circle for 3 s) → Demo mode →
+   **1-minute daily limit**. Play a story: it finishes, then **Time to play!** appears.
+   Holding for **+10 minutes** brings Home back.
+6. **Offline:** Chrome menu → **Install app**. Turn on airplane mode and open it. Everything
+   except the videos works.
+7. **Night mode:** switch the phone to dark mode. The whole app turns to the night scene.
 
 ---
 
@@ -234,85 +148,107 @@ these on a real phone once:
 npm install
 npm run dev        # http://localhost:3000
 npm run check      # lint + typecheck + tests + build (what CI should run)
-npm run build      # validates content, builds the static site into out/, writes the service worker
-npm start          # serves out/ on http://localhost:4173 (a different port from dev)
+npm run build      # validates content, builds, writes the service worker and build info
+npm start          # serves the build on http://localhost:4173
 ```
 
 Node 22.18+ (the content validator runs as TypeScript directly on Node).
 
 | Script | What it does |
 | --- | --- |
-| `validate` | Checks `content/seasons.json` (runs before every build) |
-| `build` | `next build` with `output: "export"` → static files in `out/` |
-| `postbuild` | `scripts/finalize-sw.mjs`: fills in the offline file list and version in `out/sw.js` |
-| `test` | Vitest unit tests for `lib/` and `content/` |
-| `node scripts/make-images.mjs` | Regenerates the placeholder SVG art in `public/images` |
+| `validate` | Checks `content/seasons.json` and `content/site.json` (runs before every build). |
+| `build` | `next build`. Kid pages are prerendered to static HTML; `/admin` and `/api/admin/*` run on the server. |
+| `postbuild` | `scripts/finalize-sw.mjs`: writes `public/sw.js` (offline file list + version) from `scripts/sw-template.js`, and `public/build-info.json`. |
+| `test` | Vitest: `lib/`, `content/` and `components/`, including the admin API against a fake GitHub. |
+| `node scripts/art/build.mjs` | Redraws all SVG art in `public/images` and the logo (`… world thumbs posters ui scenes answers` for some groups only). |
+| `node scripts/dev/fake-github.mjs` | A fake GitHub and YouTube for trying the dashboard locally; see [docs/ADMIN.md](docs/ADMIN.md). |
 
 ### Deploy
 
-Both hosts build from GitHub on every push:
-
-- **Vercel (production):** see [Put it online](#put-it-online-vercel-once-about-5-minutes).
-  Keep the auto-detected **Next.js** preset. It runs `npm run build` (so the content check
-  and the service-worker step run too) and serves the static export with clean URLs
-  (`/watch/s1e1` → `watch/s1e1.html`). `vercel.json` only adds headers: `sw.js` always
-  revalidated (`no-cache`), `nosniff`, `X-Frame-Options: DENY`, a `Permissions-Policy` that
-  turns off camera, microphone and location (remove an entry there if a feature ever needs
-  one), and a referrer policy that still sends the origin (YouTube embeds need it). Checked locally with `vercel build`. Don't switch the preset to
-  "Other" or set an output directory: the Next.js builder reads `out/` itself.
-- **Netlify:** import the repo; `netlify.toml` sets `npm run build` and publishes `out/`.
+Vercel builds from GitHub on every push to `main` (see
+[Put it online](#put-it-online-vercel-once-about-5-minutes)):
+- **Builder:** keep the auto-detected **Next.js** preset, which runs `npm run build`.
+- **`vercel.json`** only adds headers:
+  - `sw.js` is always revalidated;
+  - `nosniff` and `X-Frame-Options: DENY`;
+  - a `Permissions-Policy` that turns off camera, microphone and location;
+  - a referrer policy that still sends the origin, which YouTube embeds need.
+- **`/admin` is never cached.** The routes are dynamic and send `no-store`.
+- **Checked locally** with `vercel build`, which showed the generated `sw.js` is deployed.
 
 ### How it fits together
 
 ```
-app/          routes: / · /season/[slug] · /watch/[episodeId] · /challenge/[challengeId]
-              /stickers · /parents · /offline · manifest.ts
-components/   UI (TopBar, SeasonRow, ItemCard, WatchView, YouTubePlayer, QuestionPanel,
-              ChallengeFlow, ParentGate, ParentArea, TimesUp, …)
-content/      seasons.json, schema.ts (zod), validate.ts, index.ts (build-time loader)
-lib/          brand, i18n, progress (ProgressStore), recommend, unlock, skills, timer,
-              screen-time, sounds (Web Audio), speech, youtube, playback
-public/       images/ (original SVGs), audio/, icons/, sw.js
-scripts/      validate-content.ts, finalize-sw.mjs, make-images.mjs, make-icons.mjs
+app/(kid)/    the children's app: / · /season/[slug] · /watch/[id] · /challenge/[id] · /stickers · /offline
+app/parents   the parent gate and parent area
+app/admin     the admin dashboard        app/api/admin/*   its API (sessions, GitHub saves, YouTube)
+components/   home/ (slider, rows, banner), kid/ (story cards, scenes, marks), admin/, and shared screens
+content/      seasons.json + site.json (the content), schema.ts / site.ts (zod), validate.ts, index.ts
+lib/          progress, recommend, unlock, timer, screen-time, sounds, speech, youtube, path-layout,
+              messages/ (the app's words, per area, rw + en), admin/ (dashboard server + helpers)
+scripts/      validate-content.ts, finalize-sw.mjs, sw-template.js, make-icons.mjs, art/, dev/
+docs/         DESIGN.md (the design system), ADMIN.md (the dashboard: setup, security, API)
 ```
 
-- **Content is data.** Pages are prerendered from `seasons.json` at build time; `zod`
-  never ships to the browser. Unrecorded audio is dropped at build time, so phones
-  never request missing files.
-- **Progress** goes through the `ProgressStore` interface (`lib/progress.ts`). Today it
-  is localStorage (`izuba:` keys); a Supabase version can replace it without touching
-  components. React reads it through `useSyncExternalStore` (`lib/store.ts`).
-- **YouTube rules.** Privacy-enhanced host (`youtube-nocookie.com`), `rel=0`,
-  `playsinline=1`, `controls=1`, `iv_load_policy=3`, `fs=1`. Nothing is ever drawn on
-  top of the player. Our controls sit below it, and for questions and the end screen the
-  player is hidden (`visibility: hidden`, still mounted). The API script loads only on
-  the watch page, and never when the daily limit is already used up.
-- **Screen time** counts only while a video plays or a challenge is open and the tab
-  is visible, per Kigali date. When the limit is reached the current episode finishes,
-  then Time's Up replaces the end screen.
-- **Offline:** `public/sw.js` precaches the app shell (pages, JS/CSS, fonts, pictures,
-  icons and question recordings, ~1 MB plus audio). An update installs only when every
-  file downloaded, so a dropped connection keeps the previous complete version.
-  Videos are never cached.
+- **Design system:** [docs/DESIGN.md](docs/DESIGN.md).
+  - Semantic day/night tokens in `app/globals.css`: `bg-paper`, `text-ink`, `bg-play`, …
+  - Press and tap utilities, illustration rules and per-screen layouts.
+  - `npm test` checks WCAG AA contrast for every text pair, in both themes.
+  - **Never use red on children's screens.**
+- **Content is data.** Kid pages are prerendered from `content/*.json` at build time, and
+  `zod` never ships to the browser. The dashboard edits the same files through GitHub. You
+  can also edit them by hand: follow `content/schema.ts`, and `npm run validate` explains any
+  mistake in plain words.
+- **Progress** goes through the `ProgressStore` interface (`lib/progress.ts`), backed by
+  localStorage (`izuba:` keys). React reads it through `useSyncExternalStore` (`lib/store.ts`).
+- **YouTube rules:**
+  - Privacy-enhanced host (`youtube-nocookie.com`) with `rel=0`, `playsinline=1`,
+    `controls=1`, `iv_load_policy=3` and `fs=1`.
+  - Nothing is ever drawn on top of the player. For questions and the end screen it is
+    hidden (`visibility: hidden`), not covered.
+  - The API script loads only on the watch page. The dashboard saves each story's picture into
+    the repo, so kid screens don't load images from YouTube.
+- **Screen time** counts only while a story plays or a challenge is open and the tab is
+  visible, per Kigali date. When the limit is reached, the current story finishes first.
+- **Offline:**
+  - `public/sw.js` precaches the prerendered pages, JS/CSS, fonts, pictures and recordings.
+  - An update installs only when every file has downloaded.
+  - It never touches `/admin`, `/api` or in-app navigation data. Offline, a full page load
+    gets the cached HTML.
+  - Videos are never cached.
+- **Art:** every picture is an original SVG drawn by `scripts/art/*.mjs`, in day and night
+  versions.
+  - Izuba is drawn twice, in `scripts/art/mascot.mjs` and `components/Mascot.tsx`, and
+    `npm test` checks that they match.
+  - App icons: `PLAYWRIGHT_MODULE=<a Playwright install> node scripts/make-icons.mjs`, or
+    first run `npm i --no-save playwright`.
+- **Question recordings:** put MP3s in `public/audio/` with the names the build lists. Until
+  then, demo mode reads the English text aloud with the phone's voice. App voice lines are
+  in `lib/speech.ts`.
 
-### Quality checks done for this MVP
+### Quality checks
 
-- Unit tests (88): progress store, unlock, recommendations, skill mastery, time limit
-  and extensions, content validation, color contrast.
-- End-to-end checks (headless Chromium, YouTube replaced by a stand-in): pause point at
-  20 s, 80% rule, resume, end screen without autoplay, blocked-autoplay Play button below
-  the video, offline/unavailable screens, challenge flow (scaffolding, stars, saved
-  results, sticker), parent gate, settings, reset, 1-minute limit → Time's Up → +10 min,
-  installability, offline app shell, no console errors and no sideways scrolling at
-  360 px (portrait and landscape) and desktop.
-- Lighthouse 12 (mobile) on Home, Season, Challenge, Stickers, Parents: Accessibility 100,
-  Best Practices 100, Performance 88–93 (88–91 with Lighthouse's default *simulated*
-  throttling, 91–93 with *applied* devtools throttling). The watch page wasn't measured:
-  YouTube's own iframe dominates it and isn't reachable from the build machine.
+- **Unit tests (325):**
+  - Progress, unlock, recommendations, skills, time limit, content and site validation.
+  - The path-map layout, messages in both languages, and color contrast in both themes.
+  - The mascot matching its generator.
+  - The admin API (sessions, saves, conflicts, undo, uploads, YouTube) against a fake
+    GitHub, and the dashboard helpers.
+- **End-to-end (headless Chromium, with a stand-in for YouTube):**
+  - Watching: the mid-story question at 20 s, the 80% rule, resume, the end screen without
+    autoplay, and the blocked-autoplay Play button.
+  - Challenges: scaffolding, stars, results and stickers.
+  - Grown-up screens: the parent gate and settings, the 1-minute limit → Time's Up →
+    +10 minutes.
+  - Offline: every kid page with the server switched off, plus audio range requests through
+    the service worker.
+  - The full dashboard flow, with the screens checked at 390 px and 1280 px in light and dark:
+    sign in → add a story from a YouTube link → reorder → edit a challenge → settings → save →
+    Live → conflict → refused save → undo.
 
-### Known placeholders / next steps
+### Known placeholders
 
-- Brand name "Izuba", WhatsApp number (Contact card hidden until set), demo video ID: `lib/brand.ts`.
-- Sun mascot, thumbnails, posters and stickers are simple placeholder SVGs.
-- Kinyarwanda strings (`content/seasons.json`, `lib/i18n.ts`) need native review.
-- Question recordings (list printed by `npm run build`) and app voice lines.
+- Brand name "Izuba" and the logo: `lib/brand.ts` and `scripts/art/`.
+- Every sample story plays YouTube's sample video, and the sample stories are drawn stand-ins.
+- Kinyarwanda text needs a native review.
+- Question recordings and app voice lines.

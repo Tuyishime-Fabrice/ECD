@@ -13,21 +13,21 @@ export function FriendlyError({ offline, onRetry }: { offline: boolean; onRetry?
       <div className="relative">
         <Mascot pose="oops" className="w-32 short:w-20" />
         {offline && (
-          <span className="absolute -bottom-1 -right-2 grid size-12 place-items-center rounded-full bg-white shadow-soft">
-            <WifiOff className="size-7 text-ink-600" strokeWidth={2.5} aria-hidden />
+          <span className="absolute -bottom-1 -right-2 grid size-12 place-items-center rounded-full bg-paper shadow-e1">
+            <WifiOff className="size-7 text-ink-2" strokeWidth={2.5} aria-hidden />
           </span>
         )}
       </div>
-      <h2 className="font-display text-[28px] font-bold leading-tight text-ink-900">
+      <h2 className="font-display text-[28px] font-bold leading-tight text-ink">
         {offline ? t("offlineTitle") : t("videoErrorTitle")}
       </h2>
-      <p className="text-lg text-ink-600">{offline ? t("offlineHint") : t("videoErrorHint")}</p>
+      <p className="text-lg text-ink-2">{offline ? t("offlineHint") : t("videoErrorHint")}</p>
       <div className="mt-2 flex items-center gap-4">
         {onRetry && (
           <button
             type="button"
             onClick={onRetry}
-            className="tactile inline-flex min-h-16 items-center gap-2 rounded-full bg-white px-6 font-display text-[22px] font-bold text-ink-900"
+            className="press press-paper inline-flex min-h-16 items-center gap-2 rounded-full bg-paper px-6 font-display text-[22px] font-bold text-ink"
           >
             <RotateCcw className="size-7" strokeWidth={2.5} aria-hidden />
             {t("tryAgainButton")}
@@ -35,7 +35,7 @@ export function FriendlyError({ offline, onRetry }: { offline: boolean; onRetry?
         )}
         <Link
           href="/"
-          className="tactile inline-flex min-h-16 items-center gap-2 rounded-full bg-sky-700 px-6 font-display text-[22px] font-bold text-white"
+          className="press press-play inline-flex min-h-16 items-center gap-2 rounded-full bg-play px-6 font-display text-[22px] font-bold text-on-accent"
         >
           <House className="size-7" strokeWidth={2.5} aria-hidden />
           {t("home")}

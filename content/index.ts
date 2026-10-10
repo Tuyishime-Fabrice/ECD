@@ -7,6 +7,8 @@ import { join } from "node:path";
 import { DEMO_YOUTUBE_ID } from "@/lib/brand";
 import type { Content, Episode, Question } from "./schema";
 import raw from "./seasons.json";
+import rawSite from "./site.json";
+import { validateSite, whatsappContact } from "./site";
 import type {
   ChallengeView,
   EpisodeView,
@@ -16,6 +18,15 @@ import type {
   StickerSlot,
 } from "./types";
 import { validateContent } from "./validate";
+
+type EpisodeCardOf = { card: Extract<ItemCard, { type: "episode" }>; season: SeasonCard };
+
+/**
+ * A skill's name for parents; its id when it isn't listed. Own keys only: `skills["constructor"]`
+ * is the Object function, which can't be passed to the parents' page and fails the build.
+ */
+export const skillLabel = (skills: Content["skills"], id: string): SkillInfo["label"] =>
+  Object.hasOwn(skills, id) ? skills[id]! : { rw: id, en: id };
 
 type Loaded = {
   seasons: SeasonCard[];
@@ -101,7 +112,7 @@ function build(content: Content, missingAudio: Set<string>): Loaded {
       };
     });
 
-  const skills = skillIds.map((id) => ({ id, label: content.skills[id] ?? { rw: id, en: id } }));
+  const skills = skillIds.map((id) => ({ id, label: skillLabel(content.skills, id) }));
   return { seasons, episodes, challenges, skills };
 }
 
@@ -119,6 +130,27 @@ function load(): Loaded {
 }
 
 export const getSeasons = (): SeasonCard[] => load().seasons;
+
+let siteCache: { featured: string[]; contact: { link: string; label: string } | null } | undefined;
+/** Settings from content/site.json (edited in the admin dashboard). */
+export function getSite() {
+  if (siteCache) return siteCache;
+  const result = validateContent(raw, publicFileExists);
+  if (!result.ok) throw new Error("content/seasons.json has problems (run npm run validate)");
+  const site = validateSite(rawSite, result.content);
+  if (!site.ok) throw new Error(`content/site.json has problems:\n${site.errors.map((e) => `  - ${e}`).join("\n")}`);
+  siteCache = { featured: site.site.featured, contact: whatsappContact(site.site.contact.whatsapp) };
+  return siteCache;
+}
+
+/** Story cards for the Home slider, in the order chosen in the admin dashboard. */
+export const getFeatured = (): EpisodeCardOf[] =>
+  getSite().featured.flatMap((id) => {
+    const found = getEpisode(id);
+    if (!found) return [];
+    const card = found.season.items.find((i) => i.id === id);
+    return card && card.type === "episode" ? [{ card, season: found.season }] : [];
+  });
 
 export const getPublishedSeasons = (): SeasonCard[] => load().seasons.filter((s) => s.status === "published");
 
