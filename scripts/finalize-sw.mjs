@@ -56,32 +56,50 @@ const add = (url, file) => {
 const source = (file) => readFileSync(file, "utf8");
 
 // 1. Prerendered pages (the kid app, the parent area and the offline page). Never the admin.
+// Locally Next.js leaves each page's HTML in .next/server/app. Vercel's build machines may move
+// those files elsewhere; then each page still goes in the list, with this build's id as its
+// revision, so phones fetch it again after each deploy (a few small files) instead of the build failing.
 const { routes } = JSON.parse(readFileSync(join(nextDir, "prerender-manifest.json"), "utf8"));
 const appDir = join(nextDir, "server", "app");
+const buildId = existsSync(join(nextDir, "BUILD_ID")) ? source(join(nextDir, "BUILD_ID")).trim() : sha;
+const buildRev = createHash("sha256").update(buildId).digest("hex").slice(0, 10);
+const missingPages = [];
 for (const route of Object.keys(routes).sort()) {
   if (/^\/(_|admin|api)/.test(route)) continue;
   const base = route === "/" ? "index" : route.slice(1);
   const file = [`${base}.html`, `${base}.body`].map((f) => join(appDir, f)).find(existsSync);
-  if (!file) throw new Error(`finalize-sw: no prerendered file for ${route}`);
-  add(route, file);
+  if (file) add(route, file);
+  else {
+    entries.push([urlPath(route), buildRev]);
+    hash.update(route).update(buildRev);
+    missingPages.push(route);
+  }
 }
+if (missingPages.length) {
+  console.log(`ℹ Service worker: ${missingPages.length} pages have no HTML file in .next; they refresh after every deploy.`);
+}
+const pageHtml = walk(appDir).filter((f) => f.endsWith(".html"));
 
 // Legacy-browser polyfills (loaded with nomodule): phones that can run the service worker never need them.
-const legacyOnly = new Set(
-  [...readFileSync(join(appDir, "index.html"), "utf8").matchAll(/<script src="([^"]+)" noModule/gi)].map((m) => m[1]),
-);
+const buildManifestPath = join(nextDir, "build-manifest.json");
+const polyfills = existsSync(buildManifestPath) ? (JSON.parse(source(buildManifestPath)).polyfillFiles ?? []) : [];
+const legacyOnly = new Set([
+  ...polyfills.map((f) => `/_next/${f}`),
+  ...pageHtml.flatMap((f) => [...source(f).matchAll(/<script src="([^"]+)" noModule/gi)].map((m) => m[1])),
+]);
 
-// Chunks that only the admin dashboard uses: children's phones never need them.
+// Chunks that only the admin dashboard uses: children's phones never need them. This needs every
+// page's HTML to see what the kid pages load; without it, nothing is left out (safe, just bigger).
 const staticRefs = (text) => new Set([...text.matchAll(/\/_next\/static\/[^"'\\\s)]+/g)].map((m) => m[0]));
 const manifests = walk(appDir).filter((f) => f.endsWith("_client-reference-manifest.js"));
 const isAdmin = (f) => /[\\/]app[\\/]admin([\\/]|$)/.test(f);
 const kidRefs = new Set(
-  [...manifests.filter((f) => !isAdmin(f)), ...walk(appDir).filter((f) => f.endsWith(".html"))].flatMap((f) => [
-    ...staticRefs(source(f)),
-  ]),
+  [...manifests.filter((f) => !isAdmin(f)), ...pageHtml].flatMap((f) => [...staticRefs(source(f))]),
 );
 const adminOnly = new Set(
-  manifests.filter(isAdmin).flatMap((f) => [...staticRefs(source(f))]).filter((url) => !kidRefs.has(url)),
+  missingPages.length
+    ? []
+    : manifests.filter(isAdmin).flatMap((f) => [...staticRefs(source(f))]).filter((url) => !kidRefs.has(url)),
 );
 
 // 2. Versioned JS, CSS and fonts.
