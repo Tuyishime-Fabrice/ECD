@@ -30,8 +30,9 @@ describe("checkDraft", () => {
   });
 
   it("explains an empty new challenge", () => {
-    const c = addChallenge(content(), "s1", blankChallenge(content(), "s1"));
-    const problems = problemsFor(locate(c, checkDraft(c, site())), "challenge", "s1c3");
+    const challenge = blankChallenge(content(), "s1");
+    const c = addChallenge(content(), "s1", challenge);
+    const problems = problemsFor(locate(c, checkDraft(c, site())), "challenge", challenge.id);
     expect(problems.get("sticker")).toEqual(["Add a sticker picture."]);
     expect(problems.get("title.en")).toEqual(["Write the English title."]);
     expect(problems.get("questions.0.promptText.en")).toEqual(["Write the question in English."]);
