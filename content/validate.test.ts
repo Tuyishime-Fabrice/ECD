@@ -90,6 +90,17 @@ describe("validateContent", () => {
     expect(errorsFor(d)[0]).toContain('Unrecognized key: "youtubeID"');
   });
 
+  it("doesn't take names every object has (constructor) for listed skills", () => {
+    // `"constructor" in skills` is true for any object; it passed, and the build then failed.
+    const c = copy();
+    challenge1(c).questions[0].skill = "constructor";
+    c.seasons[0].items[0].episode.skills = ["constructor"];
+    expect(errorsFor(c)).toEqual([
+      expect.stringContaining('skill "constructor" is not listed in "skills"'),
+      expect.stringContaining('skill "constructor" is not listed in "skills"'),
+    ]);
+  });
+
   it("explains a malformed thumbnail", () => {
     const c = copy();
     c.seasons[0].items[0].episode.thumbnail = "images/thumbs/s1e1.svg";
