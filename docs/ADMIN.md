@@ -216,6 +216,9 @@ pure helpers, with tests, in `lib/admin/ui-*.ts`. The screens only talk to `/api
   posters 800×600, cut from the middle; answers and stickers fit in 512×512 and stay PNG when
   see-through. Names come from `uploadPath()`. The dashboard keeps showing the pictures it just
   saved; after a reload, one that isn't live yet shows a placeholder until the app is rebuilt.
+  Resizing takes a moment and editing goes on meanwhile, so the finished picture is put into the
+  content as it is then (editors change content with functions of the latest value, and answers
+  are found by id), never into the copy that was on screen when the file was picked.
 - **YouTube:** the link is looked up with `/api/admin/youtube` (title and picture). The story
   editor alone loads the YouTube IFrame API, in a hidden player, to read the length; if that
   fails it asks for minutes:seconds.

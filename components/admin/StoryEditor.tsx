@@ -644,10 +644,10 @@ function QuestionCard({ story, update, errors, skills }: SectionProps & { skills
                     skills={skills}
                     errors={errors}
                     nameHint={`${story.title.en || story.id} question`}
-                    onChange={(question) =>
+                    onChange={(change) =>
                       update((e) => ({
                         ...e,
-                        pausePoints: (e.pausePoints ?? []).map((p, k) => (k === i ? { ...p, question } : p)),
+                        pausePoints: (e.pausePoints ?? []).map((p, k) => (k === i ? { ...p, question: change(p.question) } : p)),
                       }))
                     }
                   >

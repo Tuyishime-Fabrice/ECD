@@ -4,11 +4,14 @@ import sample from "@/content/seasons.json";
 import {
   addChallenge,
   addSeason,
+  addOption,
   addStory,
   allIds,
   blankChallenge,
+  blankQuestion,
   blankSeason,
   blankStory,
+  changeOption,
   cleanFeatured,
   deleteItem,
   deleteSeason,
@@ -27,7 +30,9 @@ import {
   nextOptionId,
   picturesIn,
   prepareForSave,
+  removeOption,
   renumberStories,
+  setPromptImage,
   sortedSeasons,
   storiesBefore,
   storiesOf,
@@ -212,6 +217,49 @@ describe("featured stories", () => {
     const out = prepareForSave(c, site(["s1e1"]));
     expect(out.site.featured).toEqual([]);
     expect(storiesOf(out.seasons.seasons[0]!).map((e) => e.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8]);
+  });
+});
+
+describe("question changes", () => {
+  // A picture finishes resizing after other changes were made to the question.
+  const latest = () => ({
+    ...blankQuestion("s1c3-q1", "count-1-5"),
+    promptText: { en: "Which has 2?", rw: "" },
+    correctOptionId: "b",
+    options: [
+      { id: "a", image: "/images/uploads/a-1.png" },
+      { id: "b", image: "", label: "two" },
+    ],
+  });
+  it("puts a picture on its answer in the latest question, keeping everything else", () => {
+    const pickedForB = (q: ReturnType<typeof latest>) => changeOption(q, "b", { image: "/images/uploads/b-1.png" });
+    expect(pickedForB(latest())).toEqual({
+      ...latest(),
+      options: [
+        { id: "a", image: "/images/uploads/a-1.png" },
+        { id: "b", image: "/images/uploads/b-1.png", label: "two" },
+      ],
+    });
+  });
+  it("finds the answer by id, so removing another answer meanwhile doesn't misplace it", () => {
+    const q = removeOption(latest(), "a");
+    expect(q.correctOptionId).toBe("b");
+    expect(changeOption(q, "b", { image: "/images/uploads/b-1.png" }).options).toEqual([
+      { id: "b", image: "/images/uploads/b-1.png", label: "two" },
+    ]);
+    expect(changeOption(q, "a", { image: "/images/uploads/x-1.png" })).toEqual(q);
+  });
+  it("drops a cleared label", () => {
+    expect(changeOption(latest(), "b", { label: undefined }).options[1]).toEqual({ id: "b", image: "" });
+  });
+  it("moves the right answer when the right one is removed", () => {
+    expect(removeOption(latest(), "b").correctOptionId).toBe("a");
+  });
+  it("adds answers with the next letter, and sets or clears the question's picture", () => {
+    expect(addOption(latest()).options.map((o) => o.id)).toEqual(["a", "b", "c"]);
+    const withPicture = setPromptImage(latest(), "/images/uploads/p-1.png");
+    expect(withPicture.promptImage).toBe("/images/uploads/p-1.png");
+    expect("promptImage" in setPromptImage(withPicture, undefined)).toBe(false);
   });
 });
 

@@ -8,7 +8,7 @@ import clsx from "clsx";
 import { ChevronDown, CircleAlert, Gift, Info, ListChecks, Plus, Trash2, Type } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
-import type { Challenge, Question } from "@/content/schema";
+import type { Challenge } from "@/content/schema";
 import {
   addChallenge,
   blankChallenge,
@@ -24,7 +24,7 @@ import { checkDraft, locate, type Located } from "@/lib/admin/ui-issues";
 import { quoteTitle } from "@/lib/admin/ui-summary";
 import { useDraft } from "./AdminProvider";
 import { PictureField, ProblemSummary, useFocusFromHash, useProblems } from "./editing";
-import { QuestionEditor } from "./QuestionEditor";
+import { QuestionEditor, type QuestionChange } from "./QuestionEditor";
 import {
   Alert,
   Bilingual,
@@ -93,8 +93,9 @@ export function ChallengeEditor({ id, collection }: { id?: string; collection?: 
         text: `Changed challenge ${quoteTitle(title)}`,
       });
   };
-  const setQuestion = (index: number, question: Question) =>
-    update((c) => ({ ...c, questions: c.questions.map((q, i) => (i === index ? question : q)) }));
+  // Applied to the question as it is now: a picture can land after other changes were made.
+  const setQuestion = (index: number, change: QuestionChange) =>
+    update((c) => ({ ...c, questions: c.questions.map((q, i) => (i === index ? change(q) : q)) }));
 
   const add = () => {
     const finalId = newChallengeId(draft.seasons, newSeasonId, reservedIds);
@@ -258,7 +259,7 @@ export function ChallengeEditor({ id, collection }: { id?: string; collection?: 
                         <QuestionEditor
                           field={`questions.${i}`}
                           value={question}
-                          onChange={(q) => setQuestion(i, q)}
+                          onChange={(change) => setQuestion(i, change)}
                           skills={draft.seasons.skills}
                           errors={errors}
                           nameHint={`${challenge.title.en || challenge.id} q${i + 1}`}

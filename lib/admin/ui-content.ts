@@ -329,6 +329,45 @@ export function moveInList<T>(list: readonly T[], index: number, direction: Dire
   return next;
 }
 
+/* ---------- Question changes ---------- */
+// Each takes the question as it is now and returns a changed copy. Editors pass them to
+// the update functions, so a change that lands late (a picture still being resized) is
+// made to the latest question and never puts back an older copy of it.
+
+type Option = Question["options"][number];
+
+/** Changes the answer with this id; a value set to undefined is removed (a cleared label). */
+export function changeOption(question: Question, optionId: string, patch: Partial<Option>): Question {
+  return {
+    ...question,
+    options: question.options.map((o) => {
+      if (o.id !== optionId) return o;
+      const next: Option = { ...o, ...patch };
+      for (const key of Object.keys(patch) as (keyof Option)[]) if (next[key] === undefined) delete next[key];
+      return next;
+    }),
+  };
+}
+
+/** Removes an answer; if it was the right one, the first answer left becomes right. */
+export function removeOption(question: Question, optionId: string): Question {
+  const options = question.options.filter((o) => o.id !== optionId);
+  const correctOptionId =
+    question.correctOptionId === optionId ? (options[0]?.id ?? question.correctOptionId) : question.correctOptionId;
+  return { ...question, options, correctOptionId };
+}
+
+export const addOption = (question: Question): Question => ({
+  ...question,
+  options: [...question.options, { id: nextOptionId(question), image: "" }],
+});
+
+export function setPromptImage(question: Question, promptImage: string | undefined): Question {
+  const next = { ...question, promptImage };
+  if (!promptImage) delete next.promptImage;
+  return next;
+}
+
 /* ---------- Featured stories ---------- */
 
 /** Stories children can watch now: those in "Live" collections, in order. */
