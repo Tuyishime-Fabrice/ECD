@@ -37,6 +37,18 @@ describe("liveState", () => {
     // No save from this browser: assume the code change came after the last save.
     expect(liveState({ deployed: code, target: sha(3), history })).toBe("live");
   });
+  it("waits for the last commit of a save that was split into batches", () => {
+    const pictures = "p".repeat(40);
+    const stories = "c".repeat(40);
+    const before = "d".repeat(40);
+    // The picture batch is built first; it isn't in History yet, and it isn't the save.
+    expect(
+      liveState({ deployed: pictures, target: stories, history: [stories, before], deployedAtSave: before, savedAt: 0, now: 1, earlier: [pictures] }),
+    ).toBe("going");
+    // Once History lists both, the order says the same.
+    expect(liveState({ deployed: pictures, target: stories, history: [stories, pictures, before], earlier: [pictures] })).toBe("going");
+    expect(liveState({ deployed: stories, target: stories, history: [stories, pictures, before], earlier: [pictures] })).toBe("live");
+  });
   it("is live when there is nothing to wait for", () => {
     expect(liveState({ deployed: sha(1), target: null, history: [] })).toBe("live");
   });

@@ -21,7 +21,14 @@ export type Snapshot = { seasons: Content; site: Site };
 export type Picture = { dataUrl: string; bytes: number; pending: boolean };
 export type Phase = "checking" | "setup" | "signed-out" | "loading" | "ready" | "error";
 export type Toast = { id: number; tone: "success" | "info" | "error"; title: string; body?: string };
-type Publish = { commitSha: string; savedAt: number; deployedAtSave: string | null };
+type Publish = {
+  /** The save's last commit, the one with its stories. */
+  commitSha: string;
+  savedAt: number;
+  deployedAtSave: string | null;
+  /** Commits the same save made first, with pictures only (oldest first). */
+  earlier?: string[];
+};
 type Note = { key: string; text: string };
 /** A new story or challenge that isn't added yet, with its collection. Kept only while something is filled in. */
 export type NewForm<T> = { value: T; seasonId: string };
@@ -299,12 +306,15 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     return [...localIssues, ...stillTrue];
   }, [draft, localIssues, serverIssues]);
 
+  /** Starts waiting for `commitSha`, a save's last commit; `earlier` are its picture-only commits, oldest first. */
   const startPublish = useCallback(
-    (commitSha: string) => {
-      const value = { commitSha, savedAt: Date.now(), deployedAtSave: deployed };
+    (commitSha: string, earlier: string[] = []) => {
+      const value: Publish = { commitSha, savedAt: Date.now(), deployedAtSave: deployed, earlier };
       setPublish(value);
       writePublish(value);
-      setHistoryShas((list) => (list.includes(commitSha) ? list : [commitSha, ...list]));
+      // Newest first, like History.
+      const made = [commitSha, ...[...earlier].reverse()];
+      setHistoryShas((list) => [...made, ...list.filter((sha) => !made.includes(sha))]);
       setNow(Date.now());
     },
     [deployed],
@@ -326,6 +336,8 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     const sent = draft;
     const sentNotes = noteSeq.current;
     let sha = baseSha;
+    /** Every commit this save makes: the app has its stories only once it is built from the last one. */
+    const commits: string[] = [];
     savingNow.current = true;
     setServerIssues([]);
     try {
@@ -357,6 +369,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           return;
         }
         sha = res.data.commitSha;
+        if (!commits.includes(sha)) commits.push(sha);
         setPictures((all) => {
           const next = { ...all };
           for (const { path } of group) if (next[path]) next[path] = { ...next[path]!, pending: false };
@@ -375,7 +388,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
           if (res.data.unchanged && groups.length === 1) {
             toast({ tone: "info", title: "Nothing new to save.", body: meanwhile ?? "Everything here is already saved." });
           } else {
-            startPublish(sha);
+            startPublish(sha, commits.filter((c) => c !== sha));
             toast({ tone: "success", title: "Saved. Live in about 2 minutes.", body: meanwhile });
           }
         }
@@ -464,6 +477,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     history: historyShas,
     deployedAtSave: publish?.deployedAtSave,
     savedAt: publish?.savedAt,
+    earlier: publish?.earlier,
     now,
   });
   const waiting = ready && (live === "going" || live === "slow");

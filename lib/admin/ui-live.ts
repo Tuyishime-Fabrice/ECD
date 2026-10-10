@@ -20,16 +20,31 @@ export type LiveInput = {
   deployedAtSave?: string | null;
   /** When the save was made (ms), if it was made here. */
   savedAt?: number;
+  /**
+   * Commits the save made before `target`, its last one: pictures that didn't fit in one
+   * save go first. An app built from one of them doesn't have the save's stories yet.
+   */
+  earlier?: readonly string[];
   now?: number;
 };
 
-export function liveState({ deployed, target, history, deployedAtSave, savedAt, now = Date.now() }: LiveInput): LiveState {
+export function liveState({
+  deployed,
+  target,
+  history,
+  deployedAtSave,
+  savedAt,
+  earlier = [],
+  now = Date.now(),
+}: LiveInput): LiveState {
   if (!deployed || deployed === "dev") return "unknown";
   if (!target || deployed === target) return "live";
   const deployedAt = history.indexOf(deployed);
   const targetAt = history.indexOf(target);
   let live: boolean;
-  if (deployedAt !== -1) {
+  if (earlier.includes(deployed)) {
+    live = false;
+  } else if (deployedAt !== -1) {
     // Both in History, which is newest first: a smaller index is a newer save.
     live = targetAt !== -1 && deployedAt < targetAt;
   } else if (savedAt !== undefined) {
