@@ -28,7 +28,7 @@ files. It runs on Vercel, next to the kid app.
 | `GITHUB_TOKEN` | yes | A GitHub fine-grained token for this repo only, with **Contents: Read and write**. |
 | `GITHUB_REPO` | no | `owner/name`. Default `Tuyishime-Fabrice/ECD`. |
 | `GITHUB_BRANCH` | no | Default `main`. |
-| `ADMIN_SESSION_SECRET` | no | Signs the login cookie. Default: derived from `ADMIN_PASSWORD`, so changing the password logs everyone out. |
+| `ADMIN_SESSION_SECRET` | no | Signs the login cookie. Default: derived from `ADMIN_PASSWORD` with scrypt (slow and salted, see "Security"), so changing the password logs everyone out. If you set it, use 32+ random characters. |
 | `GITHUB_API_URL` | no | Default `https://api.github.com`. Tests point this at a local fake. |
 
 If a required variable is missing, `/admin` shows a friendly setup screen that says exactly
@@ -40,6 +40,16 @@ which one, instead of an error.
   - Value: an HMAC-SHA256-signed `{exp}`.
   - Flags: `SameSite=Strict`, `Secure` in production, 7 days.
   - The password is compared in constant time. A wrong password waits 800ms before answering.
+  - The signing key, unless `ADMIN_SESSION_SECRET` is set, is
+    `scrypt(ADMIN_PASSWORD, "izuba-admin-session\n" + GITHUB_REPO)` (N = 2¹⁵, r = 8, p = 1;
+    `deriveSessionSecret` in `lib/admin/env.ts`), worked out once per server process (about a
+    tenth of a second). A key that is a quick hash of the password would turn one copied cookie
+    (from a shared screenshot of the browser's tools, a HAR file, a proxy log) into a way to test
+    password guesses offline at millions a second; with scrypt each guess costs as much as it
+    does on the server. It still comes from the password, so changing the password signs
+    everyone out.
+  - Signing out clears the cookie in that browser only. A copied cookie keeps working until it
+    expires (7 days) or the password (or `ADMIN_SESSION_SECRET`) changes.
 - **Every** `/api/admin/*` route except `login` checks the session. State-changing routes also
   require JSON and an `Origin` header that matches the host.
 - `GITHUB_TOKEN` never reaches the browser. Admin pages and API responses are never cached

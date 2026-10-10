@@ -11,6 +11,7 @@ import { GET as session } from "@/app/api/admin/session/route";
 import { POST as undo } from "@/app/api/admin/undo/route";
 import { GET as youtube } from "@/app/api/admin/youtube/route";
 import { createFakeGitHub, seedFromWorkingTree, type FakeGitHub } from "../../scripts/dev/fake-github.mjs";
+import { readAdminEnv } from "./env";
 import { createSessionToken } from "./session";
 
 const PASSWORD = "correct horse battery";
@@ -94,8 +95,10 @@ describe("admin API", () => {
   });
 
   it("refuses everything but login and session without a valid cookie", async () => {
-    const expired = `izuba_admin=${createSessionToken(`izuba-admin-session\n${PASSWORD}`, Date.now() - 8 * 86400_000)}`;
-    for (const cookie of [undefined, "izuba_admin=forged.value", expired]) {
+    const expired = `izuba_admin=${createSessionToken(readAdminEnv().sessionSecret!, Date.now() - 8 * 86400_000)}`;
+    // Signed with a fast hash of the password (the old default key): no longer accepted.
+    const fastHash = `izuba_admin=${createSessionToken(`izuba-admin-session\n${PASSWORD}`)}`;
+    for (const cookie of [undefined, "izuba_admin=forged.value", expired, fastHash]) {
       const replies = await Promise.all([
         content(request("GET", "/api/admin/content", { cookie })),
         history(request("GET", "/api/admin/history", { cookie })),

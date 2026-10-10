@@ -1,3 +1,4 @@
+import { scryptSync } from "node:crypto";
 import { describe, expect, it } from "vitest";
 import { readAdminEnv } from "./env";
 
@@ -18,9 +19,23 @@ describe("readAdminEnv", () => {
     expect(env.production).toBe(false);
   });
 
-  it("derives the session secret from the password unless one is given", () => {
-    expect(readAdminEnv(ready).sessionSecret).toContain(ready.ADMIN_PASSWORD);
-    expect(readAdminEnv({ ...ready, ADMIN_PASSWORD: "another long password" }).sessionSecret).not.toBe(readAdminEnv(ready).sessionSecret);
+  it("derives the session secret from the password with scrypt, unless one is given", () => {
+    const derived = readAdminEnv(ready).sessionSecret!;
+    // Slow and salted: a copied cookie is no fast way to test password guesses.
+    expect(derived).toBe(
+      scryptSync(ready.ADMIN_PASSWORD, "izuba-admin-session\nTuyishime-Fabrice/ECD", 32, {
+        N: 2 ** 15,
+        r: 8,
+        p: 1,
+        maxmem: 64 * 1024 * 1024,
+      }).toString("base64url"),
+    );
+    expect(derived).not.toContain(ready.ADMIN_PASSWORD);
+    expect(readAdminEnv(ready).sessionSecret).toBe(derived);
+    // Changing the password signs everyone out.
+    expect(readAdminEnv({ ...ready, ADMIN_PASSWORD: "another long password" }).sessionSecret).not.toBe(derived);
+    // Salted per deployment (by repository).
+    expect(readAdminEnv({ ...ready, GITHUB_REPO: "someone/else" }).sessionSecret).not.toBe(derived);
     const secret = "s".repeat(32);
     expect(readAdminEnv({ ...ready, ADMIN_SESSION_SECRET: secret }).sessionSecret).toBe(secret);
   });
