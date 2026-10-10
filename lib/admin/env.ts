@@ -50,10 +50,18 @@ export function deriveSessionSecret(password: string, salt: string): string {
   return secret;
 }
 
-function httpUrl(value: string): string | null {
+/** This machine: the local stand-ins for GitHub and YouTube (scripts/dev/fake-github.mjs). */
+const LOCAL_HOSTS = new Set(["localhost", "127.0.0.1", "[::1]"]);
+
+/**
+ * A web address without its trailing slash, or null. https: only, since the GitHub token
+ * goes with every request; plain http: only to this machine, for the local stand-ins.
+ */
+function webUrl(value: string): string | null {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:" ? url.href.replace(/\/+$/, "") : null;
+    const safe = url.protocol === "https:" || (url.protocol === "http:" && LOCAL_HOSTS.has(url.hostname));
+    return safe ? url.href.replace(/\/+$/, "") : null;
   } catch {
     return null;
   }
@@ -94,13 +102,13 @@ export function readAdminEnv(env: Record<string, string | undefined> = process.e
   const branch = setting("GITHUB_BRANCH", DEFAULT_BRANCH);
   if (!BRANCH.test(branch)) problems.push(`GITHUB_BRANCH "${branch}" is not a valid branch name.`);
 
-  const apiUrl = httpUrl(setting("GITHUB_API_URL", DEFAULT_API_URL));
+  const apiUrl = webUrl(setting("GITHUB_API_URL", DEFAULT_API_URL));
   if (!apiUrl) problems.push("GITHUB_API_URL must be a web address starting with https://.");
 
-  const oembedUrl = httpUrl(setting("YOUTUBE_OEMBED_URL", DEFAULT_OEMBED_URL));
-  const thumbnailUrl = httpUrl(setting("YOUTUBE_THUMBNAIL_URL", DEFAULT_THUMBNAIL_URL));
-  if (!oembedUrl) problems.push("YOUTUBE_OEMBED_URL must be a web address. Remove it to use YouTube.");
-  if (!thumbnailUrl) problems.push("YOUTUBE_THUMBNAIL_URL must be a web address. Remove it to use YouTube.");
+  const oembedUrl = webUrl(setting("YOUTUBE_OEMBED_URL", DEFAULT_OEMBED_URL));
+  const thumbnailUrl = webUrl(setting("YOUTUBE_THUMBNAIL_URL", DEFAULT_THUMBNAIL_URL));
+  if (!oembedUrl) problems.push("YOUTUBE_OEMBED_URL must be a web address starting with https://. Remove it to use YouTube.");
+  if (!thumbnailUrl) problems.push("YOUTUBE_THUMBNAIL_URL must be a web address starting with https://. Remove it to use YouTube.");
 
   const github =
     token && repoMatch && BRANCH.test(branch) && apiUrl

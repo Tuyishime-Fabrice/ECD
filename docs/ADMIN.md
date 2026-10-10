@@ -29,7 +29,7 @@ files. It runs on Vercel, next to the kid app.
 | `GITHUB_REPO` | no | `owner/name`. Default `Tuyishime-Fabrice/ECD`. |
 | `GITHUB_BRANCH` | no | Default `main`. |
 | `ADMIN_SESSION_SECRET` | no | Signs the login cookie. Default: derived from `ADMIN_PASSWORD` with scrypt (slow and salted, see "Security"), so changing the password logs everyone out. If you set it, use 32+ random characters. |
-| `GITHUB_API_URL` | no | Default `https://api.github.com`. Tests point this at a local fake. |
+| `GITHUB_API_URL` | no | Default `https://api.github.com`. Must start with `https://`, since the token goes with every request; plain `http://` only to `localhost`, `127.0.0.1` or `[::1]`, where tests run a local fake. |
 
 If a required variable is missing, `/admin` shows a friendly setup screen that says exactly
 which one, instead of an error.
@@ -161,7 +161,8 @@ scripts/dev/admin-smoke.sh                  # curl: login → content → YouTub
 The fake keeps its repository in memory (restart it to start over). `POST /__fake/commit
 { message, files }` commits as "someone else". The YouTube stand-in treats video ids that start
 with `NoEmbed` as embedding turned off, and ids that start with `Missing` as deleted.
-`YOUTUBE_OEMBED_URL` and `YOUTUBE_THUMBNAIL_URL` exist only for this; leave them unset in Vercel.
+`YOUTUBE_OEMBED_URL` and `YOUTUBE_THUMBNAIL_URL` exist only for this; leave them unset in Vercel. Like
+`GITHUB_API_URL`, they must be `https://` unless they point at this machine.
 
 ## Screens (plain English, no jargon)
 

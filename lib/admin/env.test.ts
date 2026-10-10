@@ -67,6 +67,32 @@ describe("readAdminEnv", () => {
     ]);
   });
 
+  it("needs https:, except for a stand-in on this machine", () => {
+    // Plain http would send the GitHub token in clear text.
+    const remote = readAdminEnv({
+      ...ready,
+      GITHUB_API_URL: "http://api.github.com",
+      YOUTUBE_OEMBED_URL: "http://www.youtube.com/oembed",
+      YOUTUBE_THUMBNAIL_URL: "http://example.com/vi",
+    });
+    expect(remote.github).toBeNull();
+    expect(remote.youtube).toEqual({ oembedUrl: "https://www.youtube.com/oembed", thumbnailUrl: "https://i.ytimg.com/vi" });
+    expect(remote.setup.problems).toEqual([
+      "GITHUB_API_URL must be a web address starting with https://.",
+      "YOUTUBE_OEMBED_URL must be a web address starting with https://. Remove it to use YouTube.",
+      "YOUTUBE_THUMBNAIL_URL must be a web address starting with https://. Remove it to use YouTube.",
+    ]);
+    for (const local of ["http://localhost:4010", "http://127.0.0.1:4010", "http://[::1]:4010"]) {
+      const env = readAdminEnv({ ...ready, GITHUB_API_URL: local, YOUTUBE_OEMBED_URL: `${local}/oembed`, YOUTUBE_THUMBNAIL_URL: `${local}/vi` });
+      expect(env.setup.problems, local).toEqual([]);
+      expect(env.github?.apiUrl).toBe(local);
+      expect(env.youtube).toEqual({ oembedUrl: `${local}/oembed`, thumbnailUrl: `${local}/vi` });
+    }
+    // Not fooled by a host that only starts like one.
+    expect(readAdminEnv({ ...ready, GITHUB_API_URL: "http://localhost.evil.example" }).github).toBeNull();
+    expect(readAdminEnv({ ...ready, GITHUB_API_URL: "https://ghe.example.com/api/v3" }).github?.apiUrl).toBe("https://ghe.example.com/api/v3");
+  });
+
   it("treats blank values as missing", () => {
     expect(readAdminEnv({ ADMIN_PASSWORD: "   ", GITHUB_TOKEN: "" }).setup.problems.map((p) => p.split(" ")[0])).toEqual([
       "ADMIN_PASSWORD",

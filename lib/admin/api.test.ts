@@ -27,9 +27,9 @@ beforeEach(() => {
   vi.stubEnv("ADMIN_PASSWORD", PASSWORD);
   vi.stubEnv("ADMIN_SESSION_SECRET", "");
   vi.stubEnv("GITHUB_TOKEN", "test-token");
-  vi.stubEnv("GITHUB_API_URL", "http://fake.test");
-  vi.stubEnv("YOUTUBE_OEMBED_URL", "http://fake.test/oembed");
-  vi.stubEnv("YOUTUBE_THUMBNAIL_URL", "http://fake.test/vi");
+  vi.stubEnv("GITHUB_API_URL", "http://127.0.0.1:4010");
+  vi.stubEnv("YOUTUBE_OEMBED_URL", "http://127.0.0.1:4010/oembed");
+  vi.stubEnv("YOUTUBE_THUMBNAIL_URL", "http://127.0.0.1:4010/vi");
 });
 
 afterEach(() => {
