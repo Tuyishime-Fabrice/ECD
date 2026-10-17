@@ -90,7 +90,7 @@ function CollectionStories({ season }: { season: Season }) {
                 <li key={item.challenge.id}>
                   <Link
                     href={`/admin/challenges/${encodeURIComponent(item.challenge.id)}`}
-                    className="group flex min-h-14 items-center gap-3 bg-sun-soft/40 px-4 py-2.5 hover:bg-sun-soft sm:px-5"
+                    className="group flex min-h-14 items-center gap-3 bg-sun-soft/40 px-4 py-2.5 hover:bg-sun-soft sm:px-5 dark:bg-paper-2 dark:hover:bg-brand-soft"
                   >
                     <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-sun text-sun-ink">
                       <Gift className="size-5" {...ICON} />

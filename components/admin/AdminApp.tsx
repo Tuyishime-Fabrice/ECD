@@ -55,7 +55,7 @@ function Frame({ children, wide }: { children: React.ReactNode; wide?: boolean }
       {/* Two soft washes of the logo's teal and mustard; nothing to read, nothing to tap. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_32rem_at_0%_0%,var(--c-brand-soft),transparent_70%),radial-gradient(50rem_28rem_at_100%_100%,var(--c-sun-soft),transparent_70%)]"
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_32rem_at_0%_0%,var(--c-brand-soft),transparent_70%),radial-gradient(50rem_28rem_at_100%_100%,var(--c-sun-soft),transparent_70%)] dark:bg-[radial-gradient(60rem_32rem_at_0%_0%,var(--c-brand-soft),transparent_70%)]"
       />
       <div className={wide ? "w-full max-w-xl" : "w-full max-w-[26rem]"}>
         <div className="mb-8 flex justify-center">

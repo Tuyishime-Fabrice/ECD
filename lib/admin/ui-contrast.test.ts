@@ -76,3 +76,10 @@ describe("Save button on the unsaved-changes bar", () => {
     expect(ratio(themeTokens("dark"), "brand-strong", "ink")).toBeGreaterThanOrEqual(4.5);
   });
 });
+
+// At night, warnings ("Sample video") are mustard text on a faint mustard tint over the card.
+describe("warnings at night", () => {
+  it.each(["paper", "paper-2", "brand-soft"])("sun text on %s is at least 4.5:1", (bg) => {
+    expect(ratio(themeTokens("dark"), "sun", bg)).toBeGreaterThanOrEqual(4.5);
+  });
+});

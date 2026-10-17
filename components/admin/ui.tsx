@@ -209,7 +209,8 @@ type Tone = "live" | "soon" | "warn" | "neutral" | "info" | "danger";
 const TONES: Record<Tone, string> = {
   live: "bg-leaf-soft text-leaf-ink",
   soon: "bg-paper-2 text-ink-2 ring-1 ring-inset ring-line",
-  warn: "bg-sun-soft text-ink ring-1 ring-inset ring-sun-lip/30",
+  // At night a mustard tint with mustard text, so it stays warm without turning olive.
+  warn: "bg-sun-soft text-ink ring-1 ring-inset ring-sun-lip/30 dark:bg-sun/10 dark:text-sun dark:ring-sun/25",
   neutral: "bg-paper-2 text-ink-2 ring-1 ring-inset ring-line",
   info: "bg-brand-soft text-brand",
   danger: "bg-coral-soft text-ink ring-1 ring-inset ring-play-ink/25",
@@ -237,7 +238,7 @@ const ALERT_TONES = {
   error: "border-play-ink/40 bg-coral-soft text-ink [&_svg.alert-icon]:text-play-ink",
   info: "border-brand/20 bg-brand-soft/60 text-ink [&_svg.alert-icon]:text-brand",
   success: "border-leaf/30 bg-leaf-soft text-ink [&_svg.alert-icon]:text-leaf-ink",
-  warn: "border-sun-lip/40 bg-sun-soft text-ink [&_svg.alert-icon]:text-ink",
+  warn: "border-sun-lip/40 bg-sun-soft text-ink [&_svg.alert-icon]:text-ink dark:border-sun/30 dark:bg-sun/10 dark:[&_svg.alert-icon]:text-sun",
 } as const;
 
 export function Alert({

@@ -36,11 +36,11 @@ const NAV = [
   { href: "/admin/stories", label: "Stories", icon: Clapperboard, group: "Content" },
   { href: "/admin/challenges", label: "Challenges", icon: Gift, group: "Content" },
   { href: "/admin/collections", label: "Collections", icon: Library, group: "Content" },
-  { href: "/admin/settings", label: "Settings", icon: Settings, group: "App" },
-  { href: "/admin/history", label: "History", icon: History, group: "App" },
-  { href: "/admin/help", label: "Help", icon: LifeBuoy, group: "App" },
+  { href: "/admin/settings", label: "Settings", icon: Settings, group: "Manage" },
+  { href: "/admin/history", label: "History", icon: History, group: "Manage" },
+  { href: "/admin/help", label: "Help", icon: LifeBuoy, group: "Manage" },
 ] as const;
-const GROUPS = ["", "Content", "App"] as const;
+const GROUPS = ["", "Content", "Manage"] as const;
 
 const isActive = (pathname: string, href: string) =>
   href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
@@ -64,7 +64,7 @@ function leavingTo(link: HTMLAnchorElement): string | null {
 export function BrandMark({ className }: { className?: string }) {
   return (
     <span className={clsx("flex items-center gap-2.5", className)}>
-      <img src="/brand/wordmark.svg" alt={brand.name} className="h-8 w-auto" width={112} height={32} />
+      <img src="/brand/wordmark.svg" alt={brand.name} className="h-9 w-auto" width={126} height={36} />
       <span className="rounded-md bg-brand-soft px-1.5 py-1 text-[11px] font-black uppercase leading-none tracking-[0.1em] text-brand">
         Admin
       </span>
@@ -508,16 +508,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
         </p>
         <div className="ml-auto flex items-center gap-2">
           <LiveChip />
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener"
-            className={buttonClass("secondary", "sm", "hidden lg:inline-flex")}
-          >
-            <ExternalLink className="size-4" {...ICON} />
-            Open the app
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
+          <span className="hidden lg:block">
+            <a href="/" target="_blank" rel="noopener" className={buttonClass("secondary", "sm")}>
+              <ExternalLink className="size-4" {...ICON} />
+              Open the app
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </span>
         </div>
       </header>
 

@@ -65,7 +65,7 @@ export function ChallengesScreen() {
                           href={`/admin/challenges/${encodeURIComponent(challenge.id)}`}
                           className="group flex items-center gap-4 rounded-xl border border-line bg-paper p-3 transition-colors hover:border-brand/40 hover:bg-paper-2"
                         >
-                          <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-sun-soft ring-1 ring-inset ring-sun-lip/25">
+                          <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-sun-soft ring-1 ring-inset ring-sun-lip/25 dark:bg-paper-2 dark:ring-line">
                             <PictureView
                               src={challenge.sticker ? pictureSrc(challenge.sticker) : ""}
                               alt=""

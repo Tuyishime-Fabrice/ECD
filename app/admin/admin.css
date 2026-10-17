@@ -57,8 +57,7 @@
 }
 .admin-dialog::backdrop,
 .admin-drawer::backdrop {
-  background: rgb(10 31 30 / 0.55);
-  backdrop-filter: blur(2px);
+  background: rgb(10 31 30 / 0.5);
 }
 .admin-drawer[open] {
   animation: admin-drawer-in 180ms ease-out;
