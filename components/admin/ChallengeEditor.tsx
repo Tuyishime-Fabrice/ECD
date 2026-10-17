@@ -322,7 +322,7 @@ function ChallengeScreen({ id, collection, onStartOver }: Props & { onStartOver:
 
         <p className="flex items-center gap-2 text-sm text-ink-2">
           <Info className="size-4 text-ink-3" {...ICON} />
-          Izuba reads each question aloud, so keep the words short and simple.
+          The app reads each question aloud, so keep the words short and simple.
         </p>
 
         <div className="flex flex-col-reverse gap-3 border-t border-line pt-6 sm:flex-row sm:items-center sm:justify-between">

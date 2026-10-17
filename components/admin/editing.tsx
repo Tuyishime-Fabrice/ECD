@@ -16,10 +16,10 @@ import { PictureError, preparePicture } from "./pictures";
 import { Button, FieldErrors, ICON, PictureView } from "./ui";
 
 export const COLORS: Record<SeasonColor, { label: string; swatch: string; soft: string }> = {
-  sky: { label: "Sky blue", swatch: "bg-listen", soft: "bg-listen/15" },
+  sky: { label: "Teal", swatch: "bg-brand-strong", soft: "bg-brand-soft" },
   coral: { label: "Coral", swatch: "bg-coral", soft: "bg-coral-soft" },
   leaf: { label: "Leaf green", swatch: "bg-leaf", soft: "bg-leaf-soft" },
-  grape: { label: "Grape purple", swatch: "bg-berry", soft: "bg-berry-soft" },
+  grape: { label: "Mustard", swatch: "bg-sun", soft: "bg-sun-soft" },
 };
 
 export const videoLink = (youtubeId: string) => (youtubeId && youtubeId !== "DEMO" ? `https://youtu.be/${youtubeId}` : "");

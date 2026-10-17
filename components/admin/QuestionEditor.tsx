@@ -56,7 +56,7 @@ export function QuestionEditor({
         <Bilingual
           field={f("promptText")}
           label="The question"
-          hint="Izuba reads it out loud. Keep it short: “Tap the picture with 3 mangoes”."
+          hint="The app reads it out loud. Keep it short: “Tap the picture with 3 mangoes”."
           value={value.promptText}
           onChange={(promptText) => set({ promptText })}
           errors={errors}

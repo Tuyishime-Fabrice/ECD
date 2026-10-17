@@ -13,10 +13,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // The browser bar matches the dashboard's paper top bar.
+  // The browser bar matches the dashboard's paper top bar (white by day, deep teal at night).
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#fffdf8" },
-    { media: "(prefers-color-scheme: dark)", color: "#1f2546" },
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#12302e" },
   ],
 };
 

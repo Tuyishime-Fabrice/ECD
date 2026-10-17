@@ -694,7 +694,7 @@ function QuestionCard({ story, update, errors, skills }: SectionProps & { skills
       <CardHeader
         icon={<MessageCircleQuestion className="size-5" {...ICON} />}
         title="Question during the story"
-        description="Optional. The video pauses and Izuba asks a picture question, then the story goes on."
+        description="Optional. The video pauses and the app asks a picture question, then the story goes on."
       />
       <CardBody>
         {points.length === 0 ? (
