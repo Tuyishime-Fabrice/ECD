@@ -29,7 +29,7 @@ export function ChallengesScreen() {
               <div className="flex flex-wrap items-center gap-x-4 gap-y-3 border-b border-line px-4 py-4 sm:px-5">
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <h2 id={headingId} className="font-display text-lg font-bold text-ink">
+                    <h2 id={headingId} className="font-display text-lg font-black text-ink">
                       {season.title.en}
                     </h2>
                     {season.status === "published" ? <Badge tone="live">Live</Badge> : <Badge tone="soon">Coming soon</Badge>}
@@ -63,9 +63,9 @@ export function ChallengesScreen() {
                       <li key={challenge.id}>
                         <Link
                           href={`/admin/challenges/${encodeURIComponent(challenge.id)}`}
-                          className="group flex items-center gap-4 rounded-xl border border-line bg-paper p-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
+                          className="group flex items-center gap-4 rounded-xl border border-line bg-paper p-3 transition-colors hover:border-brand/40 hover:bg-paper-2"
                         >
-                          <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-berry-soft ring-1 ring-berry/20">
+                          <span className="grid size-16 shrink-0 place-items-center rounded-xl bg-sun-soft ring-1 ring-inset ring-sun-lip/25 dark:bg-paper-2 dark:ring-line">
                             <PictureView
                               src={challenge.sticker ? pictureSrc(challenge.sticker) : ""}
                               alt=""
@@ -74,10 +74,10 @@ export function ChallengesScreen() {
                             />
                           </span>
                           <span className="min-w-0 flex-1">
-                            <span className="block text-xs font-extrabold uppercase tracking-[0.08em] text-berry-ink">
+                            <span className="block text-xs font-black uppercase tracking-[0.1em] text-ink-3">
                               Challenge {i + 1}
                             </span>
-                            <span className="line-clamp-2 font-semibold leading-snug text-ink group-hover:underline">
+                            <span className="line-clamp-2 font-bold leading-snug text-ink group-hover:underline">
                               {challenge.title.en || "Untitled challenge"}
                             </span>
                             <span className="mt-0.5 block text-sm text-ink-2">

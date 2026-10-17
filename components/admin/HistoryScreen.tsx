@@ -94,7 +94,7 @@ export function HistoryScreen() {
                     <span className="relative mt-1.5 block size-2.5 rounded-full bg-ink-3 ring-4 ring-paper" />
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="font-semibold text-ink">{commit.summary || "Saved changes"}</p>
+                    <p className="font-bold text-ink">{commit.summary || "Saved changes"}</p>
                     <p className="mt-0.5 flex flex-wrap items-center gap-2 text-sm text-ink-2">
                       <time dateTime={commit.date} title={friendlyDate(commit.date)}>
                         {timeAgo(commit.date)}
@@ -159,7 +159,7 @@ function UndoDialog({
         <>
           {commit && (
             <span className="mb-2 block rounded-lg border border-line bg-paper-2 px-3 py-2 text-ink">
-              <span className="block font-semibold">{commit.summary || "Saved changes"}</span>
+              <span className="block font-bold">{commit.summary || "Saved changes"}</span>
               <span className="block text-sm text-ink-2">{friendlyDate(commit.date)}</span>
             </span>
           )}

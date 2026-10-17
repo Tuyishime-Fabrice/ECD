@@ -86,7 +86,7 @@ function FeaturedCard({ errors }: { errors?: readonly string[] }) {
                       className="aspect-video w-20 shrink-0 rounded-lg ring-1 ring-line sm:w-24"
                     />
                     <span className="min-w-0 flex-1">
-                      <span className="line-clamp-2 font-semibold leading-snug text-ink sm:line-clamp-1">{title}</span>
+                      <span className="line-clamp-2 font-bold leading-snug text-ink sm:line-clamp-1">{title}</span>
                       <span className="block truncate text-sm text-ink-2">{found?.season.title.en}</span>
                     </span>
                   </span>

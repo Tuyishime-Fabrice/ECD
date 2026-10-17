@@ -16,10 +16,10 @@ import { PictureError, preparePicture } from "./pictures";
 import { Button, FieldErrors, ICON, PictureView } from "./ui";
 
 export const COLORS: Record<SeasonColor, { label: string; swatch: string; soft: string }> = {
-  sky: { label: "Sky blue", swatch: "bg-listen", soft: "bg-listen/15" },
+  sky: { label: "Teal", swatch: "bg-brand-strong", soft: "bg-brand-soft" },
   coral: { label: "Coral", swatch: "bg-coral", soft: "bg-coral-soft" },
   leaf: { label: "Leaf green", swatch: "bg-leaf", soft: "bg-leaf-soft" },
-  grape: { label: "Grape purple", swatch: "bg-berry", soft: "bg-berry-soft" },
+  grape: { label: "Mustard", swatch: "bg-sun", soft: "bg-sun-soft" },
 };
 
 export const videoLink = (youtubeId: string) => (youtubeId && youtubeId !== "DEMO" ? `https://youtu.be/${youtubeId}` : "");
@@ -94,7 +94,7 @@ export function ProblemSummary({ byField }: { byField: Map<string, string[]> }) 
                 e.preventDefault();
                 focusField(fieldId(field));
               }}
-              className="text-[15px] font-semibold text-ink underline decoration-play-ink/50 underline-offset-2 hover:decoration-play-ink"
+              className="text-[15px] font-bold text-ink underline decoration-play-ink/50 underline-offset-2 hover:decoration-play-ink"
             >
               {fieldLabel(field) ? `${fieldLabel(field)}: ` : ""}
               {problem}
@@ -199,7 +199,7 @@ export function PictureField({
     <div className={className}>
       <p id={`${id}-label`} className="mb-1.5 flex items-baseline gap-2 text-[15px] font-bold text-ink">
         {label}
-        {optional && <span className="text-sm font-semibold text-ink-3">Optional</span>}
+        {optional && <span className="text-sm font-bold text-ink-3">Optional</span>}
       </p>
       {hint && <p className="-mt-0.5 mb-2.5 text-sm text-ink-2">{hint}</p>}
       <div className={clsx("flex gap-3", square ? "flex-row items-center gap-4" : "flex-col")}>
