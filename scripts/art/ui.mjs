@@ -15,6 +15,11 @@ function giftDefs(doc) {
   doc.def("glid", linear("glid", [[0, "#4FA49B"], [1, "#2A7E78"]], [0, 0, 0, 1]));
   doc.def("rib", linear("rib", [[0, "#F49580"], [1, "#E0654D"]], [0, 0, 0, 1]));
   doc.def("gold", linear("gold", [[0, "#F8D06A"], [1, "#EDA82E"]], [0, 0, 0, 1]));
+  // On the dark (deep teal) theme the box turns a lighter teal by itself, so it still stands out.
+  doc.def(
+    "gdark",
+    "<style>@media (prefers-color-scheme:dark){#gbox stop:first-child{stop-color:#4AAFA5}#gbox stop:last-child{stop-color:#2A807A}#glid stop:first-child{stop-color:#7FC8BE}#glid stop:last-child{stop-color:#4AAFA5}}</style>",
+  );
 }
 
 /** Imigongo chevrons stacked down a vertical ribbon (x0..x1, y0..y1). */
@@ -23,7 +28,7 @@ function chevrons(x0, x1, y0, y1, step = 8) {
   const half = (x1 - x0) / 2;
   let dark = "";
   let ochre = "";
-  for (let y = y0 + 3, i = 0; y < y1 - 2; y += step / 2, i++) {
+  for (let y = y0 + 3, i = 0; y + half * 0.55 < y1 - 2; y += step / 2, i++) {
     const d = `M${f(x0 + 1.5)} ${f(y)}L${f(mid)} ${f(y + half * 0.55)}L${f(x1 - 1.5)} ${f(y)}`;
     if (i % 2) ochre += d;
     else dark += d;
