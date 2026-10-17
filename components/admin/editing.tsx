@@ -94,7 +94,7 @@ export function ProblemSummary({ byField }: { byField: Map<string, string[]> }) 
                 e.preventDefault();
                 focusField(fieldId(field));
               }}
-              className="text-[15px] font-semibold text-ink underline decoration-play-ink/50 underline-offset-2 hover:decoration-play-ink"
+              className="text-[15px] font-bold text-ink underline decoration-play-ink/50 underline-offset-2 hover:decoration-play-ink"
             >
               {fieldLabel(field) ? `${fieldLabel(field)}: ` : ""}
               {problem}
@@ -199,7 +199,7 @@ export function PictureField({
     <div className={className}>
       <p id={`${id}-label`} className="mb-1.5 flex items-baseline gap-2 text-[15px] font-bold text-ink">
         {label}
-        {optional && <span className="text-sm font-semibold text-ink-3">Optional</span>}
+        {optional && <span className="text-sm font-bold text-ink-3">Optional</span>}
       </p>
       {hint && <p className="-mt-0.5 mb-2.5 text-sm text-ink-2">{hint}</p>}
       <div className={clsx("flex gap-3", square ? "flex-row items-center gap-4" : "flex-col")}>

@@ -1,8 +1,46 @@
-/* Dashboard-only styles. Colors come from the day/night tokens in app/globals.css. */
+/*
+ * Dashboard-only styles. Colors come from the ECD Imuhira day/night tokens in app/globals.css;
+ * the dashboard is calm teal on cream by day and deep teal at night.
+ */
 
-/* The kid app's gold focus outline is faint on paper; listen-blue keeps 3:1 in both themes. */
+.admin-root {
+  font-size: 1rem;
+  line-height: 1.5;
+  /* Soft, teal-tinted elevation: a hairline border does the work, the shadow only lifts. */
+  --a-sh-1: 0 1px 2px rgb(18 76 74 / 0.05), 0 1px 1px rgb(18 76 74 / 0.03);
+  --a-sh-2: 0 1px 2px rgb(18 76 74 / 0.06), 0 4px 12px -4px rgb(18 76 74 / 0.1);
+  --a-sh-3: 0 2px 4px rgb(18 76 74 / 0.06), 0 16px 40px -12px rgb(18 76 74 / 0.24);
+  --a-btn: 0 1px 2px rgb(18 76 74 / 0.08);
+  --a-btn-solid: inset 0 1px 0 rgb(255 255 255 / 0.12), 0 1px 2px rgb(18 76 74 / 0.24);
+}
+@media (prefers-color-scheme: dark) {
+  .admin-root {
+    --a-sh-1: 0 1px 2px rgb(0 0 0 / 0.25);
+    --a-sh-2: 0 1px 2px rgb(0 0 0 / 0.3), 0 6px 16px -6px rgb(0 0 0 / 0.45);
+    --a-sh-3: 0 2px 4px rgb(0 0 0 / 0.35), 0 20px 48px -12px rgb(0 0 0 / 0.6);
+    --a-btn: 0 1px 2px rgb(0 0 0 / 0.3);
+    --a-btn-solid: inset 0 1px 0 rgb(255 255 255 / 0.1), 0 1px 2px rgb(0 0 0 / 0.4);
+  }
+}
+.admin-sh-1 {
+  box-shadow: var(--a-sh-1);
+}
+.admin-sh-2 {
+  box-shadow: var(--a-sh-2);
+}
+.admin-sh-3 {
+  box-shadow: var(--a-sh-3);
+}
+.admin-btn {
+  box-shadow: var(--a-btn);
+}
+.admin-btn-solid {
+  box-shadow: var(--a-btn-solid);
+}
+
+/* The kid app's gold focus outline is faint on white; brand teal keeps 3:1 in both themes. */
 .admin-root :focus-visible {
-  outline: 3px solid var(--c-listen);
+  outline: 2px solid var(--c-brand);
   outline-offset: 2px;
 }
 /* Text fields show focus with their own ring and border instead. */
@@ -10,13 +48,17 @@
   outline: none;
 }
 
-.admin-root {
-  font-size: 1rem;
-  line-height: 1.5;
+.admin-root ::selection {
+  background: color-mix(in srgb, var(--c-sun) 45%, transparent);
 }
 
 .admin-dialog[open] {
   animation: admin-dialog-in 160ms ease-out;
+}
+.admin-dialog::backdrop,
+.admin-drawer::backdrop {
+  background: rgb(10 31 30 / 0.55);
+  backdrop-filter: blur(2px);
 }
 .admin-drawer[open] {
   animation: admin-drawer-in 180ms ease-out;

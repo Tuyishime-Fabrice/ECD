@@ -241,8 +241,8 @@ function ChallengeScreen({ id, collection, onStartOver }: Props & { onStartOver:
         <section aria-labelledby="questions-heading">
           <div className="mb-3 flex items-end justify-between gap-4">
             <div>
-              <h2 id="questions-heading" className="flex items-center gap-2 font-display text-lg font-bold text-ink">
-                <ListChecks className="size-5 text-listen-ink" {...ICON} />
+              <h2 id="questions-heading" className="flex items-center gap-2 font-display text-lg font-black text-ink">
+                <ListChecks className="size-5 text-brand" {...ICON} />
                 Questions
               </h2>
               <p className="text-[15px] text-ink-2">Exactly 5. Each has 2 to 4 picture answers.</p>
@@ -269,7 +269,7 @@ function ChallengeScreen({ id, collection, onStartOver }: Props & { onStartOver:
                           {i + 1}
                         </span>
                         <span className="min-w-0 flex-1">
-                          <span className="block truncate font-semibold text-ink">
+                          <span className="block truncate font-bold text-ink">
                             {question.promptText.en || <span className="text-ink-3">No question yet</span>}
                           </span>
                           <span className="block text-sm text-ink-2">
@@ -278,7 +278,7 @@ function ChallengeScreen({ id, collection, onStartOver }: Props & { onStartOver:
                           </span>
                         </span>
                         {problems > 0 && (
-                          <span className="flex items-center gap-1 text-sm font-semibold text-play-ink">
+                          <span className="flex items-center gap-1 text-sm font-bold text-play-ink">
                             <CircleAlert className="size-4" {...ICON} />
                             <span className="hidden sm:inline">{problems === 1 ? "1 to fix" : `${problems} to fix`}</span>
                             <span className="sm:hidden">{problems}</span>

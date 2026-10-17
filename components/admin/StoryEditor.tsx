@@ -566,7 +566,7 @@ function VideoCard({ story, errors, update, yt }: SectionProps & { yt: ReturnTyp
               <Check className="size-4" strokeWidth={3} aria-hidden />
             </span>
             <div className="min-w-0">
-              <p className="truncate font-semibold text-ink">{yt.lookup.info.title || "Video found"}</p>
+              <p className="truncate font-bold text-ink">{yt.lookup.info.title || "Video found"}</p>
               <p className="text-sm text-ink-2">
                 Found on YouTube. {lookupMessage(yt.lookup.filled)}
               </p>
@@ -795,7 +795,7 @@ function Preview({ story, number }: { story: Episode; number: number }) {
   const { pictureSrc } = useDraft();
   return (
     <Card className="overflow-hidden">
-      <p className="px-4 pt-3.5 text-xs font-extrabold uppercase tracking-[0.08em] text-ink-3">What children see</p>
+      <p className="px-4 pt-3.5 text-xs font-black uppercase tracking-[0.08em] text-ink-3">What children see</p>
       <div className="p-3">
         <div className="rounded-xl bg-paper-2 p-2.5 ring-1 ring-line">
           <PictureView
@@ -803,7 +803,7 @@ function Preview({ story, number }: { story: Episode; number: number }) {
             alt=""
             className="aspect-video w-full rounded-lg"
           />
-          <p className="mt-2 text-[11px] font-extrabold uppercase tracking-[0.08em] text-play-ink">Story {number}</p>
+          <p className="mt-2 text-[11px] font-black uppercase tracking-[0.08em] text-play-ink">Story {number}</p>
           <p className="line-clamp-2 font-display text-base font-bold leading-snug text-ink">
             {story.title.rw || story.title.en || "Story title"}
           </p>
@@ -825,7 +825,7 @@ function Checklist({ story }: { story: Episode }) {
   ];
   return (
     <Card>
-      <p className="px-4 pt-3.5 text-xs font-extrabold uppercase tracking-[0.08em] text-ink-3">Checklist</p>
+      <p className="px-4 pt-3.5 text-xs font-black uppercase tracking-[0.08em] text-ink-3">Checklist</p>
       <ul className="space-y-1 px-4 pb-4 pt-2">
         {items.map((item) => (
           <li key={item.label} className="flex items-center gap-2.5 py-0.5 text-[15px]">
@@ -845,7 +845,7 @@ function Checklist({ story }: { story: Episode }) {
         ))}
       </ul>
       <div className="border-t border-line px-4 py-3 text-sm text-ink-2">
-        <Link href="/admin/help#stories" className="font-semibold text-listen-ink hover:underline">
+        <Link href="/admin/help#stories" className="font-bold text-brand hover:underline">
           Tips for good stories
         </Link>
       </div>

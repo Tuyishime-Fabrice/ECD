@@ -8,7 +8,7 @@ import { Eye, EyeOff, LoaderCircle, RefreshCw, Settings, TriangleAlert } from "l
 import { useEffect, useRef, useState } from "react";
 import { brand } from "@/lib/brand";
 import { AdminProvider, useAdmin } from "./AdminProvider";
-import { BrandMark, Shell } from "./Shell";
+import { Shell } from "./Shell";
 import { Alert, Button, Field, ICON, TextInput } from "./ui";
 
 export function AdminApp({ children }: { children: React.ReactNode }) {
@@ -17,7 +17,7 @@ export function AdminApp({ children }: { children: React.ReactNode }) {
     document.documentElement.lang = "en";
   }, []);
   return (
-    <div lang="en" className="admin-root min-h-dvh bg-paper-2 font-body text-base text-ink">
+    <div lang="en" className="admin-root min-h-dvh bg-ground font-body text-base text-ink">
       <AdminProvider>
         <Gate>{children}</Gate>
       </AdminProvider>
@@ -33,7 +33,7 @@ function Gate({ children }: { children: React.ReactNode }) {
         <Frame>
           <div className="flex items-center justify-center gap-3 py-10 text-ink-2" role="status">
             <LoaderCircle className="size-5 animate-spin" {...ICON} />
-            <span className="font-semibold">Opening the dashboard…</span>
+            <span className="font-bold">Opening the dashboard…</span>
           </div>
         </Frame>
       );
@@ -48,19 +48,21 @@ function Gate({ children }: { children: React.ReactNode }) {
   }
 }
 
-/** Sign-in and setup: one card in the middle, with the app's hills along the bottom. */
+/** Sign-in and setup: the ECD Imuhira logo above one card in the middle of a calm cream page. */
 function Frame({ children, wide }: { children: React.ReactNode; wide?: boolean }) {
   return (
-    <div className="relative isolate flex min-h-dvh flex-col items-center overflow-hidden px-4 pb-40 pt-10 sm:justify-center sm:pt-16">
-      <picture className="pointer-events-none absolute inset-x-0 bottom-0 -z-10 block h-44 sm:h-56">
-        <source media="(prefers-color-scheme: dark)" srcSet="/images/world/home-hills-night.svg" />
-        <img src="/images/world/home-hills-day.svg" alt="" className="size-full object-cover object-bottom opacity-90" />
-      </picture>
-      <div className={wide ? "w-full max-w-xl" : "w-full max-w-[25rem]"}>
-        <div className="mb-6 flex justify-center">
-          <BrandMark />
+    <div className="relative isolate flex min-h-dvh flex-col items-center overflow-hidden px-4 pb-10 pt-10 sm:justify-center sm:py-16">
+      {/* Two soft washes of the logo's teal and mustard; nothing to read, nothing to tap. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60rem_32rem_at_0%_0%,var(--c-brand-soft),transparent_70%),radial-gradient(50rem_28rem_at_100%_100%,var(--c-sun-soft),transparent_70%)]"
+      />
+      <div className={wide ? "w-full max-w-xl" : "w-full max-w-[26rem]"}>
+        <div className="mb-8 flex justify-center">
+          <img src="/brand/lockup.svg" alt={brand.name} className="h-[4.5rem] w-auto sm:h-20" width={234} height={80} />
         </div>
-        <div className="rounded-2xl border border-line bg-paper p-6 shadow-e2 sm:p-8">{children}</div>
+        <div className="admin-sh-2 rounded-2xl border border-line bg-paper p-6 sm:p-8">{children}</div>
+        <p className="mt-6 text-center text-sm text-ink-2">{brand.name} · Admin dashboard</p>
       </div>
     </div>
   );
@@ -102,8 +104,8 @@ function LoginScreen() {
 
   return (
     <Frame>
-      <h1 className="font-display text-2xl font-bold text-ink">Sign in</h1>
-      <p className="mt-1 text-[15px] text-ink-2">Manage the stories children watch in {brand.name}.</p>
+      <h1 className="font-display text-2xl font-black text-ink">Sign in</h1>
+      <p className="mt-1.5 text-[15px] text-ink-2">Manage the stories children watch in {brand.name}.</p>
       {signedOutWithChanges && (
         <Alert tone="info" className="mt-5" title="You were signed out">
           Your changes are still here. Sign in again to save them.
@@ -127,7 +129,7 @@ function LoginScreen() {
                 onClick={() => setShow((s) => !s)}
                 aria-label={show ? "Hide the password" : "Show the password"}
                 aria-pressed={show}
-                className="absolute right-0 top-0 grid size-11 place-items-center rounded-r-xl text-ink-3 hover:text-ink"
+                className="absolute right-0 top-0 grid size-11 place-items-center rounded-r-[10px] text-ink-3 hover:text-brand"
               >
                 {show ? <EyeOff className="size-5" {...ICON} /> : <Eye className="size-5" {...ICON} />}
               </button>
@@ -138,7 +140,7 @@ function LoginScreen() {
           {busy ? "Signing in…" : "Sign in"}
         </Button>
       </form>
-      <p className="mt-6 border-t border-line pt-4 text-sm text-ink-2">
+      <p className="mt-6 border-t border-line pt-5 text-sm text-ink-2">
         Forgot the password? Ask the person who set up {brand.name}. It is kept in the hosting settings, as
         ADMIN_PASSWORD.
       </p>
@@ -170,10 +172,10 @@ function SetupScreen() {
   }, []);
   return (
     <Frame wide>
-      <span className="grid size-11 place-items-center rounded-xl bg-listen/12 text-listen-ink">
+      <span className="grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">
         <Settings className="size-6" {...ICON} />
       </span>
-      <h1 className="mt-4 font-display text-2xl font-bold text-ink">Finish setting up the dashboard</h1>
+      <h1 className="mt-4 font-display text-2xl font-black text-ink">Finish setting up the dashboard</h1>
       <p className="mt-1 text-[15px] text-ink-2">
         The dashboard needs a few settings before anyone can sign in. This is done once, by the person who
         manages the hosting (Vercel).
@@ -228,7 +230,7 @@ function SetupScreen() {
 function Step({ n, title, children }: { n: number; title: string; children: React.ReactNode }) {
   return (
     <li className="flex gap-3.5">
-      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-listen-lip font-display text-sm font-bold text-white">
+      <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-strong font-display text-sm font-black text-on-accent">
         {n}
       </span>
       <div className="min-w-0 pt-0.5">
@@ -247,7 +249,7 @@ function ErrorScreen() {
       <span className="grid size-11 place-items-center rounded-xl bg-coral-soft text-play-ink">
         <TriangleAlert className="size-6" {...ICON} />
       </span>
-      <h1 className="mt-4 font-display text-2xl font-bold text-ink">The dashboard didn&apos;t open</h1>
+      <h1 className="mt-4 font-display text-2xl font-black text-ink">The dashboard didn&apos;t open</h1>
       <p className="mt-1 text-[15px] text-ink-2">{loadError || "Something went wrong."}</p>
       <Button
         variant="primary"

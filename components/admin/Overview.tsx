@@ -32,7 +32,7 @@ function RecentSaves() {
         actions={
           <Link
             href="/admin/history"
-            className="-my-2.5 inline-flex min-h-11 items-center text-[15px] font-semibold text-listen-ink hover:underline"
+            className="-my-2.5 inline-flex min-h-11 items-center text-[15px] font-bold text-brand hover:underline"
           >
             See all
           </Link>
@@ -53,7 +53,7 @@ function RecentSaves() {
               <li key={c.sha} className="flex items-start gap-3 py-2.5 first:pt-0 last:pb-0">
                 <History className="mt-0.5 size-[18px] shrink-0 text-ink-3" {...ICON} />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate font-semibold text-ink">{c.summary || "Saved changes"}</p>
+                  <p className="truncate font-bold text-ink">{c.summary || "Saved changes"}</p>
                   <p className="text-sm text-ink-2">
                     <time dateTime={c.date} title={friendlyDate(c.date)}>
                       {timeAgo(c.date)}
@@ -135,15 +135,15 @@ export function Overview() {
           <Link
             key={href}
             href={href}
-            className="group rounded-2xl border border-line bg-paper p-4 shadow-e1 transition-colors hover:border-ink-3/40 sm:p-5"
+            className="admin-sh-1 group rounded-2xl border border-line bg-paper p-4 transition-colors hover:border-brand/40 sm:p-5"
           >
             <div className="flex items-center justify-between">
               <p className="text-[15px] font-bold text-ink-2">{label}</p>
-              <span className="grid size-9 place-items-center rounded-xl bg-listen/12 text-listen-ink">
+              <span className="grid size-9 place-items-center rounded-xl bg-brand-soft text-brand">
                 <Icon className="size-5" {...ICON} />
               </span>
             </div>
-            <p className="mt-1 font-display text-[32px] font-bold leading-none tabular-nums text-ink sm:mt-2 sm:text-4xl">{value}</p>
+            <p className="mt-1 font-display text-[32px] font-black leading-none tabular-nums text-ink sm:mt-2 sm:text-4xl">{value}</p>
             <p className="mt-2 text-sm text-ink-2">{note}</p>
           </Link>
         ))}
@@ -159,11 +159,11 @@ export function Overview() {
                   <li key={href}>
                     <Link
                       href={href}
-                      className="group flex h-full min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-ink-3/40 hover:bg-paper-2"
+                      className="group flex h-full min-h-16 items-center gap-3 rounded-xl border border-line px-3.5 py-3 transition-colors hover:border-brand/40 hover:bg-paper-2"
                     >
-                      <Icon className="size-5 shrink-0 text-ink-3 group-hover:text-listen-ink" {...ICON} />
+                      <Icon className="size-5 shrink-0 text-ink-3 group-hover:text-brand" {...ICON} />
                       <span className="min-w-0 flex-1">
-                        <span className="block font-semibold text-ink">{label}</span>
+                        <span className="block font-bold text-ink">{label}</span>
                         <span className="block text-sm text-ink-2">{note}</span>
                       </span>
                       <ArrowRight className="size-4 shrink-0 text-ink-3 opacity-0 transition-opacity group-hover:opacity-100" {...ICON} />
@@ -181,7 +181,7 @@ export function Overview() {
               description={`${draft.site.featured.length} of 6 stories in the big slider.`}
             />
             <CardBody className="pt-3">
-              <Link href="/admin/settings#f-featured" className="text-[15px] font-semibold text-listen-ink hover:underline">
+              <Link href="/admin/settings#f-featured" className="text-[15px] font-bold text-brand hover:underline">
                 Choose featured stories
               </Link>
             </CardBody>
@@ -196,7 +196,7 @@ export function Overview() {
               actions={<LiveChip announce={false} />}
             />
             <CardBody className="pt-3">
-              <Link href="/admin/history" className="text-[15px] font-semibold text-listen-ink hover:underline">
+              <Link href="/admin/history" className="text-[15px] font-bold text-brand hover:underline">
                 See all saves
               </Link>
             </CardBody>
@@ -212,7 +212,7 @@ export function Overview() {
                   ["Live in about 2 minutes", "Children see the change the next time they open the app. Every save can be undone from History."],
                 ].map(([title, body], i) => (
                   <li key={title} className="flex gap-3">
-                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-listen-lip font-display text-sm font-bold text-white">
+                    <span className="grid size-7 shrink-0 place-items-center rounded-full bg-brand-strong font-display text-sm font-black text-on-accent">
                       {i + 1}
                     </span>
                     <div className="pt-0.5">

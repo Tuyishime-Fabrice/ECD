@@ -187,7 +187,7 @@ function AnswerCard({
           <button
             type="button"
             onClick={onRemove}
-            className="-my-1 -mr-1 grid size-11 place-items-center rounded-lg text-ink-3 hover:bg-ink/[0.06] hover:text-play-ink"
+            className="-my-1 -mr-1 grid size-11 place-items-center rounded-lg text-ink-3 hover:bg-paper-2 hover:text-play-ink"
             aria-label={`Remove answer ${letter}`}
             title={`Remove answer ${letter}`}
           >
@@ -203,14 +203,14 @@ function AnswerCard({
           aria-label={option.image ? `Answer ${letter} picture: replace it` : `Answer ${letter}: add a picture`}
           aria-describedby={problems.length ? `${imageId}-error` : undefined}
           className={clsx(
-            "group relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-xl border bg-paper-2 transition-colors hover:border-listen",
+            "group relative grid size-24 shrink-0 place-items-center overflow-hidden rounded-xl border bg-paper-2 transition-colors hover:border-brand",
             problems.length ? "border-play-ink" : option.image ? "border-line" : "border-dashed border-ink-3/60",
           )}
         >
           {option.image ? (
             <PictureView src={pictureSrc(option.image)} alt="" fit="contain" className="size-full p-1.5" />
           ) : (
-            <span className="flex flex-col items-center gap-1 text-sm font-semibold text-ink-2 group-hover:text-listen-ink">
+            <span className="flex flex-col items-center gap-1 text-sm font-bold text-ink-2 group-hover:text-brand">
               <ImagePlus className="size-6" {...ICON} />
               Add picture
             </span>
@@ -223,7 +223,7 @@ function AnswerCard({
         </button>
         <div className="flex min-w-0 flex-1 flex-col justify-between gap-2">
           <div>
-            <label htmlFor={fieldId(`${field}.label`)} className="text-sm font-semibold text-ink-2">
+            <label htmlFor={fieldId(`${field}.label`)} className="text-sm font-bold text-ink-2">
               What it shows
             </label>
             <TextInput
@@ -236,8 +236,8 @@ function AnswerCard({
           </div>
           <label
             className={clsx(
-              "flex min-h-11 cursor-pointer items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 text-[15px] font-semibold",
-              correct ? "bg-leaf-soft text-leaf-ink" : "text-ink-2 hover:bg-ink/[0.05]",
+              "flex min-h-11 cursor-pointer items-center gap-2.5 whitespace-nowrap rounded-lg px-2.5 text-[15px] font-bold",
+              correct ? "bg-leaf-soft text-leaf-ink" : "text-ink-2 hover:bg-paper-2",
             )}
           >
             <input
