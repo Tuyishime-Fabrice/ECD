@@ -38,11 +38,30 @@ export function PlayDisc({ className }: { className?: string }) {
 }
 
 /** Mustard progress strip. A started story always shows a sliver; 0 shows an empty track. */
-export function ProgressStrip({ percent, className }: { percent: number; className?: string }) {
+export function ProgressStrip({
+  percent,
+  className,
+  variant = "track",
+}: {
+  percent: number;
+  className?: string;
+  /** "track": a rounded bar on a hairline track. "edge": a flat bar along a picture's bottom edge. */
+  variant?: "track" | "edge";
+}) {
   const width = percent <= 0 ? 0 : Math.max(6, Math.min(100, percent));
   return (
-    <span aria-hidden className={clsx("block h-1.5 overflow-hidden rounded-full bg-line", className)}>
-      <span className="block h-full rounded-full bg-sun" style={{ width: `${width}%` }} />
+    <span
+      aria-hidden
+      className={clsx(
+        "block overflow-hidden",
+        variant === "track" ? "h-1.5 rounded-full bg-line" : "h-1.5 bg-black/30",
+        className,
+      )}
+    >
+      <span
+        className={clsx("block h-full bg-sun", variant === "track" ? "rounded-full" : "rounded-r-full")}
+        style={{ width: `${width}%` }}
+      />
     </span>
   );
 }

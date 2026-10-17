@@ -26,7 +26,7 @@ export default function HomePage() {
         <div className="absolute inset-x-0 -bottom-px h-16 bg-gradient-to-b from-transparent to-ground" />
       </div>
 
-      <div className="mx-auto max-w-[1400px] pt-2">
+      <div className="mx-auto max-w-6xl pt-4 md:pt-8">
         <HomeHero featured={featured} seasons={seasons} />
         {published.map((season, i) => (
           <CollectionRow key={season.id} season={season} allSeasons={seasons} eager={i === 0} />

@@ -40,36 +40,37 @@ export function CollectionRow({
   }, [upNextId]);
 
   return (
-    <section aria-labelledby={`collection-${season.id}`} className="mt-8 first:mt-6">
-      <div className="flex items-center gap-3 px-4 md:px-8">
+    <section aria-labelledby={`collection-${season.id}`} className="mt-8 first:mt-6 md:mt-12">
+      <div className="flex items-center gap-3 px-4 md:gap-4 md:px-8">
         <img
           src={season.posterImage}
           alt=""
           width={56}
           height={56}
-          className="size-14 shrink-0 rounded-full border-[3px] border-paper bg-paper object-cover shadow-e1"
+          className="size-12 shrink-0 rounded-2xl border border-line bg-paper object-cover shadow-e1 md:size-14"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-black uppercase tracking-[0.08em] text-ink-3">
-            {t("storiesProgress", { n: watched, m: stories.length })}
-          </p>
-          <h2 id={`collection-${season.id}`} className="truncate font-display text-[22px] font-black leading-tight text-ink md:text-[26px]">
+          <p className="eyebrow text-ink-3">{t("storiesProgress", { n: watched, m: stories.length })}</p>
+          <h2
+            id={`collection-${season.id}`}
+            className="truncate font-display text-[22px] font-black leading-tight text-ink md:text-[28px]"
+          >
             {pick(season.title)}
           </h2>
         </div>
         <Link
           href={`/season/${season.slug}`}
           onClick={playPop}
-          className="press press-paper flex h-16 shrink-0 items-center gap-2 rounded-full bg-paper px-5 font-display text-[17px] font-black text-ink"
+          className="tap flex h-16 shrink-0 items-center gap-2 rounded-full border border-line bg-paper pl-4 pr-5 font-display text-[17px] font-black text-brand shadow-e1"
         >
-          <MapIcon className="size-6 text-play" strokeWidth={2.5} aria-hidden />
+          <MapIcon className="size-6" strokeWidth={2.5} aria-hidden />
           {t("path")}
         </Link>
       </div>
 
       <ul
         ref={row}
-        className="scrollbar-touch-hidden mt-3 flex snap-x snap-proximity gap-4 overflow-x-auto scroll-px-4 px-4 pb-6 pt-3 md:scroll-px-8 md:px-8"
+        className="scrollbar-touch-hidden mt-2 flex snap-x snap-proximity gap-3 overflow-x-auto scroll-px-4 px-4 pb-5 pt-2 md:gap-5 md:scroll-px-8 md:px-8"
       >
         {season.items.map((item, i) => {
           const status = itemStatus(item, learning);

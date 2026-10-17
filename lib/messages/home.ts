@@ -16,6 +16,9 @@ export const en = {
   nextSlide: "Next story",
   goToSlide: "Show story {n}",
   featured: "Featured stories",
+  footerAbout: "Short story videos for children aged 3–6, to learn, play and grow at home.",
+  footerLinks: "More",
+  footerPrivacy: "No ads, no tracking. Progress stays on this device.",
 } as const;
 
 export const rw: Record<keyof typeof en, string> = {
@@ -33,4 +36,7 @@ export const rw: Record<keyof typeof en, string> = {
   nextSlide: "Inkuru ikurikiraho",
   goToSlide: "Erekana inkuru ya {n}",
   featured: "Inkuru zatoranyijwe",
+  footerAbout: "Inkuru ngufi z'amashusho z'abana bafite imyaka 3–6, zo kwiga, gukina no gukura bari mu rugo.",
+  footerLinks: "Ibindi",
+  footerPrivacy: "Nta matangazo, nta gukurikirana. Iterambere riguma kuri iki gikoresho.",
 };
