@@ -5,10 +5,11 @@
  *   node scripts/art/build.mjs world ui   # only some groups
  *
  * Groups: world (scenes, day + night), thumbs (story pictures), posters (collection posters
- * and stickers), ui (gift, plate, sticker slot, empty states, logo), scenes (time's up, day +
+ * and stickers), ui (gift, plate, sticker slot, empty states), scenes (time's up, day +
  * night), answers (counting pictures and numerals for questions).
  *
- * After changing the logo, also redraw the PNG app icons with scripts/make-icons.mjs.
+ * Colors follow the ECD Imuhira brand (BRAND, DAY and NIGHT in lib.mjs). The logo itself is
+ * drawn by scripts/brand/build-logo.mjs, not here.
  */
 import { buildAnswers } from "./answers.mjs";
 import { report, write } from "./lib.mjs";

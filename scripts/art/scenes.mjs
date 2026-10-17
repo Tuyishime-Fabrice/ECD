@@ -42,7 +42,7 @@ const rope = ([lx, ly], [rx, ry]) => {
   const d = `M${lx} ${ly}C${lx - 30} ${ly - 70} ${lx - 6} -214 0 -214C${rx + 6} -214 ${rx + 30} ${ry - 70} ${rx} ${ry}`;
   const handles = `M${lx} ${ly}l-4 -14M${rx} ${ry}l4 -14`;
   return (
-    `<path d="${d}" fill="none" stroke="${OUTLINE}" stroke-width="8" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#E0457B" stroke-width="4" stroke-linecap="round"/>` +
+    `<path d="${d}" fill="none" stroke="${OUTLINE}" stroke-width="8" stroke-linecap="round"/><path d="${d}" fill="none" stroke="#EC775F" stroke-width="4" stroke-linecap="round"/>` +
     `<path d="${handles}" stroke="${OUTLINE}" stroke-width="14" stroke-linecap="round"/><path d="${handles}" stroke="#C98B4E" stroke-width="7" stroke-linecap="round"/>`
   );
 };
