@@ -92,7 +92,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             >
               <Volume2 className="size-9 text-on-accent" strokeWidth={2.5} aria-hidden />
             </button>
-            <p className="relative font-display text-[20px] font-extrabold leading-tight text-ink">{pick(question.promptText)}</p>
+            <p className="relative font-display text-[20px] font-black leading-tight text-ink">{pick(question.promptText)}</p>
           </div>
         </div>
         {question.promptImage && (

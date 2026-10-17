@@ -48,7 +48,7 @@ export function EndScreen({ homeActivity, next, onWatchAgain }: Props) {
       <div className="relative flex items-center justify-center gap-3 py-2">
         <StarBurst />
         <Mascot pose="cheer" className="w-24 short:w-16" />
-        <h2 className="font-display text-[36px] font-extrabold text-ink">{t("wellDone")}</h2>
+        <h2 className="font-display text-[36px] font-black text-ink">{t("wellDone")}</h2>
       </div>
 
       <HomeActivityCard text={homeActivity} />

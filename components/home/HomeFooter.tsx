@@ -19,7 +19,7 @@ export function HomeFooter() {
           <div className="flex items-center gap-3">
             <img src={brand.logo} alt="" width={44} height={44} className="size-11" />
             <div>
-              <p className="font-display text-2xl font-extrabold leading-none text-ink">{brand.name}</p>
+              <p className="font-display text-2xl font-black leading-none text-ink">{brand.name}</p>
               <p className="mt-1 text-sm text-ink-2">{brand.tagline[lang]}</p>
             </div>
           </div>
@@ -27,14 +27,14 @@ export function HomeFooter() {
             <Link
               href="/stickers"
               onClick={playPop}
-              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-semibold text-ink shadow-e1"
+              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-bold text-ink shadow-e1"
             >
               <Star className="size-5 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
               {t("myStickers")}
             </Link>
             <Link
               href="/parents"
-              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-semibold text-ink shadow-e1"
+              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-bold text-ink shadow-e1"
             >
               <Lock className="size-5 text-ink-2" strokeWidth={2.5} aria-hidden />
               {t("parents")}

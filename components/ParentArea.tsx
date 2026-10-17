@@ -42,7 +42,7 @@ function BackLink() {
   return (
     <Link
       href="/"
-      className="tap inline-flex min-h-12 items-center gap-2 self-start rounded-full bg-paper px-4 text-base font-semibold text-ink shadow-e1"
+      className="tap inline-flex min-h-12 items-center gap-2 self-start rounded-full bg-paper px-4 text-base font-bold text-ink shadow-e1"
     >
       <ArrowLeft className="size-5" strokeWidth={2.5} aria-hidden />
       {t("backToChild")}
@@ -86,7 +86,7 @@ function Switch({
   return (
     <div className="flex items-center justify-between gap-4 py-2">
       <div>
-        <p className="font-semibold">{label}</p>
+        <p className="font-bold">{label}</p>
         {help && <p className="text-sm text-ink-2">{help}</p>}
       </div>
       <button
@@ -133,7 +133,7 @@ function Segmented<T extends string | number>({
           aria-checked={o.value === value}
           onClick={() => onChange(o.value)}
           className={clsx(
-            "min-h-11 rounded-full border-2 px-4 text-base font-semibold",
+            "min-h-11 rounded-full border-2 px-4 text-base font-bold",
             o.value === value ? "border-listen-lip bg-listen-lip text-on-accent" : "border-line bg-paper text-ink",
           )}
         >
@@ -186,7 +186,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
           <button
             type="button"
             onClick={grantExtension}
-            className="tap mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-listen-lip px-4 font-semibold text-listen-ink"
+            className="tap mt-3 inline-flex min-h-11 items-center gap-2 rounded-full border-2 border-listen-lip px-4 font-bold text-listen-ink"
           >
             <Plus className="size-5" strokeWidth={2.5} aria-hidden />
             {t("addTenToday")}
@@ -203,7 +203,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
                 return (
                   <li key={season.id}>
                     <p className="flex justify-between gap-3">
-                      <span className="font-semibold">{pick(season.title)}</span>
+                      <span className="font-bold">{pick(season.title)}</span>
                       <span className="text-ink-2">{t("episodesWatched", { n: watched, m: episodes.length })}</span>
                     </p>
                     <Bar value={watched} max={episodes.length} />
@@ -230,7 +230,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
         </Card>
 
         <Card title={t("settings")}>
-          <p className="font-semibold">{t("dailyLimit")}</p>
+          <p className="font-bold">{t("dailyLimit")}</p>
           <p className="mb-2 text-sm text-ink-2">{t("dailyLimitHelp")}</p>
           <Segmented
             label={t("dailyLimit")}
@@ -242,7 +242,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
             <Switch label={t("sound")} help={t("soundHelp")} checked={settings.soundOn} onChange={(v) => update({ soundOn: v })} />
           </div>
           <div className="mt-2 border-t border-line pt-3">
-            <p className="mb-2 font-semibold">{t("language")}</p>
+            <p className="mb-2 font-bold">{t("language")}</p>
             <Segmented<Lang>
               label={t("language")}
               value={settings.language}
@@ -278,14 +278,14 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
                     setConfirmReset(false);
                     setResetDone(true);
                   }}
-                  className="tap min-h-11 rounded-full bg-ink px-5 font-semibold text-paper"
+                  className="tap min-h-11 rounded-full bg-ink px-5 font-bold text-paper"
                 >
                   {t("resetYes")}
                 </button>
                 <button
                   type="button"
                   onClick={() => setConfirmReset(false)}
-                  className="tap min-h-11 rounded-full border-2 border-line px-5 font-semibold"
+                  className="tap min-h-11 rounded-full border-2 border-line px-5 font-bold"
                 >
                   {t("cancel")}
                 </button>
@@ -295,7 +295,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
             <button
               type="button"
               onClick={() => setConfirmReset(true)}
-              className="tap min-h-11 rounded-full border-2 border-ink px-5 font-semibold"
+              className="tap min-h-11 rounded-full border-2 border-ink px-5 font-bold"
             >
               {t("resetAll")}
             </button>
@@ -316,7 +316,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
               href={contact.link}
               target="_blank"
               rel="noopener noreferrer"
-              className="tap mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-leaf-ink px-5 font-semibold text-paper"
+              className="tap mt-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-leaf-ink px-5 font-bold text-paper"
             >
               <MessageCircle className="size-5" strokeWidth={2.5} aria-hidden />
               {t("whatsapp")}

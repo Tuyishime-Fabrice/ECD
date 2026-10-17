@@ -35,11 +35,11 @@ export function FeaturedBanner({ seasons }: { seasons: SeasonCard[] }) {
         />
         <span aria-hidden className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-paper/95 via-paper/70 to-transparent md:w-2/3" />
         <span className="relative flex max-w-[70%] flex-col justify-center gap-2 p-6 md:max-w-md md:gap-3 md:p-10">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">{pick(season.title)}</span>
-          <span className="font-display text-[28px] font-extrabold leading-[1.05] text-ink md:text-[40px]">
+          <span className="text-[11px] font-black uppercase tracking-[0.08em] text-ink-3">{pick(season.title)}</span>
+          <span className="font-display text-[28px] font-black leading-[1.05] text-ink md:text-[40px]">
             {t("storyPath")}
           </span>
-          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start rounded-full bg-play px-5 font-display text-lg font-extrabold text-on-accent">
+          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start rounded-full bg-play px-5 font-display text-lg font-black text-on-accent">
             <MapIcon className="size-6" strokeWidth={2.5} aria-hidden />
             {t("openPath")}
           </span>

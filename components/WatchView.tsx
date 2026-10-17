@@ -268,8 +268,8 @@ function StoryCaption({ number, title }: { number: number; title: string }) {
   const t = useT();
   return (
     <div aria-hidden className="mx-auto mt-3 max-w-2xl text-center short:hidden">
-      <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-2">{t("episodeN", { n: number })}</p>
-      <p className="line-clamp-1 font-display text-[22px] font-extrabold leading-tight text-ink">{title}</p>
+      <p className="text-[11px] font-black uppercase tracking-[0.08em] text-ink-2">{t("episodeN", { n: number })}</p>
+      <p className="line-clamp-1 font-display text-[22px] font-black leading-tight text-ink">{title}</p>
     </div>
   );
 }

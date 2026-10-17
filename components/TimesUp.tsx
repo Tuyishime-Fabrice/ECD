@@ -27,7 +27,7 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
           className="w-full rounded-card shadow-e2 short:mx-auto short:w-2/3"
         />
       </picture>
-      <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink">{t("timesUpTitle")}</h1>
+      <h1 className="font-display text-[40px] font-black leading-tight text-ink">{t("timesUpTitle")}</h1>
       <p className="-mt-3 font-display text-2xl font-bold text-ink-2">{t("timesUpBody")}</p>
 
       {homeActivity && (
@@ -39,7 +39,7 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
       <button
         type="button"
         onClick={() => setGateOpen(true)}
-        className="tap mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-line bg-paper px-4 text-base font-semibold text-ink-2"
+        className="tap mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-line bg-paper px-4 text-base font-bold text-ink-2"
       >
         <Plus className="size-5" strokeWidth={2.5} aria-hidden />
         {t("addTenMinutes")}

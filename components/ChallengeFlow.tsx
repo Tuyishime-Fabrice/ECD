@@ -86,7 +86,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
           <Mascot pose="wave" className="absolute -bottom-2 -left-6 w-20 motion-safe:animate-float" />
         </div>
         <div className="flex flex-col items-center gap-5">
-          <h1 className="font-display text-[40px] font-extrabold leading-tight text-ink">{t("letsPlay")}</h1>
+          <h1 className="font-display text-[40px] font-black leading-tight text-ink">{t("letsPlay")}</h1>
           <button
             type="button"
             onClick={start}
@@ -176,7 +176,7 @@ function ChallengeDone({
 
   return (
     <section className="mx-auto flex max-w-xl flex-col items-center px-4 py-2 text-center">
-      <h1 className="font-display text-[36px] font-extrabold text-ink">{t("wellDone")}</h1>
+      <h1 className="font-display text-[36px] font-black text-ink">{t("wellDone")}</h1>
 
       <div className="mt-2 flex items-end gap-2" role="img" aria-label={t("starsN", { n: stars })}>
         {[1, 2, 3].map((i) => (
@@ -245,7 +245,7 @@ function LockedChallenge({ challenge, seasons }: { challenge: ChallengeView; sea
         <img src="/images/ui/gift.svg" alt="" width={72} height={72} className="size-[68%]" />
         <LockMark className="absolute -right-1 -top-1" />
       </span>
-      <h1 className="font-display text-[32px] font-extrabold leading-tight text-ink">{t("watchFirst")}</h1>
+      <h1 className="font-display text-[32px] font-black leading-tight text-ink">{t("watchFirst")}</h1>
       <ul className="grid w-full grid-cols-2 gap-3">
         {items.map((item) => {
           const status = itemStatus(item, learning);

@@ -45,7 +45,7 @@ export function StickerGrid({ slots }: { slots: StickerSlot[] }) {
 
   return (
     <section className="mx-auto max-w-3xl px-4 pb-10">
-      <h1 className="flex items-center gap-3 font-display text-[34px] font-extrabold text-ink">
+      <h1 className="flex items-center gap-3 font-display text-[34px] font-black text-ink">
         <span className="grid size-14 place-items-center rounded-full bg-sun-soft shadow-e1 inset-shadow-rim">
           <Star className="size-8 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
         </span>

@@ -50,17 +50,17 @@ export function CollectionRow({
           className="size-14 shrink-0 rounded-full border-[3px] border-paper bg-paper object-cover shadow-e1"
         />
         <div className="min-w-0 flex-1">
-          <p className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">
+          <p className="text-[11px] font-black uppercase tracking-[0.08em] text-ink-3">
             {t("storiesProgress", { n: watched, m: stories.length })}
           </p>
-          <h2 id={`collection-${season.id}`} className="truncate font-display text-[22px] font-extrabold leading-tight text-ink md:text-[26px]">
+          <h2 id={`collection-${season.id}`} className="truncate font-display text-[22px] font-black leading-tight text-ink md:text-[26px]">
             {pick(season.title)}
           </h2>
         </div>
         <Link
           href={`/season/${season.slug}`}
           onClick={playPop}
-          className="press press-paper flex h-16 shrink-0 items-center gap-2 rounded-full bg-paper px-5 font-display text-[17px] font-extrabold text-ink"
+          className="press press-paper flex h-16 shrink-0 items-center gap-2 rounded-full bg-paper px-5 font-display text-[17px] font-black text-ink"
         >
           <MapIcon className="size-6 text-play" strokeWidth={2.5} aria-hidden />
           {t("path")}

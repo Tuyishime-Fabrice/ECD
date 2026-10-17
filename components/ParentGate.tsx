@@ -111,7 +111,7 @@ export function ParentGate({
         {progress > 0 ? `${Math.ceil((1 - progress) * (HOLD_MS / 1000))}…` : t("gateHint")}
       </p>
       {onCancel && (
-        <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-6 text-base font-semibold text-ink-2 underline">
+        <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-6 text-base font-bold text-ink-2 underline">
           {t("cancel")}
         </button>
       )}

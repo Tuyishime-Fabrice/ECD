@@ -3,76 +3,61 @@
 import clsx from "clsx";
 import { Lock, Star } from "lucide-react";
 import Link from "next/link";
-import { useEffect, useState } from "react";
 import { brand } from "@/lib/brand";
 import { useIsImmersive } from "@/lib/immersive";
 import { playPop } from "@/lib/sounds";
 import { useProgress, useT } from "@/lib/store";
 
-function useScrolled() {
-  const [scrolled, setScrolled] = useState(false);
-  useEffect(() => {
-    const update = () => setScrolled(window.scrollY > 8);
-    update();
-    window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
-  }, []);
-  return scrolled;
-}
-
+/**
+ * The app bar on every kid screen: the ECD Imuhira wordmark (home) on the left,
+ * the sticker album and the parents' lock on the right. Solid, with a hairline
+ * under it, so it reads the same over every page.
+ */
 export function TopBar() {
   const t = useT();
   const immersive = useIsImmersive();
-  const scrolled = useScrolled();
   const stickers = useProgress((s) => s.stickers.length);
 
   return (
     <header
       className={clsx(
-        "sticky top-0 z-30 transition-[background-color,box-shadow] duration-200",
-        scrolled ? "bg-paper shadow-e1" : "bg-transparent",
+        "sticky top-0 z-30 border-b border-line bg-ground",
         // While watching or answering on a short screen, give the content every pixel.
         immersive && "short:hidden tight:hidden",
       )}
     >
-      <div className="mx-auto flex max-w-[1400px] items-center gap-3 px-4 pb-2 pt-[max(0.75rem,env(safe-area-inset-top))] md:px-8">
+      <div className="mx-auto flex max-w-6xl items-center gap-3 pb-2 pl-[max(1rem,env(safe-area-inset-left))] pr-[max(1rem,env(safe-area-inset-right))] pt-[max(0.5rem,env(safe-area-inset-top))] md:px-8">
         <Link
           href="/"
           aria-label={`${brand.name}, ${t("home")}`}
           onClick={playPop}
-          className="tap flex min-h-16 items-center gap-2 rounded-full pr-3"
+          className="tap -ml-1 flex min-h-16 items-center rounded-2xl px-1"
         >
-          <img src={brand.logo} alt="" width={44} height={44} className="size-11" />
-          <span className="font-display text-[28px] font-extrabold leading-none tracking-[-0.02em] text-ink">
-            {brand.name}
-          </span>
+          {/* The wordmark turns its teal parts cream in dark mode by itself. */}
+          <img src="/brand/wordmark.svg" alt="" width={140} height={40} className="h-9 w-auto sm:h-10" />
         </Link>
 
-        <div className="ml-auto flex items-center gap-3">
+        <nav aria-label={brand.name} className="ml-auto flex items-center gap-2 sm:gap-3">
           <Link
             href="/stickers"
             aria-label={t("myStickers")}
             onClick={playPop}
-            className="tap relative grid size-16 place-items-center rounded-full bg-sun-soft shadow-e1 inset-shadow-rim"
+            className="tap flex h-16 min-w-16 items-center justify-center gap-1.5 rounded-full border border-line bg-sun-soft px-4 shadow-e1"
           >
-            <Star className="size-8 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
+            <Star className="size-8 shrink-0 fill-sun text-sun-lip" strokeWidth={2.25} aria-hidden />
             {stickers > 0 && (
-              <span
-                aria-hidden
-                className="absolute -right-1 -top-1 grid h-6 min-w-6 place-items-center rounded-full border-2 border-paper bg-coral px-1.5 text-xs font-extrabold text-coral-ink"
-              >
+              <span aria-hidden className="font-display text-xl font-black tabular-nums leading-none text-ink">
                 {stickers}
               </span>
             )}
           </Link>
-          <Link
-            href="/parents"
-            aria-label={t("parents")}
-            className="tap grid size-16 place-items-center rounded-full bg-paper shadow-e1 inset-shadow-rim"
-          >
-            <Lock className="size-6 text-ink-2" strokeWidth={2.5} aria-hidden />
+          {/* For grown-ups: visually quieter, still a 64px target. */}
+          <Link href="/parents" aria-label={t("parents")} className="tap group grid size-16 place-items-center rounded-full">
+            <span className="grid size-12 place-items-center rounded-full border border-line bg-paper shadow-e1">
+              <Lock className="size-5 text-ink-2" strokeWidth={2.5} aria-hidden />
+            </span>
           </Link>
-        </div>
+        </nav>
       </div>
     </header>
   );

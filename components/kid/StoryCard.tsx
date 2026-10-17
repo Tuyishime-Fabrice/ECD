@@ -61,7 +61,7 @@ export function StoryCard({
       <span className="block px-2 pb-2 pt-2">
         <span
           className={clsx(
-            "block text-[11px] font-extrabold uppercase leading-4 tracking-[0.08em]",
+            "block text-[11px] font-black uppercase leading-4 tracking-[0.08em]",
             upNext ? "text-play-ink" : "text-ink-3",
           )}
         >
@@ -117,7 +117,7 @@ export function ChallengeCard({
       <span className="block px-2 pb-2 pt-2">
         <span
           className={clsx(
-            "block text-[11px] font-extrabold uppercase leading-4 tracking-[0.08em]",
+            "block text-[11px] font-black uppercase leading-4 tracking-[0.08em]",
             upNext ? "text-play-ink" : "text-berry-ink",
           )}
         >

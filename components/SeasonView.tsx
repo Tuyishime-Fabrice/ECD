@@ -70,7 +70,7 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
 
       <header className="relative mx-auto max-w-md px-4 pt-2">
         <div className="rounded-card bg-paper px-5 py-4 shadow-e2 inset-shadow-rim">
-          <h1 className="font-display text-[28px] font-extrabold leading-tight text-ink">{pick(season.title)}</h1>
+          <h1 className="font-display text-[28px] font-black leading-tight text-ink">{pick(season.title)}</h1>
           <p className="mt-1 text-sm font-bold text-ink-2">{t("storiesProgress", { n: watched, m: stories.length })}</p>
           <ProgressStrip percent={stories.length ? (watched / stories.length) * 100 : 0} className="mt-2 h-2.5" />
         </div>
@@ -153,7 +153,7 @@ function StoryStone({ story, node }: { story: EpisodeCard; node: PathNode }) {
         {/* Stones near an edge get their title pill pulled toward the middle, so it stays on screen. */}
         <span
           className={clsx(
-            "absolute top-[calc(100%+14px)] max-w-[min(220px,calc(100vw-2rem))] truncate rounded-full bg-paper px-4 py-1.5 font-display text-base font-extrabold text-ink shadow-e1",
+            "absolute top-[calc(100%+14px)] max-w-[min(220px,calc(100vw-2rem))] truncate rounded-full bg-paper px-4 py-1.5 font-display text-base font-black text-ink shadow-e1",
             node.x > 0.6 && "right-0",
             node.x < 0.4 && "left-0",
           )}
@@ -170,7 +170,7 @@ function StoryStone({ story, node }: { story: EpisodeCard; node: PathNode }) {
       onClick={playPop}
       aria-label={label}
       className={clsx(
-        "press relative grid size-[72px] place-items-center rounded-full font-display text-[30px] font-extrabold leading-none",
+        "press relative grid size-[72px] place-items-center rounded-full font-display text-[30px] font-black leading-none",
         watched ? "press-sun bg-sun text-sun-ink" : "press-paper bg-paper text-ink-3",
       )}
     >

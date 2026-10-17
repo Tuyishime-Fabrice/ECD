@@ -191,7 +191,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
           {label && (
             <span
               className={clsx(
-                "self-start rounded-full px-3 py-1 text-xs font-extrabold uppercase tracking-[0.08em]",
+                "self-start rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.08em]",
                 slide.kind === "continue" ? "bg-sun text-sun-ink" : "bg-paper-2 text-ink-2 md:bg-paper/90",
               )}
             >
@@ -199,7 +199,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
             </span>
           )}
           {/* Every slide keeps room for two lines and a progress bar, so all have the same height. */}
-          <span className="line-clamp-2 min-h-[2.1em] font-display text-[26px] font-extrabold leading-[1.05] text-ink md:min-h-0 md:text-[46px] md:text-white">
+          <span className="line-clamp-2 min-h-[2.1em] font-display text-[26px] font-black leading-[1.05] text-ink md:min-h-0 md:text-[46px] md:text-white">
             {title}
           </span>
           <ProgressStrip
