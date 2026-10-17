@@ -2,15 +2,16 @@ import clsx from "clsx";
 import { useId } from "react";
 
 /*
- * Izuba, the sun mascot, drawn inline so it can move. The shapes mirror
- * scripts/art/mascot.mjs, which draws Izuba into the SVG files (logo, empty states,
- * time's-up scenes): change both together. Mascot.test.tsx checks that they match.
+ * Izuba, the sun mascot and story guide, drawn inline so it can move. Mustard with coral
+ * cheeks and a teal-brown outline, in the ECD Imuhira palette. The shapes mirror
+ * scripts/art/mascot.mjs, which draws Izuba into the SVG files (empty states, time's-up
+ * scenes): change both together. Mascot.test.tsx checks that they match.
  */
 
 export type MascotPose = "happy" | "wave" | "cheer" | "oops" | "sleep";
 
-const OUTLINE = "#5A3112";
-const INK = "#3A1F0E";
+const OUTLINE = "#2F3A33";
+const INK = "#1E2724";
 
 const RAY_LONG = "M60 3C67 3 70 13 66.5 22H53.5C50 13 53 3 60 3Z";
 const RAY_SHORT = "M60 11C64.5 11 66.5 17 64.5 23H55.5C53.5 17 55.5 11 60 11Z";
@@ -28,8 +29,8 @@ function Arm({ d, hand }: { d: string; hand: [number, number] }) {
   return (
     <>
       <path d={d} fill="none" stroke={OUTLINE} strokeWidth="12" strokeLinecap="round" />
-      <path d={d} fill="none" stroke="#FFBE38" strokeWidth="6" strokeLinecap="round" />
-      <circle cx={hand[0]} cy={hand[1]} r="7.5" fill="#FFD453" stroke={OUTLINE} strokeWidth="3" />
+      <path d={d} fill="none" stroke="#F0B13C" strokeWidth="6" strokeLinecap="round" />
+      <circle cx={hand[0]} cy={hand[1]} r="7.5" fill="#F7CB5E" stroke={OUTLINE} strokeWidth="3" />
     </>
   );
 }
@@ -48,8 +49,8 @@ function Face({ pose }: { pose: MascotPose }) {
     return (
       <>
         <path d="M42 60C43.5 53 51.5 53 53 60M67 60C68.5 53 76.5 53 78 60" fill="none" stroke={INK} strokeWidth="3.6" strokeLinecap="round" />
-        <path d="M46.5 69C49 84 71 84 73.5 69C64 72 56 72 46.5 69Z" fill="#7C2D12" stroke={OUTLINE} strokeWidth="2.6" strokeLinejoin="round" />
-        <path d="M52.5 76.8C56.5 74.6 63.5 74.6 67.5 76.8C64.5 80.6 55.5 80.6 52.5 76.8Z" fill="#FF8467" />
+        <path d="M46.5 69C49 84 71 84 73.5 69C64 72 56 72 46.5 69Z" fill="#6B2A1E" stroke={OUTLINE} strokeWidth="2.6" strokeLinejoin="round" />
+        <path d="M52.5 76.8C56.5 74.6 63.5 74.6 67.5 76.8C64.5 80.6 55.5 80.6 52.5 76.8Z" fill="#F08A72" />
       </>
     );
   }
@@ -57,7 +58,7 @@ function Face({ pose }: { pose: MascotPose }) {
     return (
       <>
         <path d="M42 60C44 65 51 65 53 60M67 60C69 65 76 65 78 60" fill="none" stroke={INK} strokeWidth="3.2" strokeLinecap="round" />
-        <ellipse cx="60" cy="74" rx="4.2" ry="3.6" fill="#7C2D12" stroke={OUTLINE} strokeWidth="2.4" />
+        <ellipse cx="60" cy="74" rx="4.2" ry="3.6" fill="#6B2A1E" stroke={OUTLINE} strokeWidth="2.4" />
       </>
     );
   }
@@ -67,7 +68,7 @@ function Face({ pose }: { pose: MascotPose }) {
         <Eye x={47.5} y={60} />
         <Eye x={72.5} y={60} />
         <path d="M41.5 49C44 46.5 48 45.5 52 46M68 46C72 45.5 76 46.5 78.5 49" fill="none" stroke={INK} strokeWidth="2.6" strokeLinecap="round" />
-        <ellipse cx="60" cy="75" rx="4.4" ry="4.8" fill="#7C2D12" stroke={OUTLINE} strokeWidth="2.4" />
+        <ellipse cx="60" cy="75" rx="4.4" ry="4.8" fill="#6B2A1E" stroke={OUTLINE} strokeWidth="2.4" />
       </>
     );
   }
@@ -75,8 +76,8 @@ function Face({ pose }: { pose: MascotPose }) {
     <>
       <Eye x={47.5} />
       <Eye x={72.5} />
-      <path d="M49.5 70.5C52 80 68 80 70.5 70.5C63 73 57 73 49.5 70.5Z" fill="#7C2D12" stroke={OUTLINE} strokeWidth="2.6" strokeLinejoin="round" />
-      <path d="M54.5 75.6C57.5 74 62.5 74 65.5 75.6C63 78.4 57 78.4 54.5 75.6Z" fill="#FF8467" />
+      <path d="M49.5 70.5C52 80 68 80 70.5 70.5C63 73 57 73 49.5 70.5Z" fill="#6B2A1E" stroke={OUTLINE} strokeWidth="2.6" strokeLinejoin="round" />
+      <path d="M54.5 75.6C57.5 74 62.5 74 65.5 75.6C63 78.4 57 78.4 54.5 75.6Z" fill="#F08A72" />
     </>
   );
 }
@@ -98,14 +99,14 @@ function Nightcap({ p }: { p: string }) {
         strokeWidth="3"
         strokeLinejoin="round"
       />
-      <path d="M47 12C49 10 52 10 54 12M70 9C72 7 75 8 76 10M82 22C83 20 86 20 87 22M29 17C30 15 32 15 33 16" fill="none" stroke="#D9CCFF" strokeWidth="2.4" strokeLinecap="round" />
-      <path d="M21 45C25 29 95 29 99 45L96 51C88 35 32 35 24 51Z" fill="#FFF4E0" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
-      <circle cx="11" cy="30" r="7" fill="#FFF4E0" stroke={OUTLINE} strokeWidth="3" />
+      <path d="M47 12C49 10 52 10 54 12M70 9C72 7 75 8 76 10M82 22C83 20 86 20 87 22M29 17C30 15 32 15 33 16" fill="none" stroke="#9FD3C9" strokeWidth="2.4" strokeLinecap="round" />
+      <path d="M21 45C25 29 95 29 99 45L96 51C88 35 32 35 24 51Z" fill="#FCEFD5" stroke={OUTLINE} strokeWidth="3" strokeLinejoin="round" />
+      <circle cx="11" cy="30" r="7" fill="#FCEFD5" stroke={OUTLINE} strokeWidth="3" />
       <g className="motion-safe:animate-float">
-        <g fill="#fff" stroke="#fff" strokeWidth="10" strokeLinejoin="round">
+        <g fill="#FCEFD5" stroke="#FCEFD5" strokeWidth="10" strokeLinejoin="round">
           {zs}
         </g>
-        <g fill="#8E5BD0">{zs}</g>
+        <g fill="#2A7E78">{zs}</g>
       </g>
     </>
   );
@@ -129,19 +130,19 @@ export function Mascot({ pose = "happy", className, label }: { pose?: MascotPose
     >
       <defs>
         <radialGradient id={`${p}f`} cx="0.38" cy="0.32" r="0.8">
-          <stop offset="0" stopColor="#FFEB97" />
-          <stop offset="0.55" stopColor="#FFCB3D" />
-          <stop offset="1" stopColor="#FFA81E" />
+          <stop offset="0" stopColor="#FFE7A3" />
+          <stop offset="0.55" stopColor="#F6C44E" />
+          <stop offset="1" stopColor="#EBA332" />
         </radialGradient>
         <linearGradient id={`${p}r`} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stopColor="#FFC93F" />
-          <stop offset="1" stopColor="#FF9F1A" />
+          <stop offset="0" stopColor="#F5C049" />
+          <stop offset="1" stopColor="#E39A2E" />
         </linearGradient>
         {asleep && (
           <>
             <linearGradient id={`${p}c`} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stopColor="#9C86F0" />
-              <stop offset="1" stopColor="#6C4FD0" />
+              <stop offset="0" stopColor="#2E8C86" />
+              <stop offset="1" stopColor="#124C4A" />
             </linearGradient>
             <path id={`${p}z`} d={Z_GLYPH} />
           </>
@@ -166,8 +167,8 @@ export function Mascot({ pose = "happy", className, label }: { pose?: MascotPose
       <circle cx="60" cy="60" r="38" fill={`url(#${p}f)`} stroke={OUTLINE} strokeWidth="3" />
       <path d="M36 50A27 27 0 0 1 51 33.5" fill="none" stroke="#fff" strokeWidth="5" strokeLinecap="round" opacity=".6" />
       <g transform={pose === "oops" ? "rotate(-9 60 64)" : undefined}>
-        <ellipse cx="39" cy="70" rx="7.5" ry="4.8" fill="#FF7F5C" opacity={asleep ? 0.6 : 0.45} />
-        <ellipse cx="81" cy="70" rx="7.5" ry="4.8" fill="#FF7F5C" opacity={asleep ? 0.6 : 0.45} />
+        <ellipse cx="39" cy="70" rx="7.5" ry="4.8" fill="#EC775F" opacity={asleep ? 0.6 : 0.45} />
+        <ellipse cx="81" cy="70" rx="7.5" ry="4.8" fill="#EC775F" opacity={asleep ? 0.6 : 0.45} />
         <Face pose={pose} />
       </g>
 

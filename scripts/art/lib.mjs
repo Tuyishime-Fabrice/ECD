@@ -171,7 +171,7 @@ export function report() {
   console.log(`${written.length} files`);
 }
 
-/* ---------- glyphs (Baloo 2 ExtraBold outlines; fonts don't load inside <img> SVGs) ---------- */
+/* ---------- glyphs (rounded Baloo 2 ExtraBold outlines; fonts don't load inside <img> SVGs) ---------- */
 
 const DIGITS = JSON.parse(readFileSync(join(HERE, "digits.json"), "utf8")).digits;
 export const GLYPHS = { ...DIGITS, ...JSON.parse(readFileSync(join(HERE, "glyphs.json"), "utf8")).glyphs };
@@ -221,92 +221,116 @@ export function toyNumeral(doc, text, { x, y, size, color, deep, ink = OUTLINE, 
 
 /* ---------- palettes ---------- */
 
-export const OUTLINE = "#5A3112";
-export const INK = "#3A1F0E";
+/**
+ * ECD Imuhira brand colors (the logo): teal for UI and the bigger color fields, coral for small
+ * warm accents, mustard for rewards and the sun, cream and sage for soft surfaces.
+ */
+export const BRAND = {
+  teal: "#124C4A",
+  tealMid: "#2A7E78",
+  tealLight: "#5FA8A0",
+  coral: "#EC775F",
+  coralDeep: "#C9573F",
+  mustard: "#F2B83F",
+  mustardDeep: "#C98E1E",
+  cream: "#FCEFD5",
+  sage: "#BDCDCD",
+};
+
+/** Outlines and dark ink: a deep teal-brown that sits between the logo's teal and warm earth. */
+export const OUTLINE = "#2F3A33";
+export const INK = "#1E2724";
 
 export const DAY = {
   night: false,
+  // a soft mint morning that turns cream at the horizon (the app's --c-sky-top/--c-sky-bottom)
   sky: [
-    [0, "#9FD6F0"],
-    [0.3, "#D6EEF1"],
-    [0.56, "#FFE5C2"],
-    [0.78, "#FFD49E"],
+    [0, "#D6ECE6"],
+    [0.4, "#E8F3EB"],
+    [0.75, "#FBF0DC"],
   ],
   glow: [
-    [0, "#FFF6D2"],
-    [0.45, "#FFE9B0", 0.8],
-    [1, "#FFE0A6", 0],
+    [0, "#FFFAEC"],
+    [0.45, "#FCEFD5", 0.8],
+    [1, "#FCEFD5", 0],
   ],
-  far: "#D5DDB6",
-  volcano: "#DCDCE8",
-  near: "#58AB5D",
-  /** far → near hill fills */
-  hills: (t) => mix(mix("#D3DDB4", "#58AB5D", t), "#6BBF5E", Math.sin(Math.PI * t) * 0.18),
-  terrace: (c) => mix(c, "#F4FBE6", 0.3),
-  field: (c) => mix(c, "#E9F3C8", 0.22),
-  tea: (c) => mix(c, "#3E9A4E", 0.22),
-  tuft: "#479C51",
-  flowers: ["#FFF6E2", "#FFB39C", "#FFE08A"],
-  flowerEye: "#FFC23A",
-  road: ["#D6B178", "#F4E2BB"],
-  hut: { body: "#D9A156", shade: "#C2873E", band: "#B57A35", door: "#6E4122", tip: "#8A5A2B" },
-  fence: "#B98A4E",
+  far: "#CFDDCB",
+  volcano: "#D5E2DE",
+  volcanoShade: "#C3D4D0",
+  near: "#4E946F",
+  /** far → near hill fills: sage greens that deepen toward the brand teal */
+  hills: (t) => mix(mix("#CCDBC4", "#4E946F", t), "#69A97B", Math.sin(Math.PI * t) * 0.18),
+  crest: "#FBF6DE",
+  foot: "#1F5F52",
+  terrace: (c) => mix(c, "#F3F8EA", 0.3),
+  field: (c) => mix(c, "#E9EECB", 0.24),
+  tea: (c) => mix(c, "#2B7457", 0.24),
+  tuft: "#3D855F",
+  flowers: ["#FFF8EA", "#F29A84", "#F5C657"],
+  flowerEye: "#E9A42F",
+  road: ["#D8C299", "#F3E6CC"],
+  hut: { body: "#D7A863", shade: "#C0904C", band: "#AA7B3D", door: "#5C4029", tip: "#8A6435" },
+  fence: "#B08A58",
   banana: {
-    trunk: "#7FA24A",
-    trunkLight: "#96BA5C",
-    leaves: ["#2E8443", "#3F9B52", "#43A457", "#5CBE6C"],
-    ribs: ["#5DAF68", "#7CC67F", "#86CC87", "#A6DB98"],
-    stalk: "#6F8F3C",
-    hands: "#CBD458",
-    bud: "#9A3C62",
-    budLine: "#C5648A",
+    trunk: "#7E9E58",
+    trunkLight: "#97B56C",
+    leaves: ["#2C7652", "#378A5F", "#3F9467", "#56AB7B"],
+    ribs: ["#58A27A", "#74BA8E", "#80C196", "#A2D6AE"],
+    stalk: "#6B8A44",
+    hands: "#D2CF62",
+    bud: "#B4574A",
+    budLine: "#DA8070",
   },
-  cloud: ["#FFFFFF", "#FFE6D2"],
+  cloud: ["#FFFFFF", "#FCEFD5"],
   cow: { body: "#9A5A33", light: "#C98B5C", horn: "#F3E6CC", dark: "#5E3418" },
 };
 
 export const NIGHT = {
   night: true,
+  // deep teal night (the app's dark --c-sky-top/--c-sky-bottom), never navy or purple
   sky: [
-    [0, "#0B1533"],
-    [0.55, "#1B2150"],
-    [1, "#2B2F63"],
+    [0, "#071A19"],
+    [0.55, "#0D2C29"],
+    [1, "#153E3A"],
   ],
   glow: [
-    [0, "#FFF4C8", 0.32],
-    [0.4, "#BFC7FF", 0.12],
-    [1, "#8D96E8", 0],
+    [0, "#FCEFD5", 0.3],
+    [0.4, "#D9E8D8", 0.1],
+    [1, "#BFD8CC", 0],
   ],
-  far: "#2F4B70",
-  volcano: "#29366A",
-  near: "#123D30",
-  hills: (t) => mix(mix("#2E4C6F", "#123D30", t), "#18574B", Math.sin(Math.PI * t) * 0.35),
-  terrace: (c) => mix(c, "#9CC6D8", 0.16),
-  field: (c) => mix(c, "#5E8FA6", 0.1),
-  tea: (c) => mix(c, "#071F1A", 0.3),
-  tuft: "#0E3328",
-  flowers: ["#8F8AC4", "#7468B0", "#B9B08A"],
+  far: "#21504B",
+  volcano: "#1B4541",
+  volcanoShade: "#153935",
+  near: "#0C302A",
+  hills: (t) => mix(mix("#21504B", "#0C302A", t), "#14473D", Math.sin(Math.PI * t) * 0.35),
+  crest: "#8FC7B6",
+  foot: "#031513",
+  terrace: (c) => mix(c, "#8FC7B6", 0.14),
+  field: (c) => mix(c, "#5E9C86", 0.1),
+  tea: (c) => mix(c, "#03201A", 0.3),
+  tuft: "#0A2C25",
+  flowers: ["#E8DCC0", "#D98C78", "#E2B85A"],
   flowerEye: "#E9C25A",
-  road: ["#264A4C", "#34605E"],
-  hut: { body: "#6B5552", shade: "#55423F", band: "#4B3A39", door: "#2A1D1C", tip: "#3F302E" },
-  fence: "#4A3E43",
+  road: ["#21504A", "#2C5F57"],
+  hut: { body: "#5F5047", shade: "#4B3F37", band: "#40352E", door: "#1D1915", tip: "#3A3029" },
+  fence: "#3E3F36",
   banana: {
-    trunk: "#2F5A49",
-    trunkLight: "#3B6C55",
-    leaves: ["#123F35", "#195042", "#1C5847", "#24684F"],
-    ribs: ["#2A5F4F", "#33705C", "#387A62", "#46896B"],
-    stalk: "#2C4A3A",
+    trunk: "#2D5746",
+    trunkLight: "#386852",
+    leaves: ["#103D33", "#174E40", "#1A5645", "#22664E"],
+    ribs: ["#285D4D", "#316E5A", "#367860", "#448769"],
+    stalk: "#2A4838",
     hands: "#6E7A45",
-    bud: "#5A2648",
-    budLine: "#7E4466",
+    bud: "#6A3A32",
+    budLine: "#8E5446",
   },
-  cloud: ["#323C78", "#262E62"],
-  cow: { body: "#4A3A44", light: "#5E4C55", horn: "#B9B2B8", dark: "#2A2028" },
+  cloud: ["#1E4744", "#173B38"],
+  cow: { body: "#4A3D36", light: "#5E4E45", horn: "#BDB5A6", dark: "#2A221E" },
 };
 
 /* ---------- environment symbols (flat, no outlines) ---------- */
 
-/** Banana plant: paddle leaves with midribs and wind tears, a hand of bananas and a purple bud. */
+/** Banana plant: paddle leaves with midribs and wind tears, a hand of bananas and a red-brown bud. */
 export function bananaSymbol(doc, P) {
   const id = P.night ? "bpn" : "bp";
   return doc.def(id, () => {
@@ -476,8 +500,8 @@ export function fieldBand(pts, [off1, off2], [x0, x1], base, color, k = 0) {
 
 /** Vertical gradient for a hill band: lit at the crest, deeper toward its foot. */
 export function bandFill(doc, P, id, color, y0, y1) {
-  const crest = P.night ? mix(color, "#86AFCF", 0.16) : mix(color, "#FBF6CF", 0.2);
-  const foot = P.night ? mix(color, "#04121A", 0.22) : mix(color, "#2E7A43", 0.12);
+  const crest = mix(color, P.crest, P.night ? 0.16 : 0.2);
+  const foot = mix(color, P.foot, P.night ? 0.22 : 0.12);
   doc.def(id, linear(id, [[0, crest], [1, foot]], [0, f(y0), 0, f(y1)], ' gradientUnits="userSpaceOnUse"'));
   return `url(#${id})`;
 }
@@ -543,7 +567,7 @@ export function stars({ x0, y0, x1, y1, count, seed, avoid = [], twinkles = 4 })
     tw.push(`M${f(x)} ${f(y - s)}C${f(x + s * 0.12)} ${f(y - s * 0.12)} ${f(x + s * 0.12)} ${f(y - s * 0.12)} ${f(x + s)} ${f(y)}C${f(x + s * 0.12)} ${f(y + s * 0.12)} ${f(x + s * 0.12)} ${f(y + s * 0.12)} ${f(x)} ${f(y + s)}C${f(x - s * 0.12)} ${f(y + s * 0.12)} ${f(x - s * 0.12)} ${f(y + s * 0.12)} ${f(x - s)} ${f(y)}C${f(x - s * 0.12)} ${f(y - s * 0.12)} ${f(x - s * 0.12)} ${f(y - s * 0.12)} ${f(x)} ${f(y - s)}Z`);
   }
   return (
-    `<path d="${groups[0].join("")}" fill="#E9E6FF" opacity=".55"/>` +
+    `<path d="${groups[0].join("")}" fill="#DCEDE4" opacity=".55"/>` +
     `<path d="${groups[1].join("")}" fill="#FFF6DD" opacity=".75"/>` +
     `<path d="${groups[2].join("")}" fill="#FFF8E6"/>` +
     (tw.length ? `<path d="${tw.join("")}" fill="#FFF1C2"/>` : "")
@@ -552,7 +576,7 @@ export function stars({ x0, y0, x1, y1, count, seed, avoid = [], twinkles = 4 })
 
 /** A crescent moon with a soft halo, lit from the left. */
 export function moon(doc, cx, cy, R) {
-  doc.def("moonhalo", radial("moonhalo", [[0, "#FFF6CF", 0.42], [0.3, "#E7E4FF", 0.16], [1, "#C9C8FF", 0]]));
+  doc.def("moonhalo", radial("moonhalo", [[0, "#FFF6CF", 0.42], [0.3, "#FCEFD5", 0.14], [1, "#FCEFD5", 0]]));
   doc.def("moonfill", linear("moonfill", [[0, "#FFFBE6"], [1, "#FFE9A6"]], [0, 0, 1, 1]));
   // Inner circle shifted right and up carves the crescent.
   const ix = cx + R * 0.52;
@@ -594,7 +618,7 @@ export function volcanoes(P, base, cones) {
     lit += `M${nums([f(cx - wd), f(base)])}C${nums([f(cx - wd * 0.45), f(base - ht * 0.14), f(cx - wd * 0.2), f(top + ht * 0.2), f(cx - c), f(top)])}Q${nums([f(cx), f(top + 2.5), f(cx + c), f(top)])}C${nums([f(cx + wd * 0.2), f(top + ht * 0.2), f(cx + wd * 0.45), f(base - ht * 0.14), f(cx + wd), f(base)])}Z`;
     shade += `M${nums([f(cx + c * 0.4), f(top + 1)])}C${nums([f(cx + wd * 0.2), f(top + ht * 0.2), f(cx + wd * 0.45), f(base - ht * 0.14), f(cx + wd), f(base)])}H${nums([f(cx + wd * 0.12)])}C${nums([f(cx + wd * 0.1), f(base - ht * 0.4), f(cx + c), f(top + ht * 0.3), f(cx + c * 0.4), f(top + 1)])}Z`;
   }
-  return `<path d="${lit}" fill="${P.volcano}"/><path d="${shade}" fill="${P.night ? "#22305F" : "#CACDDF"}"/>`;
+  return `<path d="${lit}" fill="${P.volcano}"/><path d="${shade}" fill="${P.volcanoShade}"/>`;
 }
 
 /** A short woven-stick fence (urugo) around a homestead, flat style. */
