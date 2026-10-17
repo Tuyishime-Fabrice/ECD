@@ -17,7 +17,7 @@ function luminance(hex: string): number {
 }
 
 /**
- * Storybook World tokens: every text pair is checked in BOTH themes
+ * ECD Imuhira tokens: every text pair is checked in BOTH themes
  * (day = light, night = dark), read from the theme:light / theme:dark blocks.
  */
 function themeTokens(name: "light" | "dark"): Record<string, string> {
@@ -52,6 +52,11 @@ const themedText: [string, string][] = [
   ["berry-ink", "berry-soft"],
   ["berry-ink", "paper"],
   ["coral-ink", "coral"],
+  ["ink-3", "ground"],
+  ["brand", "paper"],
+  ["brand", "ground"],
+  ["brand", "brand-soft"],
+  ["on-accent", "brand-strong"],
 ];
 // Icons and large bold text on solid accent buttons (AA 3:1).
 const themedLarge: [string, string][] = [
@@ -61,7 +66,7 @@ const themedLarge: [string, string][] = [
   ["on-accent", "berry"],
 ];
 
-describe.each(["light", "dark"] as const)("Storybook tokens, %s theme", (name) => {
+describe.each(["light", "dark"] as const)("Imuhira tokens, %s theme", (name) => {
   const theme = themeTokens(name);
   it("found the theme block", () => {
     expect(Object.keys(theme).length).toBeGreaterThan(25);

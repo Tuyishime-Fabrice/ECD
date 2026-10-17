@@ -192,11 +192,6 @@ function lost() {
   return { doc, body: o };
 }
 
-function logo() {
-  const doc = new Doc();
-  return { doc, body: mascot(doc, "happy", "m") };
-}
-
 export function buildUi(write) {
   const items = [
     ["images/ui/gift.svg", gift, 120, 120],
@@ -210,6 +205,5 @@ export function buildUi(write) {
     const { doc, body } = make();
     write(rel, { w, h, body, doc });
   }
-  const { doc, body } = logo();
-  write("icons/logo.svg", { w: 120, h: 120, body, doc, root: ' role="img" aria-label="Izuba"' });
+  // The app's logo is the ECD Imuhira mark: scripts/brand/build-logo.mjs.
 }

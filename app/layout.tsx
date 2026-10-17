@@ -1,16 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Nunito } from "next/font/google";
+import { Lato } from "next/font/google";
 import { AppEffects } from "@/components/AppEffects";
 import { brand } from "@/lib/brand";
 import "./globals.css";
 
-// Both are variable fonts, so one self-hosted file each covers every weight.
-const baloo = Baloo_2({ subsets: ["latin"], variable: "--font-baloo", display: "swap" });
-const nunito = Nunito({ subsets: ["latin"], variable: "--font-nunito", display: "swap" });
+// Lato, the typeface of the ECD Imuhira logo, self-hosted by Next.js (no request to Google).
+const lato = Lato({ subsets: ["latin"], weight: ["400", "700", "900"], variable: "--font-lato", display: "swap" });
 
 export const metadata: Metadata = {
   title: { default: brand.name, template: `%s · ${brand.name}` },
-  description: brand.tagline.en,
+  description: brand.description,
   applicationName: brand.name,
   icons: { icon: brand.logo, apple: "/icons/apple-touch-icon.png" },
   // No external links, no tracking: keep crawlers from following anything.
@@ -18,10 +17,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  // Browser bar matches the sky: morning in light mode, night in dark mode.
+  // Browser bar matches the page: cream in light mode, deep teal in dark mode.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#9fd6f0" },
-    { media: "(prefers-color-scheme: dark)", color: "#0b1533" },
+    { media: "(prefers-color-scheme: light)", color: "#fbf6ec" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a1f1e" },
   ],
   colorScheme: "light dark",
   width: "device-width",
@@ -36,7 +35,7 @@ const langScript = `try{var s=JSON.parse(localStorage.getItem(${JSON.stringify(
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="rw" className={`${baloo.variable} ${nunito.variable}`} suppressHydrationWarning>
+    <html lang="rw" className={lato.variable} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: langScript }} />
       </head>

@@ -6,23 +6,28 @@
  * Colors live in app/globals.css (the @theme block) — see README.
  */
 export const brand = {
-  /** Shown in the header, browser tab and installed-app name. PLACEHOLDER name. */
-  name: "Izuba",
+  /** Shown in the browser tab, the installed-app name and the parent area. */
+  name: "ECD Imuhira",
   /** Short name under the home-screen icon (max ~12 characters). */
-  shortName: "Izuba",
+  shortName: "Imuhira",
+  /** The logo's tagline. */
   tagline: {
-    rw: "Twige intambwe ku yindi",
-    en: "Learning, one step at a time",
+    rw: "Iga · Kina · Kura",
+    en: "Learn · Play · Grow",
   },
-  /** Square logo used in the header and as the favicon. */
-  logo: "/icons/logo.svg",
-  /** Browser/OS chrome color (sky-700). */
-  themeColor: "#1572A8",
-  /** Splash-screen background (cream-50). */
-  backgroundColor: "#FFF9EE",
+  /** One line for search results and the install prompt. */
+  description: "Educative story videos for children aged 3–6, at home.",
+  /** The logo mark alone (house, play button, open book): favicon and small places. */
+  logo: "/brand/mark.svg",
+  /** Brand colors from the logo. The app's light/dark tokens live in app/globals.css. */
+  colors: { teal: "#124C4A", coral: "#EC775F", mustard: "#F2B83F", cream: "#FCEFD5", sage: "#BDCDCD" },
+  /** Browser/OS chrome color: the logo's teal. */
+  themeColor: "#124C4A",
+  /** Splash-screen background: the page's cream. */
+  backgroundColor: "#FBF6EC",
   /**
    * Prefix for everything saved on the device. Changing it starts every
-   * family from zero, so leave it alone after launch.
+   * family from zero, so leave it alone after launch (it keeps the app's first name).
    */
   storagePrefix: "izuba:",
 } as const;
