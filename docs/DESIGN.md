@@ -1,17 +1,26 @@
-# Izuba design system: "Storybook World"
+# ECD Imuhira design system
 
 The app is a **story app** for children aged 3–6 in Rwanda. Children watch short animated
 **stories** that each carry a lesson, in a set order, grouped into **collections** (in the
 code: `season`). After every 4 stories there is a picture **challenge** that wins a sticker.
 Grown-ups have a parent area (`/parents`) and an admin dashboard (`/admin`).
 
-The look: every kid screen lives inside one illustrated Rwandan landscape. There's a sky
-gradient, layered terraced hills with beehive huts, banana plants and tea rows, and the sun
-mascot **Izuba**. Content floats on the scene as warm paper cards. **Day** (light mode) is a
-sunrise. **Night** (dark mode) is the same world under a moon and stars. The app follows the
-phone's light/dark setting (`prefers-color-scheme`). There is no in-app toggle.
+**Brand.** ECD Imuhira ("Imuhira" is Kinyarwanda for "home"), tagline **LEARN • PLAY • GROW**
+(*Iga · Kina · Kura*). The logo is a teal roof over a coral play button above an open book with
+a teal and a mustard page. Logo colors: teal `#124C4A`, coral `#EC775F`, mustard `#F2B83F`,
+cream `#FCEFD5`, sage `#BDCDCD`; typeface **Lato**. Logo files are in `public/brand/`:
+`mark.svg` (favicon, small places), `wordmark.svg` (mark + "ECD Imuhira" on one line: top
+bars) and `lockup.svg` (stacked, with the tagline: sign-in, footer, docs). Each one turns its
+teal parts cream in dark mode by itself, so a plain `<img>` works in both themes. They are
+drawn by `scripts/brand/build-logo.mjs`; the app icons by `scripts/make-icons.mjs`.
 
-The approved concept mockups (light mode) were made outside the repo; this document is the source of truth.
+**Look.** Calm, warm and professional: few colors at once, white cards with hairline borders
+and soft teal-tinted shadows, clear Lato hierarchy, generous space. Every kid screen sits in one
+illustrated Rwandan landscape (terraced hills, beehive huts, banana plants, tea rows) in the
+brand palette. **Day** (light mode) is a soft mint-to-cream morning; **night** (dark mode) is
+the same world in deep teal under a cream moon. The app follows the phone's light/dark setting
+(`prefers-color-scheme`); there is no in-app toggle. **Izuba**, the sun, is the story guide who
+asks the questions. It is a character, not the brand.
 
 ## Non-negotiables
 
@@ -46,53 +55,56 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 | `paper` / `paper-2` | Card surface / sunken surface |
 | `line` | Hairlines, the lip of neutral press buttons |
 | `ink` / `ink-2` / `ink-3` | Text: primary / secondary / labels (uppercase, letter-spaced) |
-| `on-accent` | Icons or large bold text on play/listen/leaf/berry |
-| `sun`, `sun-soft`, `sun-lip`, `sun-ink` | **Progress and reward** (gold): watched stones, progress bars, rings, the current question dot. Text on `sun` uses `sun-ink`. |
-| `play`, `play-lip`, `play-ink` | **Play actions only** (orange). `play-ink` is orange text on paper ("UP NEXT"). |
-| `listen`, `listen-lip`, `listen-ink` | **Audio** (blue): the listen/replay button. Also the accent for grown-up screens. |
+| `on-accent` | Icons or large bold text on play/listen/leaf/berry/brand-strong |
+| `brand`, `brand-soft`, `brand-strong` | **The logo's teal**: accent text and icons / tinted surfaces / solid fills under white text (grown-up primary buttons). In dark mode `brand` is a light teal. |
+| `sun`, `sun-soft`, `sun-lip`, `sun-ink` | **Progress and reward** (mustard): watched stones, progress bars, stars, the "up next" ring. `sun-soft` is the logo's cream. Text on `sun` uses `sun-ink`. |
+| `play`, `play-lip`, `play-ink` | **Play / start / go actions only** (coral, a shade deeper than the logo's so the white triangle keeps 3:1). `play-ink` is coral text on paper. |
+| `listen`, `listen-lip`, `listen-ink` | **Audio** (teal): the listen/replay button |
 | `leaf`, `leaf-soft`, `leaf-ink` | "Watched" checks, success |
-| `berry`, `berry-soft`, `berry-lip`, `berry-ink` | **Challenges, gifts, stickers, locks**, and "sleeping" (coming soon) collections |
-| `coral`, `coral-soft`, `coral-ink` | Count badges and small warm accents (not an error color) |
+| `berry`, `berry-soft`, `berry-lip`, `berry-ink` | **Challenges, gifts, locks** (teal; the name is historical) |
+| `coral`, `coral-soft`, `coral-ink` | Small warm accents (never an error color) |
 | `sky-top` / `sky-bottom` | Scene sky gradient (CSS) |
 
 - **Elevation:**
   - `shadow-e1` for small floats (pills, round tool buttons, row cards).
   - `shadow-e2` for main cards.
-  - `shadow-rim` adds the top inner highlight to cards.
-  - Never use flat offset beige shadows. The old `tactile` utility is legacy.
+  - `inset-shadow-rim` adds a 1px hairline inside cards.
 - **Press buttons:** `press` plus one of `press-play`, `press-listen`, `press-sun`,
   `press-berry` or `press-paper`. This gives a 3D lip in a darker shade of the button's own
-  color, which presses down on `:active`. Use it for every primary kid button and answer tile.
+  color (4px), which presses down on `:active`. Use it for every primary kid button and answer tile.
 - **Cards and small buttons:** `tap` (scale 0.96 on press).
-- **Radii:** `rounded-card` (24) for cards, `rounded-tile` (28) for answer tiles and bubbles,
-  `rounded-hero` (32) for the hero and banners. Use `rounded-full` for round buttons, stones
+- **Radii:** `rounded-card` (20) for cards, `rounded-tile` (24) for answer tiles and bubbles,
+  `rounded-hero` (28) for the hero and banners. Use `rounded-full` for round buttons, stones
   and badges.
-- **Type:** Baloo 2 (`font-display`) for headings, titles, numerals and buttons; Nunito
-  (`font-body`) for body text.
-  - Kid scale: question prompt 28/800, screen title 26–32/800, card title 16–17/700 with a
-    2-line clamp, labels 11–12/800 uppercase with +0.08em tracking.
-  - Grown-up screens: normal 16px body.
-- **Focus:** a global 4px `sun` outline. Keep it visible.
-- **Legacy tokens** (`cream-50`, `ink-900`, `sky-500`, …) still exist only so unconverted
-  screens keep building. Don't use them in new work. They will be deleted.
+- **Type:** Lato only (400, 700, 900 are loaded; there is no 500/600/800). `font-display` and
+  `font-body` both map to it.
+  - Kid scale: question prompt 26–28/900, screen title 26–32/900 with tight leading, card title
+    16–17/900 with a 2-line clamp, `eyebrow` labels (11–12/700 uppercase, letter-spaced).
+  - Grown-up screens: 16px body, 900 titles, 700 labels.
+- **Focus:** a global teal outline (mustard was too faint on cream). Keep it visible.
+- Tailwind's default palette is removed: only the tokens above exist, plus white and black.
 
 ## Illustration rules
 
 - **Environment:** flat and without outlines. Layered silhouettes with atmospheric
   perspective: far hills paler, near hills more saturated. Terraces are lighter contour
   strokes. Add tea hedgerows, beehive "inzu" huts and banana plants (paddle leaves with
-  midribs and tears, a purple bud, not palm trees). Scatter meadow flowers in the foreground.
+  midribs and tears, a red-brown bud, not palm trees). Day sky mint `#d6ece6` to cream
+  `#fbf0dc` with a cream glow; hills in sage and teal-greens; road in the app's sand tones;
+  flowers cream, coral and mustard. Scatter meadow flowers in the foreground.
 - **Night:**
-  - Deep blue sky (`#0b1533` → `#2b2f63`) with stars and a moon.
-  - Hills in deep teal and green, a few warm lit hut windows, and fireflies as tiny gold dots.
+  - Deep teal sky (`#071a19` → `#153e3a`) with cream stars and moon. No navy or purple.
+  - Hills in dark teal, a few warm lit hut windows, and fireflies as tiny mustard dots.
   - Izuba sleeps or wears a nightcap only on the time's-up screen. Otherwise the mascot stays
     as it is.
 - **Characters and objects** (mascot, fruit, gifts, baskets, stickers, emblems): a 3–3.5px
-  warm-brown outline (`#5a3112`), soft gradient fills and one white highlight stroke.
-- **Izuba:** 8 long and 8 short petal rays, a gradient face, blush cheeks, eyes with
-  catch-lights and an open smile. It is the only sun on any screen.
-- **Numerals:** "toy-block" style, meaning Baloo 800 with a darker offset extrusion. No
-  outlined numerals and no duplicate number badges.
+  deep teal-brown outline (`#2f3a33`), soft gradient fills and one white highlight stroke.
+  Clothes and props use the brand colors; skin tones and fruit stay natural.
+- **Izuba:** mustard, with 8 long and 8 short petal rays, coral cheeks, eyes with catch-lights
+  and an open smile. It is the only sun on any screen.
+- **Gifts (challenges):** a teal box with a coral ribbon and a mustard bow.
+- **Numerals:** "toy-block" style with a darker offset extrusion (outlines stored in
+  `scripts/art/digits.json`). Story numbers sit on a teal tile with cream numerals.
 - **Rwandan textures:** imigongo zig-zags and agaseke weaving, used only as subtle bands (gift
   wrap, basket bands, answer-plate rims).
 - **Story thumbnails** are story scenes: a character (for example Keza, a Rwandan girl)
@@ -107,20 +119,19 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 ### Home: a streaming-style layout for kids (like a video site, but calm)
 
 1. **Top bar.**
-   - Left: the brand lockup (Izuba mascot about 44px and the wordmark in Baloo 800, about
-     28px).
-   - Right: two 56–64px round buttons: **stickers** (`sun-soft`, a die-cut star and a `coral`
-     count badge) and **parents** (`paper`, lock).
-   - Sticky. It gets `bg-paper` plus `shadow-e1` after scrolling. No blur.
+   - Left: `public/brand/wordmark.svg`, 40px tall, linking home.
+   - Right: **stickers** (a 64px mustard pill with the star and the count) and **parents** (a
+     quiet 48px lock circle inside a 64px tap target).
+   - Sticky, solid `ground` with a hairline bottom border. No blur.
 2. **Hero slider.**
    - Featured stories from `content/site.json`. The first slide is the child's
      "keep watching" story, if any.
    - Full width with 16px gutters on phones, and 32px radius with a max width of about 1200px
      on desktop.
-   - The story picture covers the slide, with a dark bottom scrim for white text. It shows a
-     collection pill, the story title (Baloo 800, 28–40px), and a big orange **Play**
-     (`press press-play`, 80–96px) that opens the watch page. A "keep watching" slide also
-     has a gold progress bar.
+   - Phones: a picture card with a label chip (mustard "keep watching", teal collection),
+     the title (Lato 900) and a big coral **Play** disc (`press press-play`).
+   - From 768px: a split layout, words and a coral **Watch** button on the left, the picture
+     filling the right. A "keep watching" slide has a mustard progress bar.
    - Scroll-snap. Dots below; on ≥768px, arrows too. Swipe or tap only, never auto-advance.
 3. **Collection rows** (one per published collection).
    - Header: a gold collection "stone" emblem, the title, "Collection 1 · 2 of 8" and a
@@ -137,17 +148,17 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 4. **Featured banner.** A wide illustrated banner (like a streaming site's mid-page banner)
    inviting the child onto the current collection's **path**. It shows the scene, Izuba and
    a "Path" button.
-5. **Coming soon.** Collection posters at 80% with a lilac "zz" badge and a gentle wiggle plus
+5. **Coming soon.** Collection posters at 80% with a "zz" badge and a gentle wiggle plus
    sound on tap. No grey locks.
-6. **Footer.** A strip of illustrated hills (day or night) with the brand, a "For parents"
-   link (lock icon, to `/parents`) and "My stickers". Internal links only.
+6. **Footer.** `public/brand/lockup.svg`, the tagline, a short description, "My stickers" and
+   "Parent area" links and a privacy line. Internal links only.
 
 ### Collection path map (`/season/[slug]`)
 
 - A winding road climbs the hills toward the summit. Story stones and challenge gift
   pedestals sit along it.
 - **Watched:** gold stones with checks, and the walked part of the road is gold.
-- **Current:** a 100px orange play stone with a progress ring and a pulsing halo, Izuba
+- **Current:** a 100px coral play stone with a progress ring and a pulsing halo, Izuba
   standing on it, and a title pill.
 - **Not yet:** cream stones with muted numerals and no locks.
 - **Challenge:** a `berry` gift pedestal with pips and a lock badge until unlocked.
@@ -167,11 +178,11 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 ### Question and challenge
 
 - **Top:** Home escape (64px), and a 5-dot progress track ending in the gift.
-- **Prompt:** a speech bubble from Izuba, who rises behind a hill. It has an 88px blue
+- **Prompt:** a speech bubble from Izuba, who rises behind a hill. It has an 88px teal
   **Listen** button (`press press-listen`) and the prompt text.
 - **Answers:** 2–4 big press tiles (`rounded-tile`) with a woven agaseke plate, in the thumb
   zone.
-- **Right answer:** gold ring, sparkles, Izuba bounces.
+- **Right answer:** mustard ring, sparkles, Izuba bounces.
 - **Wrong answer:** the tile wobbles and dims, with a "try again" voice. After 2 misses the
   correct tile gently glows.
 - **Challenge intro:** the gift on a pedestal with Izuba and a big Start.
@@ -187,8 +198,12 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 
 ### Grown-up screens (parent area, admin)
 
-- Calm and professional, in the same tokens.
-  - Background `paper-2`, cards `paper` with `shadow-e1`, `line` borders.
-  - Accent `listen`, normal 16px Nunito body and Baloo headings.
+- Calm and professional, in the same tokens: like good SaaS software.
+  - Background `ground`, cards `paper` with hairline `line` borders and soft shadows.
+  - Primary buttons solid `brand-strong` with white text; secondary outlined; careful
+    actions in warm coral, never alarm red. Accent and focus in `brand` teal.
+  - Parent area: wordmark header, "For parents" eyebrow, two columns on desktop.
+  - Admin: white sidebar with the wordmark and grouped navigation (Overview / Content /
+    Manage), page headers with the main action on the right; sign-in shows the lockup.
 - **Tap targets:** 44px minimum for grown-ups.
 - **Dark mode** follows the system too.

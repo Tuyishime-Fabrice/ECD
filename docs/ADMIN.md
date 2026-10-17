@@ -195,7 +195,7 @@ reachable by keyboard.
    a prompt, 2–4 picture answers (upload) and which one is right. A placement note says
    challenges sit after every 4 stories.
 6. **Collections:**
-   - Title in both languages, color (sky / coral / leaf / grape), "Live" or "Coming soon",
+   - Title in both languages, color (teal / coral / leaf / mustard; stored as `sky` / `coral` / `leaf` / `grape`), "Live" or "Coming soon",
      poster picture, and order.
    - Add a collection.
 7. **Settings:**
