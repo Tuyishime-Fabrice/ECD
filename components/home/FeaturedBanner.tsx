@@ -21,25 +21,25 @@ export function FeaturedBanner({ seasons }: { seasons: SeasonCard[] }) {
   if (!season) return null;
 
   return (
-    <section className="mt-4 px-4 md:px-8">
+    <section className="mt-6 px-4 md:mt-10 md:px-8">
       <Link
         href={`/season/${season.slug}`}
         onClick={playPop}
         aria-label={`${t("openPath")}: ${pick(season.title)}`}
-        className="tap relative flex min-h-56 overflow-hidden rounded-hero bg-gradient-to-b from-sky-top to-sky-bottom shadow-e2 md:min-h-72"
+        className="tap relative flex min-h-56 overflow-hidden rounded-hero border border-line bg-gradient-to-b from-sky-top to-sky-bottom shadow-e2 md:min-h-72"
       >
         <Scene
           name="map-wide"
           className="absolute inset-0"
           imgClassName="size-full object-cover object-[50%_75%]"
         />
-        <span aria-hidden className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-paper/95 via-paper/70 to-transparent md:w-2/3" />
-        <span className="relative flex max-w-[70%] flex-col justify-center gap-2 p-6 md:max-w-md md:gap-3 md:p-10">
-          <span className="text-[11px] font-extrabold uppercase tracking-[0.08em] text-ink-3">{pick(season.title)}</span>
-          <span className="font-display text-[28px] font-extrabold leading-[1.05] text-ink md:text-[40px]">
+        <span aria-hidden className="absolute inset-y-0 left-0 w-full bg-gradient-to-r from-paper via-paper/80 to-transparent md:w-2/3" />
+        <span className="relative flex max-w-[80%] flex-col justify-center gap-2 p-5 min-[400px]:p-6 md:max-w-md md:gap-3 md:p-10 lg:p-12">
+          <span className="eyebrow text-brand">{pick(season.title)}</span>
+          <span className="max-w-[12ch] font-display text-[26px] font-black leading-[1.05] tracking-[-0.01em] text-ink min-[400px]:text-[28px] md:max-w-none md:text-[40px]">
             {t("storyPath")}
           </span>
-          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start rounded-full bg-play px-5 font-display text-lg font-extrabold text-on-accent">
+          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start whitespace-nowrap rounded-full bg-play pl-4 pr-5 font-display text-[19px] font-black text-on-accent md:pl-5 md:pr-6 md:text-xl">
             <MapIcon className="size-6" strokeWidth={2.5} aria-hidden />
             {t("openPath")}
           </span>

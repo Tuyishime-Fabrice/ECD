@@ -178,8 +178,8 @@
     100% { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1) rotate(var(--r)); opacity: 0; }
   }
   @keyframes glow {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 210, 63, 0.9); transform: scale(1); }
-    50% { box-shadow: 0 0 0 10px rgba(255, 210, 63, 0); transform: scale(1.05); }
+    0%, 100% { box-shadow: 0 0 0 0 rgb(242 184 63 / 0.9); transform: scale(1); }
+    50% { box-shadow: 0 0 0 10px rgb(242 184 63 / 0); transform: scale(1.05); }
   }
   @keyframes fade-in {
     from { opacity: 0; transform: translateY(6px); }
@@ -257,12 +257,15 @@
   h1, h2, h3 {
     font-family: var(--font-display);
     line-height: 1.15;
+    letter-spacing: -0.01em;
+    text-wrap: balance;
   }
   button {
     cursor: pointer;
   }
+  /* Teal focus ring: clear on cream, white and deep-teal grounds alike. */
   :focus-visible {
-    outline: 4px solid var(--c-sun);
+    outline: 3px solid var(--c-brand);
     outline-offset: 3px;
   }
   img {
@@ -299,6 +302,16 @@
 }
 @utility press-paper {
   --lip: var(--c-line);
+}
+
+/* Small uppercase label above a title ("STORY 3", "KEEP WATCHING"). Lato 700, spaced out. */
+@utility eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.6875rem;
+  line-height: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
 }
 
 /* Soft tap feedback for cards and small round buttons. */

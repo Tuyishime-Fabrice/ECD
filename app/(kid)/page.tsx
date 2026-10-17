@@ -15,18 +15,18 @@ export default function HomePage() {
   return (
     <TimeGate mode="live">
       {/* Morning (or night) sky and hills behind the top bar and the slider. */}
-      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[460px] md:h-[620px]">
+      <div aria-hidden className="absolute inset-x-0 top-0 -z-10 h-[460px] md:h-[560px]">
         <Sky className="absolute inset-0" />
         <Scene
           name="home-hills"
           eager
           className="absolute inset-x-0 bottom-0 block"
-          imgClassName="block h-44 w-full object-cover object-bottom md:h-72"
+          imgClassName="block h-44 w-full object-cover object-bottom md:h-56"
         />
         <div className="absolute inset-x-0 -bottom-px h-16 bg-gradient-to-b from-transparent to-ground" />
       </div>
 
-      <div className="mx-auto max-w-[1400px] pt-2">
+      <div className="mx-auto max-w-6xl pt-4 md:pt-8">
         <HomeHero featured={featured} seasons={seasons} />
         {published.map((season, i) => (
           <CollectionRow key={season.id} season={season} allSeasons={seasons} eager={i === 0} />
