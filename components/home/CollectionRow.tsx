@@ -53,7 +53,7 @@ export function CollectionRow({
           <p className="eyebrow text-ink-3">{t("storiesProgress", { n: watched, m: stories.length })}</p>
           <h2
             id={`collection-${season.id}`}
-            className="truncate font-display text-[22px] font-black leading-tight text-ink md:text-[28px]"
+            className="line-clamp-2 font-display text-[20px] font-black leading-tight text-ink min-[400px]:text-[22px] md:text-[28px]"
           >
             {pick(season.title)}
           </h2>

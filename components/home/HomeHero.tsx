@@ -166,10 +166,10 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
         prefetch={false}
         onClick={playPop}
         aria-label={`${action}: ${title}`}
-        className="tap relative flex w-full flex-col overflow-hidden rounded-hero border border-line bg-paper shadow-e2 md:grid md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+        className="tap relative flex w-full flex-col overflow-hidden rounded-hero border border-line bg-paper shadow-e2 md:grid md:min-h-[340px] md:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:min-h-[400px] short:min-h-0"
       >
-        {/* Picture: on phones a 16:9 panel above the words; on wide screens the right-hand column. */}
-        <span className="relative block aspect-video overflow-hidden bg-paper-2 md:order-last">
+        {/* Picture: on phones a 16:9 panel above the words; on wide screens it fills the right-hand column. */}
+        <span className="relative block aspect-video overflow-hidden bg-paper-2 md:order-last md:aspect-auto">
           {isStory ? (
             <img
               src={item.thumbnail}
@@ -179,10 +179,10 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
               loading={eager ? "eager" : "lazy"}
               fetchPriority={eager ? "high" : "auto"}
               decoding="async"
-              className="size-full object-cover"
+              className="size-full object-cover md:absolute md:inset-0"
             />
           ) : (
-            <span className="grid size-full place-items-center bg-brand-soft">
+            <span className="grid size-full place-items-center bg-brand-soft md:absolute md:inset-0">
               <img src="/images/ui/gift.svg" alt="" width={240} height={240} className="h-3/4 w-auto" />
             </span>
           )}
@@ -190,7 +190,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
           <span aria-hidden className="absolute inset-y-0 left-0 hidden w-16 bg-gradient-to-r from-paper to-transparent md:block" />
         </span>
 
-        <span className="relative flex flex-1 flex-col gap-2 px-5 pb-5 pr-28 pt-4 md:justify-center md:gap-3 md:py-8 md:pl-10 md:pr-6 lg:pl-12">
+        <span className="relative flex flex-1 flex-col gap-2 px-5 pb-5 pr-24 pt-4 md:justify-center md:gap-3 md:py-8 md:pl-10 md:pr-6 lg:pl-12">
           {label && (
             <span
               className={clsx(
@@ -202,7 +202,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
             </span>
           )}
           {/* Every slide keeps room for two lines and a progress bar, so all have the same height. */}
-          <span className="line-clamp-2 min-h-[2.2em] font-display text-[24px] font-black leading-[1.1] tracking-[-0.01em] text-ink md:line-clamp-3 md:min-h-0 md:text-[34px] lg:text-[44px]">
+          <span className="line-clamp-2 min-h-[2.2em] font-display text-[22px] font-black leading-[1.1] tracking-[-0.01em] text-ink min-[400px]:text-[24px] md:line-clamp-3 md:min-h-0 md:text-[34px] lg:text-[44px]">
             {title}
           </span>
           <span className="hidden truncate text-base font-bold text-ink-2 md:block">{meta}</span>
@@ -223,9 +223,9 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
         {/* Phones: the coral play disc in the corner of the card. */}
         <span
           aria-hidden
-          className="press press-play absolute bottom-5 right-5 grid size-[72px] place-items-center rounded-full bg-play md:hidden"
+          className="press press-play absolute bottom-5 right-4 grid size-16 place-items-center rounded-full bg-play min-[400px]:right-5 min-[400px]:size-[72px] md:hidden"
         >
-          <Icon className={clsx("size-9 text-on-accent", isStory && "ml-1 fill-on-accent")} strokeWidth={2.5} />
+          <Icon className={clsx("size-8 text-on-accent", isStory && "ml-1 fill-on-accent")} strokeWidth={2.5} />
         </span>
       </Link>
     </li>

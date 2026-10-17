@@ -66,14 +66,14 @@ export function EndScreen({ homeActivity, next, onWatchAgain }: Props) {
               alt=""
               width={320}
               height={180}
-              className="aspect-video w-32 shrink-0 rounded-full object-cover"
+              className="aspect-video w-28 shrink-0 rounded-full object-cover"
             />
           ) : (
-            <span className="grid aspect-video w-32 shrink-0 place-items-center rounded-full bg-brand-soft">
+            <span className="grid aspect-video w-28 shrink-0 place-items-center rounded-full bg-brand-soft">
               <img src="/images/ui/gift.svg" alt="" width={56} height={56} className="h-[80%] w-auto" />
             </span>
           )}
-          <span className="min-w-0 flex-1 font-display text-[24px] font-black leading-tight">
+          <span className="min-w-0 flex-1 font-display text-[22px] font-black leading-tight">
             {next.type === "challenge" ? t("challenge") : t("nextEpisode")}
           </span>
           <ChevronRight className="size-9 shrink-0" strokeWidth={3} aria-hidden />
