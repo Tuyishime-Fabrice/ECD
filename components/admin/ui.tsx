@@ -23,7 +23,8 @@ const VARIANTS: Record<Variant, string> = {
   primary: "admin-btn-solid bg-brand-strong text-on-accent hover:brightness-110 active:brightness-95",
   secondary: "admin-btn border border-line bg-paper text-ink hover:border-ink-3/50 hover:bg-paper-2",
   ghost: "text-ink-2 hover:bg-brand-soft/70 hover:text-ink",
-  danger: "admin-btn-solid bg-play-lip text-on-accent hover:brightness-110 active:brightness-95",
+  // Warm coral with dark text: clearly "careful", never alarm red.
+  danger: "admin-btn-solid bg-coral text-coral-ink hover:brightness-105 active:brightness-95",
   "quiet-danger": "text-play-ink hover:bg-coral-soft",
   // On a brand-teal surface (the unsaved-changes bar): white by day, cream at night.
   inverse: "admin-btn bg-paper text-brand-strong hover:bg-paper-2 dark:bg-ink dark:hover:bg-ink-2",
@@ -210,7 +211,7 @@ const TONES: Record<Tone, string> = {
   live: "bg-leaf-soft text-leaf-ink",
   soon: "bg-paper-2 text-ink-2 ring-1 ring-inset ring-line",
   // At night a mustard tint with mustard text, so it stays warm without turning olive.
-  warn: "bg-sun-soft text-ink ring-1 ring-inset ring-sun-lip/30 dark:bg-sun/10 dark:text-sun dark:ring-sun/25",
+  warn: "bg-sun-soft text-ink ring-1 ring-inset ring-sun-lip/30 dark:bg-transparent dark:text-sun dark:ring-sun/40",
   neutral: "bg-paper-2 text-ink-2 ring-1 ring-inset ring-line",
   info: "bg-brand-soft text-brand",
   danger: "bg-coral-soft text-ink ring-1 ring-inset ring-play-ink/25",
@@ -238,7 +239,7 @@ const ALERT_TONES = {
   error: "border-play-ink/40 bg-coral-soft text-ink [&_svg.alert-icon]:text-play-ink",
   info: "border-brand/20 bg-brand-soft/60 text-ink [&_svg.alert-icon]:text-brand",
   success: "border-leaf/30 bg-leaf-soft text-ink [&_svg.alert-icon]:text-leaf-ink",
-  warn: "border-sun-lip/40 bg-sun-soft text-ink [&_svg.alert-icon]:text-ink dark:border-sun/30 dark:bg-sun/10 dark:[&_svg.alert-icon]:text-sun",
+  warn: "border-sun-lip/40 bg-sun-soft text-ink [&_svg.alert-icon]:text-ink dark:border-sun/35 dark:bg-paper-2 dark:[&_svg.alert-icon]:text-sun",
 } as const;
 
 export function Alert({

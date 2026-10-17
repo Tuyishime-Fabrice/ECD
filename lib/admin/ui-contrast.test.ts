@@ -32,7 +32,7 @@ function ratio(theme: Record<string, string>, fg: string, bg: string): number {
 // Text (AA 4.5:1).
 const text: [string, string][] = [
   ["on-accent", "brand-strong"], // primary buttons, step numbers, the unsaved-changes bar
-  ["on-accent", "play-lip"], // the careful "Delete" button in confirm dialogs
+  ["coral-ink", "coral"], // the careful "Delete" and "Undo" buttons in confirm dialogs
   ["brand", "brand-soft"], // active menu item, info badges
   ["brand", "paper"], // links, icons on cards
   ["brand", "paper-2"],
