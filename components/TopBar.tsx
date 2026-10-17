@@ -34,7 +34,7 @@ export function TopBar() {
           className="tap -ml-1 flex min-h-16 items-center rounded-2xl px-1"
         >
           {/* The wordmark turns its teal parts cream in dark mode by itself. */}
-          <img src="/brand/wordmark.svg" alt="" width={140} height={40} className="h-9 w-auto sm:h-10" />
+          <img src="/brand/wordmark.svg" alt="" width={140} height={40} className="h-10 w-auto" />
         </Link>
 
         <nav aria-label={brand.name} className="ml-auto flex items-center gap-2 sm:gap-3">

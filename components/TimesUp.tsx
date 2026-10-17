@@ -24,11 +24,11 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
           alt=""
           width={400}
           height={260}
-          className="w-full rounded-card shadow-e2 short:mx-auto short:w-2/3"
+          className="w-full rounded-hero border border-line shadow-e2 short:mx-auto short:w-2/3"
         />
       </picture>
-      <h1 className="font-display text-[40px] font-black leading-tight text-ink">{t("timesUpTitle")}</h1>
-      <p className="-mt-3 font-display text-2xl font-bold text-ink-2">{t("timesUpBody")}</p>
+      <h1 className="font-display text-[38px] font-black leading-[1.1] text-ink">{t("timesUpTitle")}</h1>
+      <p className="-mt-2 font-display text-[22px] font-bold text-ink-2">{t("timesUpBody")}</p>
 
       {homeActivity && (
         <div className="w-full">
@@ -39,7 +39,7 @@ export function TimesUp({ homeActivity, onExtended }: { homeActivity?: Localized
       <button
         type="button"
         onClick={() => setGateOpen(true)}
-        className="tap mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border-2 border-line bg-paper px-4 text-base font-bold text-ink-2"
+        className="tap mt-2 inline-flex min-h-12 items-center gap-2 rounded-full border border-line bg-paper px-5 text-base font-bold text-brand shadow-e1"
       >
         <Plus className="size-5" strokeWidth={2.5} aria-hidden />
         {t("addTenMinutes")}

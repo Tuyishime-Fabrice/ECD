@@ -69,7 +69,7 @@ export function HomeHero({ featured, seasons }: { featured: FeaturedStory[]; sea
       <ul
         ref={track}
         onScroll={onScroll}
-        className="scrollbar-touch-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-3 pt-1 md:gap-6 md:scroll-px-8 md:px-8"
+        className="scrollbar-touch-hidden flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-px-4 px-4 pb-3 pt-1 md:gap-8 md:scroll-px-8 md:px-8"
       >
         {slides.map((slide, i) => (
           // Keyed by position: when "keep watching" arrives, the slides update in place.

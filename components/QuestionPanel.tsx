@@ -79,10 +79,10 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
         {/* Izuba asks the question in a speech bubble; the blue button says it again. */}
         <div className="flex w-full items-center gap-2">
           <Mascot pose="happy" className="w-16 shrink-0 short:hidden tight:w-12" />
-          <div className="relative flex min-w-0 flex-1 items-center gap-3 rounded-tile bg-paper p-2.5 pr-4 shadow-e2 inset-shadow-rim short:flex-col short:p-3 short:text-center">
+          <div className="relative flex min-w-0 flex-1 items-center gap-3 rounded-tile border border-line bg-paper p-2.5 pr-4 shadow-e2 short:flex-col short:p-3 short:text-center">
             <span
               aria-hidden
-              className="absolute -left-2 top-1/2 size-5 -translate-y-1/2 rotate-45 rounded-[4px] bg-paper short:hidden"
+              className="absolute -left-[11px] top-1/2 size-5 -translate-y-1/2 rotate-45 rounded-[4px] border-b border-l border-line bg-paper short:hidden"
             />
             <button
               type="button"
@@ -92,7 +92,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             >
               <Volume2 className="size-9 text-on-accent" strokeWidth={2.5} aria-hidden />
             </button>
-            <p className="relative font-display text-[20px] font-black leading-tight text-ink">{pick(question.promptText)}</p>
+            <p className="relative min-w-0 font-display text-[20px] font-black leading-tight text-ink">{pick(question.promptText)}</p>
           </div>
         </div>
         {question.promptImage && (
@@ -101,7 +101,7 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
             alt=""
             width={240}
             height={240}
-            className="h-36 w-auto rounded-card bg-paper p-2 shadow-e1 tight:h-[min(8rem,20dvh)] short:h-28"
+            className="h-36 w-auto rounded-card border border-line bg-paper p-2 shadow-e1 tight:h-[min(8rem,20dvh)] short:h-28"
           />
         )}
       </div>
@@ -136,9 +136,9 @@ export function QuestionPanel({ question, onComplete, className }: Props) {
               aria-label={option.label ?? `${i + 1}`}
               onAnimationEnd={() => setWobbling((w) => (w === option.id ? null : w))}
               className={clsx(
-                "press press-paper relative grid aspect-square min-h-[120px] w-full place-items-center rounded-tile bg-paper p-2 transition-[opacity,filter] duration-300 short:min-h-0",
+                "press press-paper relative grid aspect-square min-h-[120px] w-full place-items-center rounded-tile border border-line bg-paper p-2 transition-[opacity,filter] duration-300 short:min-h-0",
                 question.promptImage && "tight:min-h-[112px]",
-                won && "ring-4 ring-sun outline-8 outline-sun/30",
+                won && "border-sun ring-4 ring-sun",
                 faded && "bg-paper-2 opacity-40 grayscale",
                 wobbling === option.id && "animate-wobble",
                 // The hint after two misses; a steady gold outline when motion is reduced.

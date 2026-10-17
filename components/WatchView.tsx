@@ -200,13 +200,13 @@ export function WatchView({ episode, seasons }: { episode: EpisodeView; seasons:
         <div
           aria-hidden={!showVideo}
           className={clsx(
-            "mx-auto max-w-[calc((100dvh-290px)*16/9+16px)] rounded-[26px] bg-paper p-2 shadow-e2 inset-inset-shadow-rim",
-            "short:max-w-[calc((100dvh-100px)*16/9)] short:rounded-none short:bg-transparent short:p-0 short:shadow-none",
+            "mx-auto max-w-[calc((100dvh-290px)*16/9+16px)] rounded-hero border border-line bg-paper p-2 shadow-e2",
+            "short:max-w-[calc((100dvh-100px)*16/9)] short:rounded-none short:border-0 short:bg-transparent short:p-0 short:shadow-none",
             // Hidden, the insets set the width (with w-full too, it would stick out and scroll sideways).
             showVideo ? "relative w-full" : "pointer-events-none invisible absolute inset-x-3 top-0",
           )}
         >
-          <div className="relative aspect-video overflow-hidden rounded-[18px] bg-black short:rounded-none">
+          <div className="relative aspect-video overflow-hidden rounded-[20px] bg-black short:rounded-none">
             <img
               src={episode.thumbnail}
               alt=""
@@ -268,8 +268,8 @@ function StoryCaption({ number, title }: { number: number; title: string }) {
   const t = useT();
   return (
     <div aria-hidden className="mx-auto mt-3 max-w-2xl text-center short:hidden">
-      <p className="text-[11px] font-black uppercase tracking-[0.08em] text-ink-2">{t("episodeN", { n: number })}</p>
-      <p className="line-clamp-1 font-display text-[22px] font-black leading-tight text-ink">{title}</p>
+      <p className="eyebrow text-brand">{t("episodeN", { n: number })}</p>
+      <p className="mt-0.5 line-clamp-1 font-display text-[22px] font-black leading-tight text-ink">{title}</p>
     </div>
   );
 }

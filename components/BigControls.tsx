@@ -17,7 +17,7 @@ type Props = {
 /** Our own chunky controls, always below the video, never on top of it. */
 export function BigControls({ ready, playing, needsTap, onHome, onTogglePlay, onReplay }: Props) {
   const t = useT();
-  const side = "press press-paper grid size-16 shrink-0 place-items-center rounded-full bg-paper text-ink disabled:opacity-50";
+  const side = "press press-paper grid size-16 shrink-0 place-items-center rounded-full border border-line bg-paper text-brand disabled:opacity-50";
   return (
     <div className="mx-auto flex w-full max-w-md items-center justify-center gap-7 px-4 pb-4 pt-4 short:py-2">
       <button type="button" onClick={onHome} aria-label={t("home")} className={side}>

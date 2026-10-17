@@ -23,7 +23,7 @@ import { StarBurst } from "./StarBurst";
 type Phase = { kind: "intro" } | { kind: "question"; index: number } | { kind: "done"; stars: Stars; newSticker: boolean };
 
 const bigButton =
-  "press inline-flex min-h-16 items-center justify-center gap-3 rounded-full px-8 font-display text-[22px] font-bold";
+  "press inline-flex min-h-16 items-center justify-center gap-3 rounded-full px-8 font-display text-[22px] font-black";
 
 export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView; seasons: SeasonCard[] }) {
   const t = useT();
@@ -86,7 +86,7 @@ export function ChallengeFlow({ challenge, seasons }: { challenge: ChallengeView
           <Mascot pose="wave" className="absolute -bottom-2 -left-6 w-20 motion-safe:animate-float" />
         </div>
         <div className="flex flex-col items-center gap-5">
-          <h1 className="font-display text-[40px] font-black leading-tight text-ink">{t("letsPlay")}</h1>
+          <h1 className="font-display text-[40px] font-black leading-[1.05] text-ink">{t("letsPlay")}</h1>
           <button
             type="button"
             onClick={start}
@@ -135,7 +135,7 @@ function ProgressDots({ current, total, results }: { current: number; total: num
   const t = useT();
   return (
     <div
-      className="flex items-center justify-center gap-2.5 rounded-full bg-paper px-4 py-2 shadow-e1"
+      className="flex items-center justify-center gap-2.5 rounded-full border border-line bg-paper px-4 py-2 shadow-e1"
       role="img"
       aria-label={t("questionNofM", { n: current + 1, m: total })}
     >
@@ -176,7 +176,7 @@ function ChallengeDone({
 
   return (
     <section className="mx-auto flex max-w-xl flex-col items-center px-4 py-2 text-center">
-      <h1 className="font-display text-[36px] font-black text-ink">{t("wellDone")}</h1>
+      <h1 className="font-display text-[36px] font-black leading-tight text-ink">{t("wellDone")}</h1>
 
       <div className="mt-2 flex items-end gap-2" role="img" aria-label={t("starsN", { n: stars })}>
         {[1, 2, 3].map((i) => (
@@ -210,7 +210,7 @@ function ChallengeDone({
         />
       </div>
       {newSticker && (
-        <p className="mt-1 animate-fade-in font-display text-2xl font-bold text-play-ink [animation-delay:900ms]">
+        <p className="mt-2 animate-fade-in rounded-full bg-sun px-4 py-1 font-display text-xl font-black text-sun-ink [animation-delay:900ms]">
           {t("newSticker")}
         </p>
       )}
@@ -223,7 +223,7 @@ function ChallengeDone({
             <ChevronRight className="size-8" strokeWidth={3} aria-hidden />
           </Link>
         )}
-        <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper bg-paper text-ink")}>
+        <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper border border-line bg-paper text-brand")}>
           <House className="size-8" strokeWidth={2.5} aria-hidden />
           {t("home")}
         </Link>
@@ -241,11 +241,11 @@ function LockedChallenge({ challenge, seasons }: { challenge: ChallengeView; sea
 
   return (
     <section className="mx-auto flex max-w-xl flex-col items-center gap-4 px-4 py-4 text-center">
-      <span className="relative grid size-28 place-items-center rounded-full bg-berry-soft shadow-e2">
+      <span className="relative grid size-28 place-items-center rounded-full border border-line bg-brand-soft shadow-e2">
         <img src="/images/ui/gift.svg" alt="" width={72} height={72} className="size-[68%]" />
         <LockMark className="absolute -right-1 -top-1" />
       </span>
-      <h1 className="font-display text-[32px] font-black leading-tight text-ink">{t("watchFirst")}</h1>
+      <h1 className="font-display text-[30px] font-black leading-tight text-ink">{t("watchFirst")}</h1>
       <ul className="grid w-full grid-cols-2 gap-3">
         {items.map((item) => {
           const status = itemStatus(item, learning);
@@ -256,7 +256,7 @@ function LockedChallenge({ challenge, seasons }: { challenge: ChallengeView; sea
           ) : null;
         })}
       </ul>
-      <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper mt-2 bg-paper text-ink")}>
+      <Link href="/" onClick={playPop} className={clsx(bigButton, "press-paper mt-2 border border-line bg-paper text-brand")}>
         <House className="size-8" strokeWidth={2.5} aria-hidden />
         {t("home")}
       </Link>

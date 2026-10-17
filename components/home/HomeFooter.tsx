@@ -16,8 +16,8 @@ export function HomeFooter() {
   return (
     <footer className="mt-12">
       <Scene name="home-hills" className="block" imgClassName="block h-28 w-full object-cover object-bottom md:h-40" />
-      <div className="border-t border-line bg-paper px-4 pb-[max(2rem,env(safe-area-inset-bottom))] pt-8 md:px-8">
-        <div className="mx-auto max-w-6xl">
+      <div className="border-t border-line bg-paper pb-[max(2rem,env(safe-area-inset-bottom))] pt-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-sm">
               <img src="/brand/lockup.svg" alt={brand.name} width={234} height={80} className="h-20 w-auto" />

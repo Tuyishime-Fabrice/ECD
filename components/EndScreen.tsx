@@ -14,13 +14,13 @@ export function HomeActivityCard({ text }: { text: LocalizedText }) {
   const t = useT();
   const pick = usePick();
   return (
-    <div className="flex gap-4 rounded-card bg-paper p-4 text-left shadow-e2 inset-shadow-rim sm:p-5">
-      <span className="grid size-14 shrink-0 place-items-center rounded-full bg-leaf-soft">
-        <House className="size-8 text-leaf-ink" strokeWidth={2.5} aria-hidden />
+    <div className="flex gap-4 rounded-card border border-line bg-paper p-4 text-left shadow-e2 sm:p-5">
+      <span className="grid size-14 shrink-0 place-items-center rounded-2xl bg-brand-soft">
+        <House className="size-7 text-brand" strokeWidth={2.5} aria-hidden />
       </span>
-      <div>
-        <h3 className="font-display text-2xl font-bold text-leaf-ink">{t("doItAtHome")}</h3>
-        <p className="mt-1 text-lg leading-relaxed text-ink">{pick(text)}</p>
+      <div className="min-w-0">
+        <h3 className="font-display text-[22px] font-black leading-tight text-brand">{t("doItAtHome")}</h3>
+        <p className="mt-1.5 text-lg leading-relaxed text-ink">{pick(text)}</p>
       </div>
     </div>
   );
@@ -41,14 +41,14 @@ export function EndScreen({ homeActivity, next, onWatchAgain }: Props) {
     playCheer();
   }, []);
 
-  const round = "press press-paper grid size-16 shrink-0 place-items-center rounded-full bg-paper text-ink";
+  const round = "press press-paper grid size-16 shrink-0 place-items-center rounded-full border border-line bg-paper text-brand";
 
   return (
     <section className="mx-auto w-full max-w-2xl animate-fade-in px-4 pb-6">
       <div className="relative flex items-center justify-center gap-3 py-2">
         <StarBurst />
         <Mascot pose="cheer" className="w-24 short:w-16" />
-        <h2 className="font-display text-[36px] font-black text-ink">{t("wellDone")}</h2>
+        <h2 className="font-display text-[34px] font-black leading-tight text-ink">{t("wellDone")}</h2>
       </div>
 
       <HomeActivityCard text={homeActivity} />
@@ -69,11 +69,11 @@ export function EndScreen({ homeActivity, next, onWatchAgain }: Props) {
               className="aspect-video w-32 shrink-0 rounded-full object-cover"
             />
           ) : (
-            <span className="grid aspect-video w-32 shrink-0 place-items-center rounded-full bg-berry-soft">
+            <span className="grid aspect-video w-32 shrink-0 place-items-center rounded-full bg-brand-soft">
               <img src="/images/ui/gift.svg" alt="" width={56} height={56} className="h-[80%] w-auto" />
             </span>
           )}
-          <span className="min-w-0 flex-1 font-display text-[26px] font-bold leading-tight">
+          <span className="min-w-0 flex-1 font-display text-[24px] font-black leading-tight">
             {next.type === "challenge" ? t("challenge") : t("nextEpisode")}
           </span>
           <ChevronRight className="size-9 shrink-0" strokeWidth={3} aria-hidden />
