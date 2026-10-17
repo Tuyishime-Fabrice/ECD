@@ -39,7 +39,7 @@ export function FeaturedBanner({ seasons }: { seasons: SeasonCard[] }) {
           <span className="max-w-[12ch] font-display text-[26px] font-black leading-[1.05] tracking-[-0.01em] text-ink min-[400px]:text-[28px] md:max-w-none md:text-[40px]">
             {t("storyPath")}
           </span>
-          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start whitespace-nowrap rounded-full bg-play pl-4 pr-5 font-display text-[17px] font-black text-on-accent md:pl-5 md:pr-6 md:text-lg">
+          <span className="press press-play mt-2 inline-flex h-16 items-center gap-2 self-start whitespace-nowrap rounded-full bg-play pl-4 pr-5 font-display text-[19px] font-black text-on-accent md:pl-5 md:pr-6 md:text-xl">
             <MapIcon className="size-6" strokeWidth={2.5} aria-hidden />
             {t("openPath")}
           </span>

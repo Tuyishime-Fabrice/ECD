@@ -202,7 +202,7 @@ function HeroSlide({ slide, index, count, eager }: { slide: Slide; index: number
             </span>
           )}
           {/* Every slide keeps room for two lines and a progress bar, so all have the same height. */}
-          <span className="line-clamp-2 min-h-[2.2em] font-display text-[22px] font-black leading-[1.1] tracking-[-0.01em] text-ink min-[400px]:text-[24px] md:line-clamp-3 md:min-h-0 md:text-[34px] lg:text-[44px]">
+          <span className="line-clamp-2 min-h-[2.3em] font-display text-[22px] font-black leading-[1.15] tracking-[-0.01em] text-ink min-[400px]:text-[24px] md:line-clamp-3 md:min-h-0 md:text-[34px] lg:text-[44px]">
             {title}
           </span>
           <span className="hidden truncate text-base font-bold text-ink-2 md:block">{meta}</span>
