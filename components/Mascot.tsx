@@ -3,7 +3,7 @@ import { useId } from "react";
 
 /*
  * Izuba, the sun mascot and story guide, drawn inline so it can move. Mustard with coral
- * cheeks and a teal-brown outline, in the ECD Imuhira palette. The shapes mirror
+ * cheeks and a teal-brown outline, in the CED Imuhira palette. The shapes mirror
  * scripts/art/mascot.mjs, which draws Izuba into the SVG files (empty states, time's-up
  * scenes): change both together. Mascot.test.tsx checks that they match.
  */

@@ -7,7 +7,7 @@
  */
 export const brand = {
   /** Shown in the browser tab, the installed-app name and the parent area. */
-  name: "ECD Imuhira",
+  name: "CED Imuhira",
   /** Short name under the home-screen icon (max ~12 characters). */
   shortName: "Imuhira",
   /** The logo's tagline. */
@@ -17,8 +17,8 @@ export const brand = {
   },
   /** One line for search results and the install prompt. */
   description: "Educative story videos for children aged 3–6, at home.",
-  /** The logo mark alone (house, play button, open book): favicon and small places. */
-  logo: "/brand/mark.svg",
+  /** The logo mark alone (house, play button, open book), cut from the official logo: favicon. */
+  logo: "/brand/mark.png",
   /** Brand colors from the logo. The app's light/dark tokens live in app/globals.css. */
   colors: { teal: "#124C4A", coral: "#EC775F", mustard: "#F2B83F", cream: "#FCEFD5", sage: "#BDCDCD" },
   /** Browser/OS chrome color: the logo's teal. */

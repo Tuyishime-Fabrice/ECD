@@ -1,10 +1,11 @@
-<p align="center"><img src="public/brand/lockup.svg" alt="ECD Imuhira: learn, play, grow" width="420"></p>
+<p align="center"><img src="public/brand/logo.webp" alt="CED Imuhira: learn, play, grow" width="420"></p>
 
-# ECD Imuhira: educational story videos for children aged 3–6
+# CED Imuhira: educational story videos for children aged 3–6
 
 **Imuhira** is Kinyarwanda for "home": early childhood development (ECD) through stories a
 family watches together. The name, tagline and logo colors live in one place, `lib/brand.ts`; the
-logo files are drawn by `scripts/brand/build-logo.mjs`.
+official logo is `scripts/brand/official-logo.webp`, prepared for the app by
+`scripts/brand/prepare-logo.py`.
 
 Children in Rwanda learn from short animated **stories**, each with a lesson, played in
 a set order and grouped into **collections**. After every 4 stories the child plays a
@@ -16,7 +17,7 @@ team manages everything from an **admin dashboard**, with no coding.
   **only on their device**.
 - **Built for real conditions:** works on cheap Android phones, installs as an app and
   opens offline. Stories still need the internet.
-- **ECD Imuhira design:** the logo's teal, coral, mustard and cream over an illustrated
+- **CED Imuhira design:** the logo's teal, coral, mustard and cream over an illustrated
   Rwandan landscape, set in Lato. Light mode is a soft morning; dark mode is a deep teal night.
   The app follows the phone's light/dark setting.
 - **Languages:** Kinyarwanda first, with English as the fallback.
@@ -56,7 +57,7 @@ The dashboard saves your changes into this GitHub repository, so it needs two ke
 
 1. **Make a GitHub key.** Signed in as **Tuyishime-Fabrice**, open
    [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new).
-   - **Token name:** `ECD Imuhira admin`.
+   - **Token name:** `CED Imuhira admin`.
    - **Expiration:** 1 year. Put a reminder in your calendar to make a new one.
    - **Repository access:** *Only select repositories* → **ECD**.
    - **Permissions → Repository permissions → Contents:** *Read and write*.
@@ -253,8 +254,8 @@ docs/         DESIGN.md (the design system), ADMIN.md (the dashboard: setup, sec
 
 ### Known placeholders
 
-- Brand: name, tagline and colors in `lib/brand.ts`; logo files in `public/brand/`, drawn by
-  `scripts/brand/build-logo.mjs`; app icons by `scripts/make-icons.mjs`.
+- Brand: name, tagline and colors in `lib/brand.ts`; logo files in `public/brand/`, cut from the
+  official logo by `scripts/brand/prepare-logo.py`; app icons by `scripts/make-icons.mjs`.
 - Every sample story plays YouTube's sample video, and the sample stories are drawn stand-ins.
 - Kinyarwanda text needs a native review.
 - Question recordings and app voice lines.

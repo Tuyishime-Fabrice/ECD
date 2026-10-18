@@ -7,7 +7,7 @@ import { brand } from "@/lib/brand";
 export default function NotFound() {
   return (
     <main className="mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-6 p-6 text-center">
-      <img src="/brand/wordmark.svg" alt={brand.name} width={140} height={40} className="mb-4 h-10 w-auto" />
+      <img src="/brand/logo-sm.webp" alt={brand.name} width={125} height={48} className="brand-logo mb-4 h-12 w-auto" />
       <Mascot pose="oops" className="w-36" />
       <p className="font-display text-[28px] font-black leading-tight text-ink">
         <T k="notFound" />

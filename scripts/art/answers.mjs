@@ -11,7 +11,7 @@ const KINDS = ["mango", "banana", "orange", "avocado"];
 // Rows per amount: small groups stay big, larger ones form tidy rows that are easy to count.
 const ROWS = { 1: [1], 2: [2], 3: [2, 1], 4: [2, 2], 5: [3, 2], 6: [3, 3], 7: [4, 3], 8: [4, 4], 9: [3, 3, 3], 10: [4, 3, 3] };
 const TILT = [-8, 6, -4, 8, -6, 4];
-// The ECD Imuhira family, in turn: teal, coral, mustard, leaf green.
+// The CED Imuhira family, in turn: teal, coral, mustard, leaf green.
 const COLORS = [
   ["#45A69D", "#1F6B65"],
   ["#F08A72", "#C4553F"],

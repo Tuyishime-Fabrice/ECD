@@ -1,7 +1,7 @@
 "use client";
 
 /**
- * Building blocks for the dashboard screens, in the ECD Imuhira brand: white cards
+ * Building blocks for the dashboard screens, in the CED Imuhira brand: white cards
  * with hairline borders on the cream ground, brand teal for actions and focus,
  * Lato (900 titles, 700 labels, 400 text), 16px text and 44px targets.
  * Coral is kept for careful (destructive) actions; red is never used.

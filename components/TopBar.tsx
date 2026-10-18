@@ -9,7 +9,7 @@ import { playPop } from "@/lib/sounds";
 import { useProgress, useT } from "@/lib/store";
 
 /**
- * The app bar on every kid screen: the ECD Imuhira wordmark (home) on the left,
+ * The app bar on every kid screen: the CED Imuhira logo (home) on the left,
  * the sticker album and the parents' lock on the right. Solid, with a hairline
  * under it, so it reads the same over every page.
  */
@@ -33,8 +33,8 @@ export function TopBar() {
           onClick={playPop}
           className="tap -ml-1 flex min-h-16 items-center rounded-2xl px-1"
         >
-          {/* The wordmark turns its teal parts cream in dark mode by itself. */}
-          <img src="/brand/wordmark.svg" alt="" width={140} height={40} className="h-10 w-auto" />
+          {/* The official logo; brand-logo gives it a white backing in dark mode. */}
+          <img src="/brand/logo-sm.webp" alt="" width={125} height={48} className="brand-logo h-12 w-auto" />
         </Link>
 
         <nav aria-label={brand.name} className="ml-auto flex items-center gap-2 sm:gap-3">

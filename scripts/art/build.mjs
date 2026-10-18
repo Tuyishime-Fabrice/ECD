@@ -8,8 +8,8 @@
  * and stickers), ui (gift, plate, sticker slot, empty states), scenes (time's up, day +
  * night), answers (counting pictures and numerals for questions).
  *
- * Colors follow the ECD Imuhira brand (BRAND, DAY and NIGHT in lib.mjs). The logo itself is
- * drawn by scripts/brand/build-logo.mjs, not here.
+ * Colors follow the CED Imuhira brand (BRAND, DAY and NIGHT in lib.mjs). The logo is the
+ * official file prepared by scripts/brand/prepare-logo.py, not drawn here.
  */
 import { buildAnswers } from "./answers.mjs";
 import { report, write } from "./lib.mjs";

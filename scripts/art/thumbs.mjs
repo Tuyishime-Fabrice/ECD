@@ -1,6 +1,6 @@
 /**
  * Story thumbnails (16:9, 640×360): each is a little scene from its story with Keza, in its
- * own soft hue from the ECD Imuhira family (cream, peach, butter, mint, sage). The top-right 100×80
+ * own soft hue from the CED Imuhira family (cream, peach, butter, mint, sage). The top-right 100×80
  * and the bottom-right 120×120 stay free of key content (status badges and the play disc sit
  * there), and key content stays inside y 44–316 so a wider hero crop keeps it. The story number
  * sits top-left on a teal tile with cream numerals.

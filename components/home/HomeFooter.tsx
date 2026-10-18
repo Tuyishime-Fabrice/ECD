@@ -20,7 +20,7 @@ export function HomeFooter() {
         <div className="mx-auto max-w-6xl px-4 md:px-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
             <div className="max-w-sm">
-              <img src="/brand/lockup.svg" alt={brand.name} width={234} height={80} className="h-20 w-auto" />
+              <img src="/brand/logo.webp" alt={brand.name} width={208} height={80} className="brand-logo h-20 w-auto" />
               {/* The logo carries the English tagline; the Kinyarwanda one sits under it. */}
               <p lang="rw" className="mt-3 font-display text-lg font-black text-brand">
                 {brand.tagline.rw}

@@ -222,7 +222,7 @@ export function toyNumeral(doc, text, { x, y, size, color, deep, ink = OUTLINE, 
 /* ---------- palettes ---------- */
 
 /**
- * ECD Imuhira brand colors (the logo): teal for UI and the bigger color fields, coral for small
+ * CED Imuhira brand colors (the logo): teal for UI and the bigger color fields, coral for small
  * warm accents, mustard for rewards and the sun, cream and sage for soft surfaces.
  */
 export const BRAND = {
