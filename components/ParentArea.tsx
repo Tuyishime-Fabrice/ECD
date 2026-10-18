@@ -60,7 +60,7 @@ function ParentHeader() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-paper">
       <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top))] md:px-8">
-        <img src="/brand/wordmark.svg" alt={brand.name} width={126} height={36} className="h-9 w-auto" />
+        <img src="/brand/logo-sm.webp" alt={brand.name} width={114} height={44} className="brand-logo h-11 w-auto" />
         <Link href="/" className={clsx(secondaryButton, "ml-auto min-h-12 px-4 text-sm sm:text-base")}>
           <ArrowLeft className="size-5 shrink-0" strokeWidth={2.5} aria-hidden />
           {t("backToChild")}
@@ -368,7 +368,7 @@ function ParentArea({ seasons, skills, contact }: { seasons: SeasonCard[]; skill
         </div>
 
         <footer className="mt-10 flex flex-col items-center gap-2 text-center">
-          <img src="/brand/lockup.svg" alt={brand.name} width={176} height={60} className="h-14 w-auto" />
+          <img src="/brand/logo.webp" alt={brand.name} width={146} height={56} className="brand-logo h-14 w-auto" />
           <p className="text-sm text-ink-3">© {brand.name}</p>
         </footer>
       </main>

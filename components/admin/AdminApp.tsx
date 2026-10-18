@@ -48,7 +48,7 @@ function Gate({ children }: { children: React.ReactNode }) {
   }
 }
 
-/** Sign-in and setup: the ECD Imuhira logo above one card in the middle of a calm cream page. */
+/** Sign-in and setup: the CED Imuhira logo above one card in the middle of a calm cream page. */
 function Frame({ children, wide }: { children: React.ReactNode; wide?: boolean }) {
   return (
     <div className="relative isolate flex min-h-dvh flex-col items-center overflow-hidden px-4 pb-10 pt-10 sm:justify-center sm:py-16">
@@ -59,7 +59,7 @@ function Frame({ children, wide }: { children: React.ReactNode; wide?: boolean }
       />
       <div className={wide ? "w-full max-w-xl" : "w-full max-w-[26rem]"}>
         <div className="mb-8 flex justify-center">
-          <img src="/brand/lockup.svg" alt={brand.name} className="h-[4.5rem] w-auto sm:h-20" width={234} height={80} />
+          <img src="/brand/logo.webp" alt={brand.name} className="brand-logo h-[4.5rem] w-auto sm:h-20" width={208} height={80} />
         </div>
         <div className="admin-sh-2 rounded-2xl border border-line bg-paper p-6 sm:p-8">{children}</div>
         <p className="mt-6 text-center text-sm text-ink-2">{brand.name} · Admin dashboard</p>

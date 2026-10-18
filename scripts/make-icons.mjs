@@ -1,5 +1,5 @@
 /**
- * Renders the PNG app icons from public/brand/mark.svg: the ECD Imuhira mark on a cream tile
+ * Renders the PNG app icons from public/brand/mark.png: the official CED Imuhira mark on a cream tile
  * (re-run after changing the logo). Needs Playwright, which is not a project
  * dependency:
  *
@@ -16,9 +16,9 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-// The light-mode colors: home screens show the icon the same way in either theme.
-const logo = readFileSync(join(root, "public/brand/mark.svg"), "utf8").replace(/<style>.*?<\/style>/, "");
-const dataUrl = `data:image/svg+xml;base64,${Buffer.from(logo).toString("base64")}`;
+// The mark cut from the official logo (scripts/brand/prepare-logo.py), placed as is.
+const logo = readFileSync(join(root, "public/brand/mark.png"));
+const dataUrl = `data:image/png;base64,${logo.toString("base64")}`;
 
 const ICONS = [
   // [file, size, logo size as share of the icon, corner radius as share (0 = full bleed)]

@@ -6,7 +6,7 @@
 @custom-variant tight (@media (orientation: portrait) and (max-height: 600px));
 
 /*
- * ECD IMUHIRA design tokens, from the logo: teal #124C4A, coral #EC775F, mustard #F2B83F,
+ * CED IMUHIRA design tokens, from the logo: teal #124C4A, coral #EC775F, mustard #F2B83F,
  * cream #FCEFD5. Light and dark follow the phone's setting.
  * Semantic colors are CSS variables (set below for each theme) exposed to Tailwind as
  * bg-paper, text-ink, bg-play… Text pairs are checked in both themes by lib/contrast.test.ts.
@@ -312,6 +312,14 @@
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
+}
+
+/* The official logo is drawn for light backgrounds; in dark mode it sits on a white backing. */
+@media (prefers-color-scheme: dark) {
+  .brand-logo {
+    background-color: #ffffff;
+    border-radius: 12px;
+  }
 }
 
 /* Soft tap feedback for cards and small round buttons. */

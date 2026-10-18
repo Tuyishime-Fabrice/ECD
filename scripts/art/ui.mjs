@@ -1,6 +1,6 @@
 /**
  * UI objects: the challenge gift (closed and open), the agaseke answer plate, the empty sticker
- * slot, the offline and 404 pictures. One file each in public/images/ui, in the ECD Imuhira
+ * slot, the offline and 404 pictures. One file each in public/images/ui, in the CED Imuhira
  * colors: a teal box with a coral ribbon and a mustard bow.
  */
 import { Doc, GLYPHS, INK, OUTLINE, f, linear, radial } from "./lib.mjs";
@@ -212,5 +212,5 @@ export function buildUi(write) {
     const { doc, body } = make();
     write(rel, { w, h, body, doc });
   }
-  // The app's logo is the ECD Imuhira mark: scripts/brand/build-logo.mjs.
+  // The app's logo is the official CED Imuhira logo: scripts/brand/prepare-logo.py.
 }

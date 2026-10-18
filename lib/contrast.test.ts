@@ -17,7 +17,7 @@ function luminance(hex: string): number {
 }
 
 /**
- * ECD Imuhira tokens: every text pair is checked in BOTH themes
+ * CED Imuhira tokens: every text pair is checked in BOTH themes
  * (day = light, night = dark), read from the theme:light / theme:dark blocks.
  */
 function themeTokens(name: "light" | "dark"): Record<string, string> {

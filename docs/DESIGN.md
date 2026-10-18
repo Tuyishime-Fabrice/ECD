@@ -1,18 +1,19 @@
-# ECD Imuhira design system
+# CED Imuhira design system
 
 The app is a **story app** for children aged 3–6 in Rwanda. Children watch short animated
 **stories** that each carry a lesson, in a set order, grouped into **collections** (in the
 code: `season`). After every 4 stories there is a picture **challenge** that wins a sticker.
 Grown-ups have a parent area (`/parents`) and an admin dashboard (`/admin`).
 
-**Brand.** ECD Imuhira ("Imuhira" is Kinyarwanda for "home"), tagline **LEARN • PLAY • GROW**
+**Brand.** CED Imuhira ("Imuhira" is Kinyarwanda for "home"), tagline **LEARN • PLAY • GROW**
 (*Iga · Kina · Kura*). The logo is a teal roof over a coral play button above an open book with
 a teal and a mustard page. Logo colors: teal `#124C4A`, coral `#EC775F`, mustard `#F2B83F`,
-cream `#FCEFD5`, sage `#BDCDCD`; typeface **Lato**. Logo files are in `public/brand/`:
-`mark.svg` (favicon, small places), `wordmark.svg` (mark + "ECD Imuhira" on one line: top
-bars) and `lockup.svg` (stacked, with the tagline: sign-in, footer, docs). Each one turns its
-teal parts cream in dark mode by itself, so a plain `<img>` works in both themes. They are
-drawn by `scripts/brand/build-logo.mjs`; the app icons by `scripts/make-icons.mjs`.
+cream `#FCEFD5`, sage `#BDCDCD`; typeface **Lato**. The official logo is
+`scripts/brand/official-logo.webp`, kept exactly as supplied; `scripts/brand/prepare-logo.py`
+crops it (transparent around the logo, artwork untouched) into `public/brand/`: `logo.webp`
+(sign-in, footer, docs), `logo-sm.webp` (top bars) and `mark.png` (favicon; the app icons come
+from it via `scripts/make-icons.mjs`). Give every logo `<img>` the `brand-logo` class: the logo
+is drawn for light backgrounds, so in dark mode it sits on a white backing.
 
 **Look.** Calm, warm and professional: few colors at once, white cards with hairline borders
 and soft teal-tinted shadows, clear Lato hierarchy, generous space. Every kid screen sits in one
@@ -119,7 +120,7 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
 ### Home: a streaming-style layout for kids (like a video site, but calm)
 
 1. **Top bar.**
-   - Left: `public/brand/wordmark.svg`, 40px tall, linking home.
+   - Left: `public/brand/logo-sm.webp`, 48px tall, linking home.
    - Right: **stickers** (a 64px mustard pill with the star and the count) and **parents** (a
      quiet 48px lock circle inside a 64px tap target).
    - Sticky, solid `ground` with a hairline bottom border. No blur.
@@ -150,7 +151,7 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
    a "Path" button.
 5. **Coming soon.** Collection posters at 80% with a "zz" badge and a gentle wiggle plus
    sound on tap. No grey locks.
-6. **Footer.** `public/brand/lockup.svg`, the tagline, a short description, "My stickers" and
+6. **Footer.** `public/brand/logo.webp`, the tagline, a short description, "My stickers" and
    "Parent area" links and a privacy line. Internal links only.
 
 ### Collection path map (`/season/[slug]`)
@@ -202,8 +203,8 @@ Semantic colors switch automatically between day and night. Use them as Tailwind
   - Background `ground`, cards `paper` with hairline `line` borders and soft shadows.
   - Primary buttons solid `brand-strong` with white text; secondary outlined; careful
     actions in warm coral, never alarm red. Accent and focus in `brand` teal.
-  - Parent area: wordmark header, "For parents" eyebrow, two columns on desktop.
-  - Admin: white sidebar with the wordmark and grouped navigation (Overview / Content /
-    Manage), page headers with the main action on the right; sign-in shows the lockup.
+  - Parent area: logo header, "For parents" eyebrow, two columns on desktop.
+  - Admin: white sidebar with the logo and grouped navigation (Overview / Content /
+    Manage), page headers with the main action on the right; sign-in shows the full logo.
 - **Tap targets:** 44px minimum for grown-ups.
 - **Dark mode** follows the system too.

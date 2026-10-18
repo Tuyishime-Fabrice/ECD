@@ -4,7 +4,7 @@ import { AppEffects } from "@/components/AppEffects";
 import { brand } from "@/lib/brand";
 import "./globals.css";
 
-// Lato, the typeface of the ECD Imuhira logo, self-hosted by Next.js (no request to Google).
+// Lato, the typeface of the CED Imuhira logo, self-hosted by Next.js (no request to Google).
 const lato = Lato({ subsets: ["latin"], weight: ["400", "700", "900"], variable: "--font-lato", display: "swap" });
 
 export const metadata: Metadata = {

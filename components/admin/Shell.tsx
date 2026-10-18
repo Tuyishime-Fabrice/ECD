@@ -60,11 +60,11 @@ function leavingTo(link: HTMLAnchorElement): string | null {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
-/** The ECD Imuhira wordmark (it turns its teal parts cream at night by itself) and an "Admin" tag. */
+/** The CED Imuhira logo (on a white backing at night, see .brand-logo) and an "Admin" tag. */
 export function BrandMark({ className }: { className?: string }) {
   return (
     <span className={clsx("flex items-center gap-2.5", className)}>
-      <img src="/brand/wordmark.svg" alt={brand.name} className="h-9 w-auto" width={126} height={36} />
+      <img src="/brand/logo-sm.webp" alt={brand.name} className="brand-logo h-11 w-auto" width={114} height={44} />
       <span className="rounded-md bg-brand-soft px-1.5 py-1 text-[11px] font-black uppercase leading-none tracking-[0.1em] text-brand">
         Admin
       </span>
