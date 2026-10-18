@@ -13,10 +13,17 @@ import { LockMark, Pips, PlayDisc, ProgressStrip, StarMarks, WatchedMark } from 
 export const itemHref = (item: { type: "episode" | "challenge"; id: string }) =>
   item.type === "episode" ? `/watch/${item.id}` : `/challenge/${item.id}`;
 
-const card =
-  "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col rounded-card bg-paper p-1.5 text-left shadow-e1 inset-shadow-rim md:w-64";
-/** The story to watch next: a sun ring and a soft halo. */
-const upNextRing = "ring-4 ring-sun outline-8 outline-sun/25";
+/** White card, hairline border, soft shadow; the picture sits flush at the top. */
+export const cardClass =
+  "tap relative flex w-[min(62vw,240px)] shrink-0 flex-col overflow-hidden rounded-card border border-line bg-paper text-left shadow-e1 md:w-64";
+/** The story to watch next: a mustard ring. */
+const upNextRing = "border-sun ring-2 ring-sun";
+/** The picture at the top of a card. */
+export const cardPicture = "relative block aspect-video overflow-hidden bg-paper-2";
+/** The words under the picture. */
+export const cardBody = "block px-3 pb-3 pt-2.5";
+/** Card titles keep room for two lines, so every card in a row is the same height. */
+export const cardTitle = "mt-1 line-clamp-2 block min-h-[2.5em] font-display text-base font-black leading-[1.25] text-ink";
 
 export function StoryCard({
   story,
@@ -41,9 +48,9 @@ export function StoryCard({
       prefetch={false}
       onClick={playPop}
       data-up-next={upNext || undefined}
-      className={clsx(card, upNext && upNextRing, className)}
+      className={clsx(cardClass, upNext && upNextRing, className)}
     >
-      <span className="relative block aspect-video overflow-hidden rounded-[18px] bg-paper-2">
+      <span className={cardPicture}>
         <img
           src={story.thumbnail}
           alt=""
@@ -56,20 +63,16 @@ export function StoryCard({
         />
         {status.watched && <WatchedMark className="absolute right-2 top-2" />}
         {upNext && <PlayDisc className="absolute bottom-2 right-2" />}
+        {/* How far the child got, along the picture's bottom edge. */}
+        {inProgress && (
+          <ProgressStrip percent={status.percent} variant="edge" className="absolute inset-x-0 bottom-0" />
+        )}
       </span>
-      {inProgress && <ProgressStrip percent={status.percent} className="mx-1.5 mt-2" />}
-      <span className="block px-2 pb-2 pt-2">
-        <span
-          className={clsx(
-            "block text-[11px] font-extrabold uppercase leading-4 tracking-[0.08em]",
-            upNext ? "text-play-ink" : "text-ink-3",
-          )}
-        >
+      <span className={cardBody}>
+        <span className={clsx("eyebrow block", upNext ? "text-play-ink" : "text-ink-3")}>
           {upNext ? t("upNext") : t("episodeN", { n: story.number })}
         </span>
-        <span className="mt-0.5 line-clamp-2 block min-h-[2.5em] font-display text-[17px] font-bold leading-[1.25] text-ink">
-          {pick(story.title)}
-        </span>
+        <span className={cardTitle}>{pick(story.title)}</span>
         {status.watched && <span className="sr-only">, {t("watched")}</span>}
       </span>
     </Link>
@@ -94,7 +97,7 @@ export function ChallengeCard({
 
   const body = (
     <>
-      <span className="relative grid aspect-video place-items-center overflow-hidden rounded-[18px] bg-berry-soft">
+      <span className={clsx(cardPicture, "grid place-items-center bg-brand-soft")}>
         <img
           src={status.done ? "/images/ui/gift-open.svg" : "/images/ui/gift.svg"}
           alt=""
@@ -102,37 +105,30 @@ export function ChallengeCard({
           height={120}
           loading="lazy"
           decoding="async"
-          className={clsx("h-[78%] w-auto", status.locked && "opacity-80")}
+          className={clsx("h-[70%] w-auto", status.locked && "opacity-80")}
         />
         {status.locked && <LockMark className="absolute right-2 top-2" />}
         {status.done && <WatchedMark className="absolute right-2 top-2" />}
         <span className="absolute inset-x-0 bottom-2 flex justify-center">
           {status.done ? (
-            <StarMarks stars={status.stars} className="rounded-full bg-paper px-2 py-1 shadow-e1" />
+            <StarMarks stars={status.stars} className="rounded-full border border-line bg-paper px-2 py-1" />
           ) : (
-            <Pips done={watched} total={challenge.requires.length} className="rounded-full bg-paper px-2.5 py-1.5 shadow-e1" />
+            <Pips done={watched} total={challenge.requires.length} className="rounded-full border border-line bg-paper px-2.5 py-1.5" />
           )}
         </span>
       </span>
-      <span className="block px-2 pb-2 pt-2">
-        <span
-          className={clsx(
-            "block text-[11px] font-extrabold uppercase leading-4 tracking-[0.08em]",
-            upNext ? "text-play-ink" : "text-berry-ink",
-          )}
-        >
+      <span className={cardBody}>
+        <span className={clsx("eyebrow block", upNext ? "text-play-ink" : "text-brand")}>
           {upNext ? t("upNext") : t("challenge")}
         </span>
-        <span className="mt-0.5 line-clamp-2 block min-h-[2.5em] font-display text-[17px] font-bold leading-[1.25] text-ink">
-          {t("challengeN", { n: challenge.number })}
-        </span>
+        <span className={cardTitle}>{t("challengeN", { n: challenge.number })}</span>
         {status.locked && <span className="sr-only">, {t("locked")}</span>}
         {status.done && <span className="sr-only">, {t("starsN", { n: status.stars })}</span>}
       </span>
     </>
   );
 
-  const className_ = clsx(card, "bg-paper", upNext && upNextRing, wiggle.className, className);
+  const className_ = clsx(cardClass, upNext && upNextRing, wiggle.className, className);
 
   if (status.locked) {
     return (

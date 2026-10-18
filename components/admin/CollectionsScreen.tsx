@@ -60,7 +60,7 @@ function CollectionRow({ season, index, count }: { season: Season; index: number
         </span>
         <span className="min-w-0">
           <span className="flex flex-wrap items-center gap-2">
-            <span className="font-display text-lg font-bold leading-tight text-ink group-hover:underline">{title}</span>
+            <span className="font-display text-lg font-black leading-tight text-ink group-hover:underline">{title}</span>
           </span>
           {season.title.rw && (
             <span lang="rw" className="mt-0.5 block truncate text-sm text-ink-2">
@@ -90,7 +90,7 @@ function CollectionRow({ season, index, count }: { season: Season; index: number
         />
         <Link
           href={href}
-          className="ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 font-display text-[15px] font-semibold text-ink-2 hover:bg-ink/[0.06] hover:text-ink"
+          className="ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-3 text-[15px] font-bold text-ink-2 hover:bg-paper-2 hover:text-brand"
         >
           <Pencil className="size-[18px]" {...ICON} />
           Edit<span className="sr-only"> {title}</span>

@@ -1,12 +1,7 @@
 import clsx from "clsx";
 
-const COLORS = [
-  "var(--c-sun)",
-  "var(--c-listen)",
-  "var(--c-coral)",
-  "var(--c-leaf)",
-  "var(--c-berry)",
-];
+// Brand colors only: mustard stars with a little coral and teal.
+const COLORS = ["var(--c-sun)", "var(--c-coral)", "var(--c-sun)", "var(--c-listen)"];
 
 // Fixed layout (no randomness) so server and client render the same thing.
 const PIECES = Array.from({ length: 14 }, (_, i) => {

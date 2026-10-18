@@ -1,47 +1,51 @@
 "use client";
 
-import { Lock, Star } from "lucide-react";
+import { Lock, ShieldCheck, Star } from "lucide-react";
 import Link from "next/link";
 import { brand } from "@/lib/brand";
 import { playPop } from "@/lib/sounds";
-import { useLang, useT } from "@/lib/store";
+import { useT } from "@/lib/store";
 import { Scene } from "../kid/Scene";
+
+const pill =
+  "tap inline-flex min-h-12 items-center gap-2 rounded-full border border-line bg-paper px-4 text-base font-bold text-ink shadow-e1";
 
 /** The bottom of Home: a strip of hills, then the brand and grown-up links. Internal links only. */
 export function HomeFooter() {
   const t = useT();
-  const lang = useLang();
   return (
-    <footer className="mt-10">
+    <footer className="mt-12">
       <Scene name="home-hills" className="block" imgClassName="block h-28 w-full object-cover object-bottom md:h-40" />
-      <div className="bg-paper-2 px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-6 md:px-8">
-        <div className="mx-auto flex max-w-6xl flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center gap-3">
-            <img src={brand.logo} alt="" width={44} height={44} className="size-11" />
-            <div>
-              <p className="font-display text-2xl font-extrabold leading-none text-ink">{brand.name}</p>
-              <p className="mt-1 text-sm text-ink-2">{brand.tagline[lang]}</p>
+      <div className="border-t border-line bg-paper pb-[max(2rem,env(safe-area-inset-bottom))] pt-8">
+        <div className="mx-auto max-w-6xl px-4 md:px-8">
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="max-w-sm">
+              <img src="/brand/lockup.svg" alt={brand.name} width={234} height={80} className="h-20 w-auto" />
+              {/* The logo carries the English tagline; the Kinyarwanda one sits under it. */}
+              <p lang="rw" className="mt-3 font-display text-lg font-black text-brand">
+                {brand.tagline.rw}
+              </p>
+              <p className="mt-1 text-base leading-relaxed text-ink-2">{t("footerAbout")}</p>
             </div>
+            <nav className="flex flex-wrap gap-3" aria-label={t("footerLinks")}>
+              <Link href="/stickers" onClick={playPop} className={pill}>
+                <Star className="size-5 fill-sun text-sun-lip" strokeWidth={2.25} aria-hidden />
+                {t("myStickers")}
+              </Link>
+              <Link href="/parents" className={pill}>
+                <Lock className="size-5 text-brand" strokeWidth={2.5} aria-hidden />
+                {t("parentArea")}
+              </Link>
+            </nav>
           </div>
-          <nav className="flex flex-wrap gap-3" aria-label={brand.name}>
-            <Link
-              href="/stickers"
-              onClick={playPop}
-              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-semibold text-ink shadow-e1"
-            >
-              <Star className="size-5 fill-sun text-sun-lip" strokeWidth={2.5} aria-hidden />
-              {t("myStickers")}
-            </Link>
-            <Link
-              href="/parents"
-              className="tap inline-flex min-h-12 items-center gap-2 rounded-full bg-paper px-4 font-semibold text-ink shadow-e1"
-            >
-              <Lock className="size-5 text-ink-2" strokeWidth={2.5} aria-hidden />
-              {t("parents")}
-            </Link>
-          </nav>
+          <div className="mt-8 flex flex-col gap-2 border-t border-line pt-5 text-sm text-ink-3 sm:flex-row sm:items-center sm:justify-between">
+            <p>© {brand.name}</p>
+            <p className="flex items-center gap-1.5">
+              <ShieldCheck className="size-4 shrink-0 text-brand" strokeWidth={2.5} aria-hidden />
+              {t("footerPrivacy")}
+            </p>
+          </div>
         </div>
-        <p className="mx-auto mt-6 max-w-6xl text-xs text-ink-3">© {brand.name}</p>
       </div>
     </footer>
   );

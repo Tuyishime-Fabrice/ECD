@@ -29,17 +29,18 @@ import { brand } from "@/lib/brand";
 import { targetHref } from "@/lib/admin/ui-issues";
 import { useAdmin, type NewFormKind } from "./AdminProvider";
 import { focusField } from "./editing";
-import { Alert, Button, ButtonLink, ConfirmDialog, Dialog, ICON, IconButton } from "./ui";
+import { Alert, Button, ButtonLink, ConfirmDialog, Dialog, ICON, IconButton, buttonClass } from "./ui";
 
 const NAV = [
-  { href: "/admin", label: "Overview", icon: LayoutDashboard },
-  { href: "/admin/stories", label: "Stories", icon: Clapperboard },
-  { href: "/admin/challenges", label: "Challenges", icon: Gift },
-  { href: "/admin/collections", label: "Collections", icon: Library },
-  { href: "/admin/settings", label: "Settings", icon: Settings },
-  { href: "/admin/history", label: "History", icon: History },
-  { href: "/admin/help", label: "Help", icon: LifeBuoy },
+  { href: "/admin", label: "Overview", icon: LayoutDashboard, group: "" },
+  { href: "/admin/stories", label: "Stories", icon: Clapperboard, group: "Content" },
+  { href: "/admin/challenges", label: "Challenges", icon: Gift, group: "Content" },
+  { href: "/admin/collections", label: "Collections", icon: Library, group: "Content" },
+  { href: "/admin/settings", label: "Settings", icon: Settings, group: "Manage" },
+  { href: "/admin/history", label: "History", icon: History, group: "Manage" },
+  { href: "/admin/help", label: "Help", icon: LifeBuoy, group: "Manage" },
 ] as const;
+const GROUPS = ["", "Content", "Manage"] as const;
 
 const isActive = (pathname: string, href: string) =>
   href === "/admin" ? pathname === "/admin" : pathname === href || pathname.startsWith(`${href}/`);
@@ -59,57 +60,64 @@ function leavingTo(link: HTMLAnchorElement): string | null {
   return `${url.pathname}${url.search}${url.hash}`;
 }
 
+/** The ECD Imuhira wordmark (it turns its teal parts cream at night by itself) and an "Admin" tag. */
 export function BrandMark({ className }: { className?: string }) {
   return (
     <span className={clsx("flex items-center gap-2.5", className)}>
-      <img src={brand.logo} alt="" className="size-8" width={32} height={32} />
-      <span className="font-display text-[21px] font-extrabold leading-none tracking-tight text-ink">{brand.name}</span>
-      <span className="rounded-md bg-listen/12 px-1.5 py-1 text-[11px] font-extrabold uppercase leading-none tracking-[0.08em] text-listen-ink">
+      <img src="/brand/wordmark.svg" alt={brand.name} className="h-9 w-auto" width={126} height={36} />
+      <span className="rounded-md bg-brand-soft px-1.5 py-1 text-[11px] font-black uppercase leading-none tracking-[0.1em] text-brand">
         Admin
       </span>
     </span>
   );
 }
 
+const navItem =
+  "group relative flex min-h-11 w-full items-center gap-3 rounded-[10px] px-3 text-left text-[15px] font-bold transition-colors";
+
 function NavList({ onNavigate }: { onNavigate?: () => void }) {
   const pathname = usePathname();
   return (
-    <ul className="space-y-0.5">
-      {NAV.map(({ href, label, icon: Icon }) => {
-        const active = isActive(pathname, href);
-        return (
-          <li key={href}>
-            <Link
-              href={href}
-              onClick={onNavigate}
-              aria-current={active ? "page" : undefined}
-              className={clsx(
-                "group flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px] font-semibold transition-colors",
-                active ? "bg-listen/12 font-bold text-listen-ink" : "text-ink-2 hover:bg-ink/[0.05] hover:text-ink",
-              )}
-            >
-              <Icon
-                className={clsx("size-5 shrink-0", active ? "text-listen-ink" : "text-ink-3 group-hover:text-ink-2")}
-                {...ICON}
-              />
-              {label}
-            </Link>
-          </li>
-        );
-      })}
-    </ul>
+    <div className="space-y-5">
+      {GROUPS.map((group) => (
+        <div key={group}>
+          {group && <p className="mb-1.5 px-3 text-[11px] font-black uppercase tracking-[0.12em] text-ink-3">{group}</p>}
+          <ul className="space-y-0.5">
+            {NAV.filter((n) => n.group === group).map(({ href, label, icon: Icon }) => {
+              const active = isActive(pathname, href);
+              return (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    onClick={onNavigate}
+                    aria-current={active ? "page" : undefined}
+                    className={clsx(
+                      navItem,
+                      active
+                        ? "bg-brand-soft text-brand before:absolute before:inset-y-2.5 before:left-0 before:w-[3px] before:rounded-r-full before:bg-brand"
+                        : "text-ink-2 hover:bg-paper-2 hover:text-ink",
+                    )}
+                  >
+                    <Icon
+                      className={clsx("size-5 shrink-0", active ? "text-brand" : "text-ink-3 group-hover:text-ink-2")}
+                      {...ICON}
+                    />
+                    {label}
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
   );
 }
 
 function SidebarFooter({ onSignOut }: { onSignOut: () => void }) {
   return (
     <div className="space-y-0.5 border-t border-line pt-3">
-      <a
-        href="/"
-        target="_blank"
-        rel="noopener"
-        className="flex min-h-11 items-center gap-3 rounded-xl px-3 text-[15px] font-semibold text-ink-2 hover:bg-ink/[0.05] hover:text-ink"
-      >
+      <a href="/" target="_blank" rel="noopener" className={clsx(navItem, "text-ink-2 hover:bg-paper-2 hover:text-ink")}>
         <ExternalLink className="size-5 text-ink-3" {...ICON} />
         Open the app
         <span className="sr-only">(opens in a new tab)</span>
@@ -117,7 +125,7 @@ function SidebarFooter({ onSignOut }: { onSignOut: () => void }) {
       <button
         type="button"
         onClick={onSignOut}
-        className="flex min-h-11 w-full items-center gap-3 rounded-xl px-3 text-left text-[15px] font-semibold text-ink-2 hover:bg-ink/[0.05] hover:text-ink"
+        className={clsx(navItem, "text-ink-2 hover:bg-paper-2 hover:text-ink")}
       >
         <LogOut className="size-5 text-ink-3" {...ICON} />
         Sign out
@@ -132,7 +140,7 @@ export function LiveChip({ className, announce = true }: { className?: string; a
   let chip: React.ReactNode = null;
   if (saving) {
     chip = (
-      <span className="inline-flex items-center gap-1.5 rounded-full bg-paper px-3 py-1.5 text-[13px] font-bold text-ink-2 ring-1 ring-inset ring-line">
+      <span className="inline-flex items-center gap-1.5 rounded-full bg-paper-2 px-3 py-1.5 text-[13px] font-bold text-ink-2 ring-1 ring-inset ring-line">
         <LoaderCircle className="size-3.5 animate-spin" {...ICON} />
         Saving…
       </span>
@@ -155,10 +163,10 @@ export function LiveChip({ className, announce = true }: { className?: string; a
     chip = (
       <span
         title="Everything you saved is live in the app."
-        className="inline-flex items-center gap-1.5 rounded-full bg-leaf-soft px-3 py-1.5 text-[13px] font-bold text-leaf-ink"
+        className="inline-flex items-center gap-1.5 rounded-full bg-leaf-soft px-3 py-1.5 text-[13px] font-bold text-leaf-ink ring-1 ring-inset ring-leaf/20"
       >
-        Live
         <CircleCheck className="size-3.5" strokeWidth={2.5} aria-hidden />
+        Live
       </span>
     );
   }
@@ -180,13 +188,16 @@ function SaveBar() {
         <div
           role="region"
           aria-label="Unsaved changes"
-          // Dark brown in day mode; at night a lit paper bar, since a cream one would glare.
-          className="pointer-events-auto mx-auto flex max-w-3xl items-center gap-3 rounded-2xl bg-ink py-2.5 pl-4 pr-2.5 text-paper shadow-e2 sm:gap-4 sm:py-3 sm:pl-5 dark:bg-paper dark:text-ink dark:ring-1 dark:ring-listen/40"
+          // Brand teal by day and at night, with a white Save button: hard to miss, calm to look at.
+          className="admin-sh-3 pointer-events-auto mx-auto flex max-w-3xl items-center gap-3 rounded-2xl bg-brand-strong py-2.5 pl-4 pr-2.5 text-on-accent ring-1 ring-black/5 sm:gap-4 sm:py-3 sm:pl-5 dark:ring-white/10"
         >
           <div className="flex min-w-0 flex-1 items-center gap-3">
-            <span className="hidden size-2.5 shrink-0 rounded-full bg-sun sm:block" aria-hidden />
+            <span className="relative hidden size-2.5 shrink-0 sm:flex" aria-hidden>
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-sun opacity-50" />
+              <span className="relative inline-flex size-2.5 rounded-full bg-sun" />
+            </span>
             <div className="min-w-0">
-              <p className="font-display text-base font-bold leading-tight">
+              <p className="font-display text-base font-black leading-tight">
                 {saving ?? (
                   <>
                     <span className="sm:hidden">Unsaved changes</span>
@@ -199,13 +210,13 @@ function SaveBar() {
                   <button
                     type="button"
                     onClick={() => setProblemsOpen(true)}
-                    className="mt-0.5 inline-flex items-center gap-1 text-sm font-semibold text-sun underline-offset-2 hover:underline"
+                    className="mt-0.5 inline-flex items-center gap-1 text-sm font-bold text-on-accent underline decoration-sun decoration-2 underline-offset-2"
                   >
-                    <CircleAlert className="size-3.5" {...ICON} />
+                    <CircleAlert className="size-3.5 text-sun" {...ICON} />
                     {problems === 1 ? "1 thing to fix" : `${problems} things to fix`}
                   </button>
                 ) : (
-                  <p className="mt-0.5 hidden text-sm text-paper/75 sm:block dark:text-ink-2">
+                  <p className="mt-0.5 hidden text-sm text-on-accent/90 sm:block">
                     {changeCount > 1 ? `${changeCount} changes. ` : ""}Children see them after you save.
                   </p>
                 ))}
@@ -216,11 +227,11 @@ function SaveBar() {
               type="button"
               onClick={() => setConfirmDiscard(true)}
               disabled={Boolean(saving)}
-              className="min-h-11 rounded-xl px-3 font-display text-[15px] font-semibold text-paper/85 hover:bg-paper/10 hover:text-paper disabled:opacity-50 sm:px-3.5 dark:text-ink-2 dark:hover:bg-ink/10 dark:hover:text-ink"
+              className="min-h-11 rounded-[10px] px-3 text-[15px] font-bold text-on-accent/90 hover:bg-white/10 hover:text-on-accent disabled:opacity-50 sm:px-3.5"
             >
               Discard
             </button>
-            <Button variant="primary" onClick={() => void save()} loading={Boolean(saving)} className="min-w-20 sm:min-w-24">
+            <Button variant="inverse" onClick={() => void save()} loading={Boolean(saving)} className="min-w-20 sm:min-w-24">
               Save
             </Button>
           </div>
@@ -253,12 +264,12 @@ function Toasts() {
         <div
           key={t.id}
           role={t.tone === "error" ? "alert" : "status"}
-          className="pointer-events-auto flex w-full max-w-sm animate-fade-in items-start gap-3 rounded-xl border border-line bg-paper py-3 pl-4 pr-2 shadow-e2"
+          className="admin-sh-3 pointer-events-auto flex w-full max-w-sm animate-fade-in items-start gap-3 rounded-xl border border-line bg-paper py-3 pl-4 pr-2"
         >
           {t.tone === "error" ? (
             <CircleAlert className="mt-0.5 size-5 shrink-0 text-play-ink" {...ICON} />
           ) : (
-            <CircleCheck className={clsx("mt-0.5 size-5 shrink-0", t.tone === "success" ? "text-leaf-ink" : "text-listen-ink")} {...ICON} />
+            <CircleCheck className={clsx("mt-0.5 size-5 shrink-0", t.tone === "success" ? "text-leaf-ink" : "text-brand")} {...ICON} />
           )}
           <div className="min-w-0 flex-1 pt-0.5">
             <p className="text-[15px] font-bold text-ink">{t.title}</p>
@@ -268,7 +279,7 @@ function Toasts() {
             type="button"
             onClick={() => dismissToast(t.id)}
             aria-label="Dismiss"
-            className="-my-1 grid size-11 shrink-0 place-items-center rounded-lg text-ink-3 hover:bg-ink/[0.06] hover:text-ink"
+            className="-my-1 grid size-11 shrink-0 place-items-center rounded-lg text-ink-3 hover:bg-paper-2 hover:text-ink"
           >
             <X className="size-5" {...ICON} />
           </button>
@@ -453,22 +464,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
     <div className="min-h-dvh lg:pl-64">
       <a
         href="#admin-main"
-        className="sr-only z-[60] rounded-lg bg-paper px-4 py-3 font-semibold text-ink shadow-e2 focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
+        className="admin-sh-3 sr-only z-[60] rounded-lg bg-paper px-4 py-3 font-bold text-ink focus:not-sr-only focus:fixed focus:left-3 focus:top-3"
       >
         Skip to content
       </a>
 
-      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper px-3 pb-3 pt-5 lg:flex">
-        <Link href="/admin" className="mb-6 flex min-h-11 items-center rounded-xl px-3" aria-label={`${brand.name} admin home`}>
-          <BrandMark />
-        </Link>
-        <nav aria-label="Dashboard" className="flex-1 overflow-y-auto">
+      <aside className="fixed inset-y-0 left-0 z-30 hidden w-64 flex-col border-r border-line bg-paper lg:flex">
+        <div className="flex h-16 shrink-0 items-center border-b border-line px-4">
+          <Link href="/admin" className="flex min-h-11 items-center rounded-[10px] px-2" aria-label={`${brand.name} admin home`}>
+            <BrandMark />
+          </Link>
+        </div>
+        <nav aria-label="Dashboard" className="flex-1 overflow-y-auto px-3 pb-4 pt-5">
           <NavList />
         </nav>
-        <SidebarFooter onSignOut={requestSignOut} />
+        <div className="px-3 pb-3">
+          <SidebarFooter onSignOut={requestSignOut} />
+        </div>
       </aside>
 
-      <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-line bg-paper px-2 sm:px-4 lg:bg-paper-2 lg:px-8">
+      <header className="sticky top-0 z-20 flex h-16 items-center gap-2 border-b border-line bg-paper/95 px-2 backdrop-blur-sm sm:px-4 lg:px-8">
         <IconButton
           label="Open the menu"
           icon={<Menu className="size-6" {...ICON} />}
@@ -480,22 +495,26 @@ export function Shell({ children }: { children: React.ReactNode }) {
         <Link href="/admin" className="flex min-h-11 items-center lg:hidden" aria-label={`${brand.name} admin home`}>
           <BrandMark />
         </Link>
-        <p className="hidden items-center gap-2 text-[15px] font-semibold text-ink-2 lg:flex">
-          {current && <current.icon className="size-[18px] text-ink-3" {...ICON} />}
-          {current?.label}
+        <p className="hidden items-center gap-2 text-[15px] lg:flex">
+          <span className="text-ink-3">Dashboard</span>
+          {current && current.href !== "/admin" && (
+            <>
+              <span className="text-ink-3" aria-hidden>
+                /
+              </span>
+              <span className="font-bold text-ink">{current.label}</span>
+            </>
+          )}
         </p>
         <div className="ml-auto flex items-center gap-2">
           <LiveChip />
-          <a
-            href="/"
-            target="_blank"
-            rel="noopener"
-            className="hidden min-h-11 items-center gap-2 rounded-xl px-3 text-[15px] font-semibold text-ink-2 hover:bg-ink/[0.06] hover:text-ink lg:inline-flex"
-          >
-            Open the app
-            <ExternalLink className="size-4" {...ICON} />
-            <span className="sr-only">(opens in a new tab)</span>
-          </a>
+          <span className="hidden lg:block">
+            <a href="/" target="_blank" rel="noopener" className={buttonClass("secondary", "sm")}>
+              <ExternalLink className="size-4" {...ICON} />
+              Open the app
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </span>
         </div>
       </header>
 
@@ -509,13 +528,13 @@ export function Shell({ children }: { children: React.ReactNode }) {
         onClick={(e) => {
           if (e.target === e.currentTarget) setMenuOpen(false);
         }}
-        className="admin-drawer m-0 h-dvh max-h-dvh w-[min(20rem,86vw)] border-r border-line bg-paper p-0 text-ink shadow-e2 backdrop:bg-black/50 lg:hidden"
+        className="admin-drawer admin-sh-3 m-0 h-dvh max-h-dvh w-[min(20rem,86vw)] border-r border-line bg-paper p-0 text-ink lg:hidden"
       >
         {menuOpen && (
-          <div className="flex h-full flex-col px-3 pb-3 pt-3">
-            <div className="mb-4 flex items-center justify-between pl-3">
+          <div className="flex h-full flex-col px-3 pb-3">
+            <div className="-mx-3 mb-5 flex h-16 shrink-0 items-center justify-between border-b border-line pl-5 pr-2">
               <BrandMark />
-              <IconButton label="Close the menu" icon={<X className="size-7" {...ICON} />} onClick={() => setMenuOpen(false)} />
+              <IconButton label="Close the menu" icon={<X className="size-6" {...ICON} />} onClick={() => setMenuOpen(false)} />
             </div>
             <nav aria-label="Dashboard" className="flex-1 overflow-y-auto">
               <NavList onNavigate={() => setMenuOpen(false)} />
@@ -534,7 +553,7 @@ export function Shell({ children }: { children: React.ReactNode }) {
         {phase === "loading" ? (
           <div className="flex items-center justify-center gap-3 py-24 text-ink-2" role="status">
             <LoaderCircle className="size-5 animate-spin" {...ICON} />
-            <span className="font-semibold">Loading the stories…</span>
+            <span className="font-bold">Loading the stories…</span>
           </div>
         ) : (
           <>

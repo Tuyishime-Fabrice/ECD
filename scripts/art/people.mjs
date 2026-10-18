@@ -93,7 +93,7 @@ function face({ cx, cy, look = 0, mouth = "smile", hair = "#2A1810", closed = fa
 export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", closed = false, hold, front = "", sit = false }) {
   const skin = skinFill(doc, "keza");
   const ls = limbSkin("keza");
-  doc.def("kz-dress", linear("kz-dress", [[0, "#F0558E"], [1, "#C93A72"]], [0, 0, 0.3, 1]));
+  doc.def("kz-dress", linear("kz-dress", [[0, "#F07E68"], [1, "#D2594A"]], [0, 0, 0.3, 1]));
   const hair = "#2A1810";
   const [armL, armR] = ARMS[pose];
   let o = "";
@@ -136,12 +136,12 @@ export function keza(doc, { x, y, s = 1, flip = false, pose = "stand", legs = "s
   return `<g transform="${t}">${o}</g>`;
 }
 
-/** A friend: a boy (Mugisha, short hair, blue shirt) or a girl (Ineza, yellow dress, a bun). */
+/** A friend: a boy (Mugisha, short hair, teal shirt) or a girl (Ineza, mustard dress, a bun). */
 export function friend(doc, who, { x, y, s = 1, flip = false, pose = "stand", legs = "stand", look = 0, mouth = "smile", hold, front = "", sit = false }) {
   const skin = skinFill(doc, who);
   const ls = limbSkin(who);
   const boy = who === "mugisha";
-  const top = boy ? ["#4FB3EA", "#2B88C4"] : ["#FFD45A", "#F2A91C"];
+  const top = boy ? ["#3E9C95", "#24766F"] : ["#F7CB5C", "#E9A733"];
   const gid = `${who}-top`;
   doc.def(gid, linear(gid, [[0, top[0]], [1, top[1]]], [0, 0, 0.3, 1]));
   const hair = "#21130C";
@@ -150,15 +150,15 @@ export function friend(doc, who, { x, y, s = 1, flip = false, pose = "stand", le
   if (!boy) o += `<circle cx="0" cy="-168" r="13" fill="${hair}" stroke="${OUTLINE}" stroke-width="${OW}"/>`;
   if (sit) {
     o += limb([[-8, -40], [-30, -22], [-6, -12]], 14, ls) + limb([[8, -40], [30, -22], [6, -12]], 14, ls);
-    o += foot([-6, -14], 1, "#3E5C8A") + foot([6, -14], -1, "#3E5C8A");
+    o += foot([-6, -14], 1, "#34505E") + foot([6, -14], -1, "#34505E");
   } else {
     const [legL, legR] = LEGS[legs];
     o += limb(legL, 12, ls) + limb(legR, 12, ls);
-    o += foot(legL[2], -1, boy ? "#3E5C8A" : "#7A4A2A") + foot(legR[2], 1, boy ? "#3E5C8A" : "#7A4A2A");
+    o += foot(legL[2], -1, boy ? "#34505E" : "#7A4A2A") + foot(legR[2], 1, boy ? "#34505E" : "#7A4A2A");
   }
   if (boy) {
     const sy = sit ? -30 : -44;
-    o += `<path d="M-24 -66L-${sit ? 34 : 26} ${sy}H${sit ? 34 : 26}L24 -66Z" fill="#3C4F86" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/>`;
+    o += `<path d="M-24 -66L-${sit ? 34 : 26} ${sy}H${sit ? 34 : 26}L24 -66Z" fill="#34505E" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/>`;
     o += `<path d="M-15 -105C-24 -103-27-96-27-86L-26 -62C-26 -58-24 -56-20 -56H20C24 -56 26 -58 26 -62L27 -86C27 -96 24 -103 15 -105C8 -101-8 -101-15 -105Z" fill="url(#${gid})" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/>`;
     o += `<path d="M-6 -101L0 -92L6 -101" fill="none" stroke="#FFFFFF" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>`;
   } else {
@@ -193,8 +193,8 @@ export function woman(doc, who, { x, y, s = 1, flip = false, look = 0, mouth = "
   const skin = skinFill(doc, who);
   const ls = limbSkin(who);
   const gran = who === "grandma";
-  const wrap = gran ? ["#3BB3A6", "#1F8A80"] : ["#FF9A3C", "#E8701A"];
-  const cloth = gran ? ["#FFF1DA", "#F1D7AE"] : ["#7CC46A", "#4E9E48"];
+  const wrap = gran ? ["#2E8C86", "#1C6863"] : ["#F29A45", "#DE7A2A"];
+  const cloth = gran ? ["#FFF1DA", "#F1D7AE"] : ["#7DBB7F", "#4F9A63"];
   doc.def(`${who}-wrap`, linear(`${who}-wrap`, [[0, wrap[0]], [1, wrap[1]]], [0, 0, 1, 1]));
   doc.def(`${who}-cloth`, linear(`${who}-cloth`, [[0, cloth[0]], [1, cloth[1]]], [0, 0, 0.3, 1]));
   let o = "";
@@ -234,7 +234,7 @@ export function woman(doc, who, { x, y, s = 1, flip = false, look = 0, mouth = "
   o += `<g fill="${skin}" stroke="${OUTLINE}" stroke-width="${OW}"><ellipse cx="0" cy="${hy}" rx="30" ry="30"/></g>`;
   o += `<path d="M-33 ${hy - 2}C-38 ${hy - 30}-20 ${hy - 50} 2 ${hy - 50}C24 ${hy - 50} 40 ${hy - 34} 34 ${hy - 4}C30 ${hy - 14} 20 ${hy - 20} 0 ${hy - 20}C-18 ${hy - 20}-28 ${hy - 14}-33 ${hy - 2}Z" fill="url(#${who}-wrap)" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/>`;
   o += `<path d="M18 ${hy - 46}C30 ${hy - 58} 44 ${hy - 54} 42 ${hy - 40}C36 ${hy - 46} 28 ${hy - 46} 22 ${hy - 40}Z" fill="url(#${who}-wrap)" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/>`;
-  o += `<path d="M-24 ${hy - 30}C-18 ${hy - 38}-8 ${hy - 42} 4 ${hy - 42}M-26 ${hy - 20}C-16 ${hy - 28} 0 ${hy - 31} 16 ${hy - 30}" fill="none" stroke="${gran ? "#BFF0E6" : "#FFE0A8"}" stroke-width="2.6" stroke-linecap="round" opacity=".8"/>`;
+  o += `<path d="M-24 ${hy - 30}C-18 ${hy - 38}-8 ${hy - 42} 4 ${hy - 42}M-26 ${hy - 20}C-16 ${hy - 28} 0 ${hy - 31} 16 ${hy - 30}" fill="none" stroke="${gran ? "#B7E3DC" : "#FFE0A8"}" stroke-width="2.6" stroke-linecap="round" opacity=".8"/>`;
   if (gran) o += `<path d="M-31 ${hy - 4}C-32 ${hy - 10}-30 ${hy - 14}-27 ${hy - 15}M31 ${hy - 4}C32 ${hy - 10} 30 ${hy - 14} 27 ${hy - 15}" fill="none" stroke="#E8E2DA" stroke-width="3.4" stroke-linecap="round"/>`;
   o += face({ cx: 0, cy: hy + 2, look, mouth, glasses: gran, age: gran ? 0.6 : 0, hair: "#3A2418" });
   if (gran) o += `<path d="M-23 ${hy + 20}q3 3 6 3M23 ${hy + 20}q-3 3-6 3" fill="none" stroke="#5A2E16" stroke-width="1.8" stroke-linecap="round" opacity=".5"/>`;

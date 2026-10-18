@@ -55,7 +55,7 @@ function CollectionStories({ season }: { season: Season }) {
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 id={headingId} className="font-display text-lg font-bold leading-tight text-ink">
+            <h2 id={headingId} className="font-display text-lg font-black leading-tight text-ink">
               {season.title.en}
             </h2>
             {season.status === "published" ? <Badge tone="live">Live</Badge> : <Badge tone="soon">Coming soon</Badge>}
@@ -90,13 +90,13 @@ function CollectionStories({ season }: { season: Season }) {
                 <li key={item.challenge.id}>
                   <Link
                     href={`/admin/challenges/${encodeURIComponent(item.challenge.id)}`}
-                    className="flex min-h-14 items-center gap-3 bg-berry-soft/50 px-4 py-2.5 hover:bg-berry-soft sm:px-5"
+                    className="group flex min-h-14 items-center gap-3 bg-sun-soft/40 px-4 py-2.5 hover:bg-sun-soft sm:px-5 dark:bg-paper-2 dark:hover:bg-brand-soft"
                   >
-                    <span className="grid size-9 shrink-0 place-items-center rounded-lg bg-berry-soft text-berry-ink ring-1 ring-berry/30">
+                    <span className="grid size-9 shrink-0 place-items-center rounded-[10px] bg-sun text-sun-ink">
                       <Gift className="size-5" {...ICON} />
                     </span>
                     <span className="min-w-0 flex-1">
-                      <span className="block text-[15px] font-bold text-berry-ink">
+                      <span className="block text-[15px] font-bold text-ink group-hover:underline">
                         {item.challenge.title.en || `Challenge ${challengeNumber}`}
                       </span>
                       <span className="block text-sm text-ink-2">
@@ -148,8 +148,8 @@ function StoryRow({ story, number, first, last }: { story: Episode; number: numb
           className="aspect-video w-24 shrink-0 rounded-lg ring-1 ring-line sm:w-28"
         />
         <span className="min-w-0">
-          <span className="block text-xs font-extrabold uppercase tracking-[0.08em] text-ink-3 sm:hidden">Story {number}</span>
-          <span className="line-clamp-2 font-semibold leading-snug text-ink group-hover:underline sm:line-clamp-1">{title}</span>
+          <span className="block text-xs font-black uppercase tracking-[0.08em] text-ink-3 sm:hidden">Story {number}</span>
+          <span className="line-clamp-2 font-bold leading-snug text-ink group-hover:underline sm:line-clamp-1">{title}</span>
           {story.title.rw && (
             <span lang="rw" className="mt-0.5 line-clamp-1 text-sm text-ink-2">
               {story.title.rw}
@@ -190,7 +190,7 @@ function StoryRow({ story, number, first, last }: { story: Episode; number: numb
         />
         <Link
           href={href}
-          className="ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-xl px-3 font-display text-[15px] font-semibold text-ink-2 hover:bg-ink/[0.06] hover:text-ink"
+          className="ml-1 inline-flex min-h-11 items-center gap-1.5 rounded-[10px] px-3 text-[15px] font-bold text-ink-2 hover:bg-paper-2 hover:text-brand"
         >
           <Pencil className="size-[18px]" {...ICON} />
           Edit<span className="sr-only"> {title}</span>

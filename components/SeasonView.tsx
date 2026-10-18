@@ -69,10 +69,13 @@ export function SeasonView({ season, allSeasons }: { season: SeasonCard; allSeas
       </div>
 
       <header className="relative mx-auto max-w-md px-4 pt-2">
-        <div className="rounded-card bg-paper px-5 py-4 shadow-e2 inset-shadow-rim">
-          <h1 className="font-display text-[28px] font-extrabold leading-tight text-ink">{pick(season.title)}</h1>
-          <p className="mt-1 text-sm font-bold text-ink-2">{t("storiesProgress", { n: watched, m: stories.length })}</p>
-          <ProgressStrip percent={stories.length ? (watched / stories.length) * 100 : 0} className="mt-2 h-2.5" />
+        <div className="rounded-card border border-line bg-paper px-5 py-4 shadow-e2">
+          <p className="eyebrow text-brand">{t("storyPath")}</p>
+          <h1 className="mt-1 font-display text-[26px] font-black leading-tight text-ink">{pick(season.title)}</h1>
+          <div className="mt-3 flex items-center gap-3">
+            <ProgressStrip percent={stories.length ? (watched / stories.length) * 100 : 0} className="flex-1" />
+            <p className="shrink-0 text-sm font-bold text-ink-2">{t("storiesProgress", { n: watched, m: stories.length })}</p>
+          </div>
         </div>
       </header>
 
@@ -153,7 +156,7 @@ function StoryStone({ story, node }: { story: EpisodeCard; node: PathNode }) {
         {/* Stones near an edge get their title pill pulled toward the middle, so it stays on screen. */}
         <span
           className={clsx(
-            "absolute top-[calc(100%+14px)] max-w-[min(220px,calc(100vw-2rem))] truncate rounded-full bg-paper px-4 py-1.5 font-display text-base font-extrabold text-ink shadow-e1",
+            "absolute top-[calc(100%+14px)] max-w-[min(260px,calc(100vw-2rem))] truncate whitespace-nowrap rounded-full border border-line bg-paper px-4 py-1.5 font-display text-base font-black text-ink shadow-e1",
             node.x > 0.6 && "right-0",
             node.x < 0.4 && "left-0",
           )}
@@ -170,7 +173,7 @@ function StoryStone({ story, node }: { story: EpisodeCard; node: PathNode }) {
       onClick={playPop}
       aria-label={label}
       className={clsx(
-        "press relative grid size-[72px] place-items-center rounded-full font-display text-[30px] font-extrabold leading-none",
+        "press relative grid size-[72px] place-items-center rounded-full font-display text-[28px] font-black leading-none tabular-nums",
         watched ? "press-sun bg-sun text-sun-ink" : "press-paper bg-paper text-ink-3",
       )}
     >
@@ -203,12 +206,12 @@ function ChallengeStone({ challenge, node }: { challenge: ChallengeCard; node: P
     </>
   );
   const below = status.done ? (
-    <StarMarks stars={status.stars} className="absolute top-[calc(100%+12px)] rounded-full bg-paper px-2 py-1 shadow-e1" />
+    <StarMarks stars={status.stars} className="absolute top-[calc(100%+12px)] rounded-full border border-line bg-paper px-2 py-1 shadow-e1" />
   ) : (
     <Pips
       done={done}
       total={challenge.requires.length}
-      className="absolute top-[calc(100%+12px)] rounded-full bg-paper px-2.5 py-1.5 shadow-e1"
+      className="absolute top-[calc(100%+12px)] rounded-full border border-line bg-paper px-2.5 py-1.5 shadow-e1"
     />
   );
   const label = `${t("challengeN", { n: challenge.number })}${status.locked ? `, ${t("locked")}` : ""}`;

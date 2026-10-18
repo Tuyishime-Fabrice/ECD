@@ -64,10 +64,15 @@ export function ParentGate({
 
   return (
     <div className={clsx("flex flex-col items-center gap-5 text-center", className)}>
-      <h2 id={titleId} className="font-display text-2xl font-bold text-ink">
-        {t("gateTitle")}
-      </h2>
-      <p className="max-w-xs text-lg text-ink">{t("gateInstruction")}</p>
+      <div>
+        <span className="mx-auto mb-3 grid size-11 place-items-center rounded-xl bg-brand-soft text-brand">
+          <Lock className="size-5" strokeWidth={2.5} aria-hidden />
+        </span>
+        <h2 id={titleId} className="font-display text-[26px] font-black leading-tight text-ink">
+          {t("gateTitle")}
+        </h2>
+        <p className="mx-auto mt-2 max-w-xs text-base leading-relaxed text-ink-2">{t("gateInstruction")}</p>
+      </div>
       <button
         type="button"
         aria-label={t("gateInstruction")}
@@ -89,29 +94,39 @@ export function ParentGate({
         }}
         onBlur={stop}
         onContextMenu={(e) => e.preventDefault()}
-        className="relative grid size-36 touch-none select-none place-items-center rounded-full bg-paper shadow-e2 inset-shadow-rim [-webkit-touch-callout:none]"
+        className="relative grid size-36 touch-none select-none place-items-center rounded-full border border-line bg-paper shadow-e2 [-webkit-touch-callout:none]"
       >
         <svg viewBox="0 0 120 120" className="absolute inset-0 size-full -rotate-90" aria-hidden>
-          <circle cx="60" cy="60" r={R} fill="none" className="stroke-line" strokeWidth="10" />
+          <circle cx="60" cy="60" r={R} fill="none" className="stroke-brand-soft" strokeWidth="10" />
           <circle
             cx="60"
             cy="60"
             r={R}
             fill="none"
-            className="stroke-listen"
+            className="stroke-brand-strong"
             strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={CIRCUMFERENCE}
             strokeDashoffset={CIRCUMFERENCE * (1 - progress)}
           />
         </svg>
-        <Lock className="relative size-10 text-listen-ink" strokeWidth={2.5} aria-hidden />
+        <span className="relative grid size-20 place-items-center rounded-full bg-brand-soft">
+          <span className="font-display text-3xl font-black tabular-nums text-brand">
+            {progress > 0 ? Math.ceil((1 - progress) * (HOLD_MS / 1000)) : <Lock className="size-9" strokeWidth={2.5} aria-hidden />}
+          </span>
+        </span>
       </button>
-      <p className="text-base text-ink-2" aria-live="polite">
-        {progress > 0 ? `${Math.ceil((1 - progress) * (HOLD_MS / 1000))}…` : t("gateHint")}
+      <p className="text-sm text-ink-3">{t("gateHint")}</p>
+      {/* The countdown shows inside the circle; screen readers hear it here. */}
+      <p className="sr-only" aria-live="polite">
+        {progress > 0 ? `${Math.ceil((1 - progress) * (HOLD_MS / 1000))}…` : ""}
       </p>
       {onCancel && (
-        <button type="button" onClick={onCancel} className="min-h-12 rounded-full px-6 text-base font-semibold text-ink-2 underline">
+        <button
+          type="button"
+          onClick={onCancel}
+          className="tap min-h-12 rounded-full border border-line bg-paper px-6 text-base font-bold text-brand"
+        >
           {t("cancel")}
         </button>
       )}
@@ -158,7 +173,7 @@ export function ParentGateDialog({ onPass, onClose }: { onPass: () => void; onCl
         role="dialog"
         aria-modal="true"
         aria-labelledby={titleId}
-        className="w-full max-w-sm rounded-card bg-paper p-6 shadow-e2"
+        className="w-full max-w-sm rounded-hero border border-line bg-paper px-6 py-8 shadow-e2"
         onClick={(e) => e.stopPropagation()}
       >
         <ParentGate onPass={onPass} onCancel={onClose} titleId={titleId} />

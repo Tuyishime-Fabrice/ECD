@@ -1,6 +1,10 @@
-# Izuba: educational story videos for children aged 3–6
+<p align="center"><img src="public/brand/lockup.svg" alt="ECD Imuhira: learn, play, grow" width="420"></p>
 
-> **Izuba** ("sun") is a placeholder name. Change it in one place: `lib/brand.ts`.
+# ECD Imuhira: educational story videos for children aged 3–6
+
+**Imuhira** is Kinyarwanda for "home": early childhood development (ECD) through stories a
+family watches together. The name, tagline and logo colors live in one place, `lib/brand.ts`; the
+logo files are drawn by `scripts/brand/build-logo.mjs`.
 
 Children in Rwanda learn from short animated **stories**, each with a lesson, played in
 a set order and grouped into **collections**. After every 4 stories the child plays a
@@ -12,8 +16,9 @@ team manages everything from an **admin dashboard**, with no coding.
   **only on their device**.
 - **Built for real conditions:** works on cheap Android phones, installs as an app and
   opens offline. Stories still need the internet.
-- **Storybook World design:** an illustrated Rwandan landscape. By day it's a sunrise; at
-  night it's a moonlit sky. The app follows the phone's light/dark setting.
+- **ECD Imuhira design:** the logo's teal, coral, mustard and cream over an illustrated
+  Rwandan landscape, set in Lato. Light mode is a soft morning; dark mode is a deep teal night.
+  The app follows the phone's light/dark setting.
 - **Languages:** Kinyarwanda first, with English as the fallback.
 
 ---
@@ -51,7 +56,7 @@ The dashboard saves your changes into this GitHub repository, so it needs two ke
 
 1. **Make a GitHub key.** Signed in as **Tuyishime-Fabrice**, open
    [github.com/settings/personal-access-tokens/new](https://github.com/settings/personal-access-tokens/new).
-   - **Token name:** `Izuba admin`.
+   - **Token name:** `ECD Imuhira admin`.
    - **Expiration:** 1 year. Put a reminder in your calendar to make a new one.
    - **Repository access:** *Only select repositories* → **ECD**.
    - **Permissions → Repository permissions → Contents:** *Read and write*.
@@ -125,10 +130,10 @@ The app works today with sample content. Swap these in from the dashboard as the
 The app was tested in a headless browser with a stand-in for YouTube's player, because
 YouTube can't be reached from the build machine. Please check these on a real phone once:
 
-1. **Play:** on Home, tap the big orange **Play** on the first story. It plays, or the big
+1. **Play:** on Home, tap the big coral **Play** on the first story. It plays, or the big
    Play button below the video pulses; tap it.
-2. **Mid-story question:** at **0:20** the story pauses and Izuba asks a question. Tap the
-   plate with one mango. You hear a cheer, then the story continues.
+2. **Mid-story question:** at **0:20** the story pauses and Izuba, the sun guide, asks a
+   question. Tap the plate with one mango. You hear a cheer, then the story continues.
 3. **End screen:** drag YouTube's progress bar near the end. You get **Well done!**, the
    "Do it at home" card and **Next story**. Nothing plays by itself.
 4. **Progress:** back on Home, the story card has a ✓ and the slider starts with
@@ -200,7 +205,7 @@ docs/         DESIGN.md (the design system), ADMIN.md (the dashboard: setup, sec
   can also edit them by hand: follow `content/schema.ts`, and `npm run validate` explains any
   mistake in plain words.
 - **Progress** goes through the `ProgressStore` interface (`lib/progress.ts`), backed by
-  localStorage (`izuba:` keys). React reads it through `useSyncExternalStore` (`lib/store.ts`).
+  localStorage (`izuba:` keys, kept from the app's first name so nobody loses progress). React reads it through `useSyncExternalStore` (`lib/store.ts`).
 - **YouTube rules:**
   - Privacy-enhanced host (`youtube-nocookie.com`) with `rel=0`, `playsinline=1`,
     `controls=1`, `iv_load_policy=3` and `fs=1`.
@@ -248,7 +253,8 @@ docs/         DESIGN.md (the design system), ADMIN.md (the dashboard: setup, sec
 
 ### Known placeholders
 
-- Brand name "Izuba" and the logo: `lib/brand.ts` and `scripts/art/`.
+- Brand: name, tagline and colors in `lib/brand.ts`; logo files in `public/brand/`, drawn by
+  `scripts/brand/build-logo.mjs`; app icons by `scripts/make-icons.mjs`.
 - Every sample story plays YouTube's sample video, and the sample stories are drawn stand-ins.
 - Kinyarwanda text needs a native review.
 - Question recordings and app voice lines.

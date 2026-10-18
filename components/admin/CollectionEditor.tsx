@@ -139,7 +139,7 @@ export function CollectionEditor({ id }: { id: string }) {
                 {SEASON_COLORS.map((color: SeasonColor) => (
                   <label
                     key={color}
-                    className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border border-line bg-paper px-3.5 py-2.5 hover:border-ink-3/50 has-[:checked]:border-listen has-[:checked]:bg-listen/[0.07] has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-listen/30"
+                    className="flex min-h-14 cursor-pointer items-center gap-3 rounded-xl border border-line bg-paper px-3.5 py-2.5 hover:border-ink-3/50 has-[:checked]:border-brand/60 has-[:checked]:bg-brand-soft/60 has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-brand/25"
                   >
                     <input
                       type="radio"
@@ -152,11 +152,11 @@ export function CollectionEditor({ id }: { id: string }) {
                       className={clsx(
                         "size-7 shrink-0 rounded-full ring-2 ring-offset-2 ring-offset-paper",
                         COLORS[color].swatch,
-                        season.color === color ? "ring-listen" : "ring-transparent",
+                        season.color === color ? "ring-brand" : "ring-transparent",
                       )}
                       aria-hidden
                     />
-                    <span className="text-[15px] font-semibold text-ink">{COLORS[color].label}</span>
+                    <span className="text-[15px] font-bold text-ink">{COLORS[color].label}</span>
                   </label>
                 ))}
               </div>
@@ -211,7 +211,7 @@ export function CollectionEditor({ id }: { id: string }) {
               className="flex min-h-14 items-center gap-3 rounded-xl border border-line px-4 py-3 hover:bg-paper-2"
             >
               <span className="min-w-0 flex-1">
-                <span className="block font-semibold text-ink">
+                <span className="block font-bold text-ink">
                   {stories} {stories === 1 ? "story" : "stories"}
                   {challenges ? `, ${challenges} ${challenges === 1 ? "challenge" : "challenges"}` : ""}
                 </span>
@@ -282,14 +282,14 @@ function StatusOption({
   return (
     <label
       className={clsx(
-        "flex cursor-pointer gap-3 rounded-xl border px-4 py-3.5 transition-colors has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-listen/30",
-        checked ? "border-listen bg-listen/[0.07]" : "border-line bg-paper hover:border-ink-3/50",
+        "flex cursor-pointer gap-3 rounded-xl border px-4 py-3.5 transition-colors has-[:focus-visible]:ring-[3px] has-[:focus-visible]:ring-brand/25",
+        checked ? "border-brand/60 bg-brand-soft/60" : "border-line bg-paper hover:border-ink-3/50",
       )}
     >
-      <input id={id} type="radio" name="collection-status" checked={checked} onChange={onChange} className="mt-1 size-[18px] shrink-0 accent-listen-lip" />
+      <input id={id} type="radio" name="collection-status" checked={checked} onChange={onChange} className="mt-1 size-[18px] shrink-0 accent-brand-strong" />
       <span className="min-w-0">
         <span className="flex items-center gap-2 font-bold text-ink">
-          <span className={tone === "live" ? "text-leaf-ink" : "text-berry-ink"}>{icon}</span>
+          <span className={tone === "live" ? "text-leaf-ink" : "text-ink-3"}>{icon}</span>
           {title}
         </span>
         <span className="mt-0.5 block text-sm text-ink-2">{description}</span>

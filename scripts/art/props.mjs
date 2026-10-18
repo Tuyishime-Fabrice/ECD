@@ -137,7 +137,7 @@ export function hen(x, y, s = 1, flip = false, v = 0, peck = false) {
 
 /** A mango tree: flat rounded canopy over a trunk; returns the canopy box for hanging fruit. */
 export function mangoTree(doc, cx, groundY, w, { night = false, tone = 0 } = {}) {
-  const leaves = night ? ["#14453A", "#1B5646", "#24684F"] : [mix("#2E8443", "#3C7A52", tone), mix("#3F9B52", "#4F8A60", tone), mix("#5CBE6C", "#6AAE78", tone)];
+  const leaves = night ? ["#14453A", "#1B5646", "#24684F"] : [mix("#2C7652", "#3C7458", tone), mix("#378A5F", "#4C8466", tone), mix("#56AB7B", "#68A47E", tone)];
   const trunk = night ? "#3A2E2A" : "#8A5A3A";
   const h = w * 1.05;
   const top = groundY - h;
@@ -164,11 +164,11 @@ export function mat(cx, cy, w, h) {
     const half = w * (0.42 + 0.08 * u);
     stripes += `M${f(cx - half)} ${f(y)}H${f(cx + half)}`;
   }
-  return `<path d="${d}" fill="#E9C27E" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/><path d="${stripes}" stroke="#C9934A" stroke-width="3"/><path d="M${f(cx - w * 0.46)} ${f(cy)}H${f(cx + w * 0.46)}" stroke="#2BA6A0" stroke-width="5"/><path d="M${f(cx - w * 0.47)} ${f(cy + h * 0.25)}H${f(cx + w * 0.47)}" stroke="#E0457B" stroke-width="4"/>`;
+  return `<path d="${d}" fill="#E9C27E" stroke="${OUTLINE}" stroke-width="${OW}" stroke-linejoin="round"/><path d="${stripes}" stroke="#C9934A" stroke-width="3"/><path d="M${f(cx - w * 0.46)} ${f(cy)}H${f(cx + w * 0.46)}" stroke="#2A7E78" stroke-width="5"/><path d="M${f(cx - w * 0.47)} ${f(cy + h * 0.25)}H${f(cx + w * 0.47)}" stroke="#EC775F" stroke-width="4"/>`;
 }
 
 /** Market stall: a wooden table under a striped awning. Returns the table top y. */
-export function stall(doc, x0, x1, topY, groundY, colors = ["#2BA6A0", "#FFF3DE"]) {
+export function stall(doc, x0, x1, topY, groundY, colors = ["#2A7E78", "#FCEFD5"]) {
   const w = x1 - x0;
   const tableY = groundY - 70;
   let o = "";
@@ -201,5 +201,5 @@ export function ball(doc, cx, cy, r) {
 }
 
 /** A ground shadow under a figure. */
-export const shadow = (cx, cy, rx, ry = rx * 0.18, o = 0.18) => `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="#2E4A1E" opacity="${o}"/>`;
+export const shadow = (cx, cy, rx, ry = rx * 0.18, o = 0.18) => `<ellipse cx="${f(cx)}" cy="${f(cy)}" rx="${f(rx)}" ry="${f(ry)}" fill="#1F3D33" opacity="${o}"/>`;
 
